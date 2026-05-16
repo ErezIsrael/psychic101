@@ -89,6 +89,20 @@ header h1 span {
   .nav-btn:hover { background: var(--accent); color: #fff; }
 }
 
+/* ─── About Link (lightweight, no box) ─────────────────── */
+.about-link {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  transition: color 0.2s;
+}
+
+@media (hover: hover) {
+  .about-link:hover { color: var(--accent2); }
+}
+
 /* ─── Language Selector ────────────────────────────────── */
 .lang-selector {
   display: flex;
