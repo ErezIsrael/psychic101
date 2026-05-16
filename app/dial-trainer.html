@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Dial Trainer</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="dial-title">🎯 Dial Trainer</span></h1>
+  <div id="lang-selector"></div>
+</header>
+
+<main>
+
+  <!-- Welcome Screen -->
+  <div id="screen-welcome" class="screen active">
+    <div class="card">
+      <h2 data-i18n="dial-welcome">Welcome to Dial Trainer</h2>
+      <p data-i18n="dial-instruction">A pointer starts at 0 and moves randomly every half-second. Choose a target (+10 or -10), then focus your mind to influence the pointer toward it.</p>
+
+      <div class="tip-banner" id="tip-welcome">
+        <span class="tip-icon">💡</span>
+        <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+        <button class="tip-refresh" onclick="refreshTip('dial')">↻</button>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="dial-choose-target">Choose Your Target</label>
+        <div class="nav-row" style="margin-top:0.5rem">
+          <button class="cat-btn" data-value="-10" onclick="selectTarget(this)" style="color:#e74c3c">-10</button>
+          <button class="cat-btn" data-value="10" onclick="selectTarget(this)" style="color:#27ae60">+10</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-i18n="dial-duration-label">Duration (seconds)</label>
+        <div class="nav-row" style="margin-top:0.5rem">
+          <button class="cat-btn" data-value="30" onclick="selectDuration(this)">30</button>
+          <button class="cat-btn active" data-value="60" onclick="selectDuration(this)">60</button>
+          <button class="cat-btn" data-value="120" onclick="selectDuration(this)">120</button>
+          <button class="cat-btn" data-value="300" onclick="selectDuration(this)">300</button>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="startSession()" data-i18n="dial-start">▶ Start Session</button>
+      <button class="btn btn-secondary" onclick="showScreen('history')" data-i18n="dial-history">📊 History</button>
+    </div>
+  </div>
+
+  <!-- Active Session Screen -->
+  <div id="screen-active" class="screen">
+    <div class="card">
+      <h2 data-i18n="dial-focus-title">Focus on the Dial</h2>
+      <p style="text-align:center;color:var(--text-dim);margin-bottom:0.5rem">
+        <span data-i18n="dial-focus-desc">Try to influence the pointer toward</span>
+        <strong id="target-display" style="font-size:1.25rem"></strong>
+      </p>
+
+      <div class="tip-banner" id="tip-active">
+        <span class="tip-icon">💡</span>
+        <span class="tip-text" id="tip-active-text" data-i18n="loading-tip">Loading tip...</span>
+        <button class="tip-refresh" onclick="refreshTip('dial')">↻</button>
+      </div>
+
+      <!-- Dial Visualization -->
+      <div class="dial-container">
+        <canvas id="dial-canvas" width="400" height="200"></canvas>
+      </div>
+
+      <!-- Live Stats -->
+      <div class="stats-grid" style="margin:1rem 0">
+        <div class="stat-card">
+          <div class="stat-value" id="current-value">0</div>
+          <div class="stat-label" data-i18n="dial-current">Current</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="elapsed-time">0:00</div>
+          <div class="stat-label" data-i18n="dial-elapsed">Elapsed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="moves-count">0</div>
+          <div class="stat-label" data-i18n="dial-moves">Moves</div>
+        </div>
+      </div>
+
+      <!-- Direction Stats -->
+      <div style="display:flex;justify-content:space-around;margin:0.75rem 0;font-size:0.9rem">
+        <div style="text-align:center">
+          <div style="color:#e74c3c;font-weight:700;font-size:1.25rem" id="moves-toward">0</div>
+          <div style="color:var(--text-dim)" data-i18n="dial-toward">Toward</div>
+        </div>
+        <div style="text-align:center">
+          <div style="color:#f39c12;font-weight:700;font-size:1.25rem" id="moves-away">0</div>
+          <div style="color:var(--text-dim)" data-i18n="dial-away">Away</div>
+        </div>
+        <div style="text-align:center">
+          <div style="color:#3498db;font-weight:700;font-size:1.25rem" id="moves-neutral">0</div>
+          <div style="color:var(--text-dim)" data-i18n="dial-neutral">Neutral</div>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="stopSession()" data-i18n="dial-stop">⏹ Stop Session</button>
+    </div>
+  </div>
+
+  <!-- Results Screen -->
+  <div id="screen-result" class="screen">
+    <div class="card">
+      <h2 data-i18n="dial-result">Session Results</h2>
+
+      <div class="tip-banner" id="tip-result">
+        <span class="tip-icon">💡</span>
+        <span class="tip-text" id="tip-result-text" data-i18n="loading-tip">Loading tip...</span>
+        <button class="tip-refresh" onclick="refreshTip('dial')">↻</button>
+      </div>
+
+      <!-- Final Dial -->
+      <div class="dial-container">
+        <canvas id="dial-result-canvas" width="400" height="200"></canvas>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid" style="margin:1rem 0">
+        <div class="stat-card">
+          <div class="stat-value" id="res-target">0</div>
+          <div class="stat-label" data-i18n="dial-target">Target</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-final">0</div>
+          <div class="stat-label" data-i18n="dial-final">Final Position</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-diff">0</div>
+          <div class="stat-label" data-i18n="dial-difference">Difference</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin:0.5rem 0">
+        <div class="stat-card">
+          <div class="stat-value" id="res-toward">0</div>
+          <div class="stat-label" data-i18n="dial-toward">Toward</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-away">0</div>
+          <div class="stat-label" data-i18n="dial-away">Away</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-neutral">0</div>
+          <div class="stat-label" data-i18n="dial-neutral">Neutral</div>
+        </div>
+      </div>
+
+      <div class="stats-grid" style="margin:0.5rem 0">
+        <div class="stat-card">
+          <div class="stat-value" id="res-ratio">0%</div>
+          <div class="stat-label" data-i18n="dial-ratio">Toward Ratio</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-peak">0</div>
+          <div class="stat-label" data-i18n="dial-peak">Peak Position</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="res-moves">0</div>
+          <div class="stat-label" data-i18n="dial-moves">Total Moves</div>
+        </div>
+      </div>
+
+      <div id="result-verdict" style="text-align:center;font-size:1.25rem;font-weight:700;margin:1rem 0"></div>
+
+      <div class="nav-row">
+        <button class="btn btn-primary" onclick="saveSession()" data-i18n="dial-save">💾 Save Session</button>
+        <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Screen -->
+  <div id="screen-history" class="screen">
+    <div class="card">
+      <h2 data-i18n="dial-history">📊 History</h2>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="hist-sessions">0</div>
+          <div class="stat-label" data-i18n="dial-sessions">Sessions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="hist-avg-ratio">—</div>
+          <div class="stat-label" data-i18n="dial-avg-ratio">Avg Toward %</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="hist-best">—</div>
+          <div class="stat-label" data-i18n="dial-best">Best Difference</div>
+        </div>
+      </div>
+
+      <ul id="history-list" class="session-list"></ul>
+
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+
+</main>
+
+<script src="utils.js"></script>
+<script>
+// ─── State ────────────────────────────────────────────────
+let chosenTarget = null;       // +10 or -10
+let durationSeconds = 60;
+let pointerValue = 0;
+let moveInterval = null;
+let dialTimerInterval = null;
+let startTime = 0;
+let moves = [];                // array of { prev, next, direction }
+let movesToward = 0;
+let movesAway = 0;
+let movesNeutral = 0;
+let peakPosition = 0;
+let totalMoves = 0;
+
+function selectTarget(btn) {
+  document.querySelectorAll('#screen-welcome .cat-btn[data-value="-10"], #screen-welcome .cat-btn[data-value="10"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  chosenTarget = parseInt(btn.dataset.value);
+}
+
+function selectDuration(btn) {
+  document.querySelectorAll('#screen-welcome .cat-btn[data-value="30"], #screen-welcome .cat-btn[data-value="60"], #screen-welcome .cat-btn[data-value="120"], #screen-welcome .cat-btn[data-value="300"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  durationSeconds = parseInt(btn.dataset.value);
+}
+
+// ─── Dial Drawing ─────────────────────────────────────────
+function drawDial(canvasId, currentValue, targetValue) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  const cx = w / 2;
+  const cy = h / 2;
+  const barLen = w * 0.8;
+  const halfLen = barLen / 2;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Scale labels
+  ctx.fillStyle = '#888';
+  ctx.font = '12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('-10', cx - halfLen, cy + 25);
+  ctx.fillText('0', cx, cy + 25);
+  ctx.fillText('+10', cx + halfLen, cy + 25);
+
+  // Tick marks
+  ctx.strokeStyle = '#555';
+  ctx.lineWidth = 1;
+  for (let i = -10; i <= 10; i += 2) {
+    const x = cx + (i / 10) * halfLen;
+    const tickH = i % 5 === 0 ? 12 : 6;
+    ctx.beginPath();
+    ctx.moveTo(x, cy - tickH);
+    ctx.lineTo(x, cy + tickH);
+    ctx.stroke();
+    if (i % 5 === 0) {
+      ctx.fillStyle = '#aaa';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(i.toString(), x, cy - tickH - 4);
+    }
+  }
+
+  // Main bar
+  ctx.strokeStyle = '#444';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(cx - halfLen, cy);
+  ctx.lineTo(cx + halfLen, cy);
+  ctx.stroke();
+
+  // Center marker
+  ctx.fillStyle = '#666';
+  ctx.beginPath();
+  ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Target marker (dashed line)
+  if (targetValue !== undefined && targetValue !== null) {
+    const tx = cx + (targetValue / 10) * halfLen;
+    ctx.strokeStyle = '#e74c3c';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(tx, cy - 40);
+    ctx.lineTo(tx, cy + 40);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Target label
+    ctx.fillStyle = '#e74c3c';
+    ctx.font = 'bold 11px sans-serif';
+    ctx.fillText((targetValue > 0 ? '+' : '') + targetValue, tx, cy - 44);
+  }
+
+  // Current pointer (blue arrow)
+  if (currentValue !== undefined && currentValue !== null) {
+    const gx = cx + (currentValue / 10) * halfLen;
+    ctx.fillStyle = '#3498db';
+    ctx.beginPath();
+    ctx.moveTo(gx, cy + 30);
+    ctx.lineTo(gx - 8, cy + 14);
+    ctx.lineTo(gx + 8, cy + 14);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#3498db';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(gx, cy + 30);
+    ctx.lineTo(gx, cy + 4);
+    ctx.stroke();
+  }
+}
+
+// ─── Session Logic ────────────────────────────────────────
+function startSession() {
+  if (chosenTarget === null) {
+    alert(t('dial-choose-target') || 'Please choose a target first!');
+    return;
+  }
+
+  pointerValue = 0;
+  moves = [];
+  movesToward = 0;
+  movesAway = 0;
+  movesNeutral = 0;
+  peakPosition = 0;
+  totalMoves = 0;
+  startTime = Date.now();
+
+  document.getElementById('target-display').textContent = (chosenTarget > 0 ? '+' : '') + chosenTarget;
+  document.getElementById('target-display').style.color = chosenTarget > 0 ? '#27ae60' : '#e74c3c';
+
+  showScreen('active');
+  showTip('dial');
+
+  // Draw initial dial
+  drawDial('dial-canvas', 0, chosenTarget);
+  updateLiveStats();
+
+  // Pointer moves every 500ms
+  moveInterval = setInterval(() => {
+    const prev = pointerValue;
+    const delta = Math.random() < 0.5 ? -1 : +1;
+    pointerValue = Math.max(-10, Math.min(10, pointerValue + delta));
+
+    // Track direction relative to target
+    const distPrev = Math.abs(prev - chosenTarget);
+    const distNext = Math.abs(pointerValue - chosenTarget);
+    let direction;
+    if (distNext < distPrev) {
+      movesToward++;
+      direction = 'toward';
+    } else if (distNext > distPrev) {
+      movesAway++;
+      direction = 'away';
+    } else {
+      movesNeutral++;
+      direction = 'neutral';
+    }
+
+    totalMoves++;
+    moves.push({ prev, next: pointerValue, direction });
+
+    // Track peak (closest to target)
+    if (distNext < Math.abs(peakPosition - chosenTarget)) {
+      peakPosition = pointerValue;
+    }
+
+    drawDial('dial-canvas', pointerValue, chosenTarget);
+    updateLiveStats();
+  }, 500);
+
+  // Countdown timer
+  dialTimerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const remaining = durationSeconds - elapsed;
+    if (remaining <= 0) {
+      stopSession();
+      return;
+    }
+    const min = Math.floor(remaining / 60);
+    const sec = remaining % 60;
+    document.getElementById('elapsed-time').textContent =
+      min + ':' + (sec < 10 ? '0' : '') + sec;
+  }, 1000);
+}
+
+function stopSession() {
+  clearInterval(moveInterval);
+  clearInterval(dialTimerInterval);
+  moveInterval = null;
+  dialTimerInterval = null;
+
+  // Compute results
+  const finalValue = pointerValue;
+  const diff = Math.abs(finalValue - chosenTarget);
+  const total = movesToward + movesAway + movesNeutral;
+  const towardRatio = total > 0 ? ((movesToward / total) * 100).toFixed(1) : 0;
+
+  // Populate result screen
+  document.getElementById('res-target').textContent = (chosenTarget > 0 ? '+' : '') + chosenTarget;
+  document.getElementById('res-target').style.color = chosenTarget > 0 ? '#27ae60' : '#e74c3c';
+  document.getElementById('res-final').textContent = (finalValue > 0 ? '+' : '') + finalValue;
+  document.getElementById('res-diff').textContent = diff;
+  document.getElementById('res-toward').textContent = movesToward;
+  document.getElementById('res-away').textContent = movesAway;
+  document.getElementById('res-neutral').textContent = movesNeutral;
+  document.getElementById('res-ratio').textContent = towardRatio + '%';
+  document.getElementById('res-peak').textContent = (peakPosition > 0 ? '+' : '') + peakPosition;
+  document.getElementById('res-moves').textContent = totalMoves;
+
+  // Verdict
+  const verdict = document.getElementById('result-verdict');
+  if (towardRatio >= 60) {
+    verdict.textContent = t('dial-strong');
+    verdict.style.color = '#27ae60';
+  } else if (towardRatio >= 55) {
+    verdict.textContent = t('dial-promising');
+    verdict.style.color = '#2ecc71';
+  } else if (towardRatio >= 50) {
+    verdict.textContent = t('dial-slight');
+    verdict.style.color = '#f39c12';
+  } else {
+    verdict.textContent = t('dial-weak');
+    verdict.style.color = '#e74c3c';
+  }
+
+  // Draw result dial
+  drawDial('dial-result-canvas', finalValue, chosenTarget);
+
+  showScreen('result');
+  showTip('dial');
+}
+
+function updateLiveStats() {
+  document.getElementById('current-value').textContent = (pointerValue > 0 ? '+' : '') + pointerValue;
+  document.getElementById('moves-count').textContent = totalMoves;
+  document.getElementById('moves-toward').textContent = movesToward;
+  document.getElementById('moves-away').textContent = movesAway;
+  document.getElementById('moves-neutral').textContent = movesNeutral;
+
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const min = Math.floor(elapsed / 60);
+  const sec = elapsed % 60;
+  document.getElementById('elapsed-time').textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+
+// ─── Save / History ───────────────────────────────────────
+function loadHistory() { return loadData('dial_history') || []; }
+function saveHistory(data) { saveData('dial_history', data); }
+
+function saveSession() {
+  const total = movesToward + movesAway + movesNeutral;
+  const towardRatio = total > 0 ? ((movesToward / total) * 100).toFixed(1) : 0;
+  const diff = Math.abs(pointerValue - chosenTarget);
+
+  const history = loadHistory();
+  history.push({
+    timestamp: Date.now(),
+    target: chosenTarget,
+    finalValue: pointerValue,
+    diff: diff,
+    movesToward: movesToward,
+    movesAway: movesAway,
+    movesNeutral: movesNeutral,
+    towardRatio: parseFloat(towardRatio),
+    peakPosition: peakPosition,
+    totalMoves: totalMoves,
+    duration: durationSeconds
+  });
+  saveHistory(history);
+  showScreen('history');
+  renderHistory();
+}
+
+function renderHistory() {
+  const history = loadHistory() || [];
+  const list = document.getElementById('history-list');
+
+  document.getElementById('hist-sessions').textContent = history.length;
+
+  if (!history.length) {
+    document.getElementById('hist-avg-ratio').textContent = '—';
+    document.getElementById('hist-best').textContent = '—';
+    list.innerHTML = '<li class="card" style="text-align:center;color:var(--text-dim)">' + (t('no-sessions') || 'No sessions yet') + '</li>';
+    return;
+  }
+
+  const avgRatio = (history.reduce((s, h) => s + h.towardRatio, 0) / history.length).toFixed(1);
+  const bestDiff = Math.min(...history.map(h => h.diff)).toFixed(0);
+  document.getElementById('hist-avg-ratio').textContent = avgRatio + '%';
+  document.getElementById('hist-best').textContent = bestDiff;
+
+  list.innerHTML = history.map((s, i) => {
+    const dateStr = formatDate(s.timestamp);
+    const targetLabel = (s.target > 0 ? '+' : '') + s.target;
+    const rc = s.towardRatio >= 55 ? 'tag-green' : s.towardRatio >= 50 ? 'tag-yellow' : 'tag-red';
+    return `<li class="session-item" onclick="viewSession(${i})">
+      <span class="code">${targetLabel}</span>
+      <span class="date">${dateStr}</span>
+      <span class="score"><span class="tag ${rc}">${s.towardRatio}%</span></span>
+    </li>`;
+  }).reverse().join('');
+}
+
+function viewSession(index) {
+  const history = loadHistory() || [];
+  const s = history[index];
+  if (!s) return;
+
+  const targetLabel = (s.target > 0 ? '+' : '') + s.target;
+  const finalLabel = (s.finalValue > 0 ? '+' : '') + s.finalValue;
+  const peakLabel = (s.peakPosition > 0 ? '+' : '') + s.peakPosition;
+
+  let html = `<h3>${formatDate(s.timestamp)}</h3>
+    <p><strong>${t('dial-target')}</strong>: ${targetLabel}</p>
+    <p><strong>${t('dial-final')}</strong>: ${finalLabel}</p>
+    <p><strong>${t('dial-difference')}</strong>: ${s.diff}</p>
+    <p><strong>${t('dial-peak')}</strong>: ${peakLabel}</p>
+    <p><strong>${t('dial-moves')}</strong>: ${s.totalMoves}</p>
+    <p><strong>${t('dial-toward')}</strong>: ${s.movesToward} |
+       <strong>${t('dial-away')}</strong>: ${s.movesAway} |
+       <strong>${t('dial-neutral')}</strong>: ${s.movesNeutral}</p>
+    <p><strong>${t('dial-ratio')}</strong>: ${s.towardRatio}%</p>
+    <p><strong>${t('dial-elapsed')}</strong>: ${s.duration}s</p>`;
+
+  showModal(t('dial-history'), html, [
+    { label: t('back'), action: "closeModal()" }
+  ]);
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  showTip('dial');
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (['welcome','active','result'].includes(name)) showTip('dial');
+};
+</script>
+
+</body>
+</html>

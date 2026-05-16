@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Zener Symbol Trainer</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+
+  /* ─── Symbol Display ───────────────────────────────── */
+  .symbol-display {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    border: 2px solid var(--surface2);
+    font-size: 5rem;
+    transition: border-color 0.3s;
+  }
+
+  .symbol-display.hidden { color: transparent; }
+  .symbol-display.hidden::after {
+    content: '?';
+    color: var(--accent);
+    font-size: 4rem;
+  }
+
+  .symbol-display.revealed { border-color: var(--accent); }
+  .symbol-display.correct { border-color: var(--success); }
+  .symbol-display.wrong { border-color: var(--danger); }
+
+  /* ─── Symbol Buttons ───────────────────────────────── */
+  .symbol-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .symbol-btn {
+    padding: 0.75rem 0.25rem;
+    min-height: 3rem;
+    border-radius: 8px;
+    border: 1px solid var(--surface2);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 1.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .symbol-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  @media (hover: hover) { .symbol-btn:hover { border-color: var(--accent); } }
+
+  /* ─── Progress ─────────────────────────────────────── */
+  .trial-progress {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+  }
+
+  .trial-progress strong { color: var(--accent); }
+
+  /* ─── Stats Bar ────────────────────────────────────── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 600px) { .stats-bar { grid-template-columns: repeat(5, 1fr); } }
+
+  .mini-stat {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 0.625rem;
+    text-align: center;
+  }
+
+  .mini-stat .val { font-size: 1rem; font-weight: 700; color: var(--accent); }
+  .mini-stat .lbl { font-size: 0.65rem; color: var(--text-dim); }
+
+  /* ─── Chi-Square Indicator ─────────────────────────── */
+  .chi-indicator {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .chi-sig { background: rgba(74,222,128,0.12); color: var(--success); border: 1px solid rgba(74,222,128,0.25); }
+  .chi-ns { background: rgba(251,191,36,0.12); color: var(--warn); border: 1px solid rgba(251,191,36,0.25); }
+  .chi-low { background: rgba(248,113,113,0.12); color: var(--danger); border: 1px solid rgba(248,113,113,0.25); }
+
+  /* ─── Per-Symbol Accuracy ──────────────────────────── */
+  .symbol-accuracy {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.375rem;
+    margin-bottom: 1rem;
+  }
+
+  .sym-acc {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+  }
+
+  .sym-acc .sym-icon { font-size: 1.25rem; }
+  .sym-acc .sym-pct { font-weight: 700; color: var(--accent); }
+
+  /* ─── History ──────────────────────────────────────── */
+  .history-item {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: 8px;
+    padding: 0.625rem 0.75rem;
+    margin-bottom: 0.375rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    font-size: 0.85rem;
+  }
+
+  .history-item .trial-num { color: var(--text-dim); font-size: 0.75rem; flex-shrink: 0; width: 2rem; }
+  .history-item .target-sym { font-size: 1.25rem; flex-shrink: 0; }
+  .history-item .guess-sym { font-size: 1.25rem; flex-shrink: 0; }
+  .history-item .match { flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="zener-title">⭕ Zener Symbols</span> <span data-i18n="zener-subtitle">— ESP Trainer</span></h1>
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+    <div id="lang-selector"></div>
+    <button class="nav-btn" onclick="showScreen('history')" data-i18n="history">📋 History</button>
+  </div>
+</header>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('zener')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="zener-title">Zener Symbol Trainer</h2>
+      <p data-i18n="zener-desc">Classic ESP research using 5 symbols. Random chance is 20% — sustained scores above 25% are noteworthy.</p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="zener-symbols-title">The 5 Zener Symbols</h2>
+      <div class="symbol-grid" style="pointer-events:none;">
+        <div class="mini-stat"><div class="val" style="font-size:2rem">○</div><div class="lbl" data-i18n="sym-circle">Circle</div></div>
+        <div class="mini-stat"><div class="val" style="font-size:2rem">✚</div><div class="lbl" data-i18n="sym-cross">Cross</div></div>
+        <div class="mini-stat"><div class="val" style="font-size:2rem">≋</div><div class="lbl" data-i18n="sym-waves">Waves</div></div>
+        <div class="mini-stat"><div class="val" style="font-size:2rem">□</div><div class="lbl" data-i18n="sym-square">Square</div></div>
+        <div class="mini-stat"><div class="val" style="font-size:2rem">★</div><div class="lbl" data-i18n="sym-star">Star</div></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="session-size" data-i18n="trials-per-session">Trials per Session</label>
+      <select id="session-size" style="width:100%;background:var(--surface2);border:1px solid var(--surface2);color:var(--text);padding:0.75rem;border-radius:8px;font-size:1rem;">
+        <option value="10">10 trials</option>
+        <option value="25" selected>25 trials (standard)</option>
+        <option value="50">50 trials</option>
+        <option value="100">100 trials</option>
+      </select>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="startSession()" data-i18n="zener-start">⭕ Start New Session</button>
+      <button class="btn btn-secondary" onclick="continueSession()" id="continue-btn" style="display:none" data-i18n="continue-session">▶ Continue Session</button>
+    </div>
+  </div>
+
+  <!-- GUESS SCREEN -->
+  <div id="screen-guess" class="screen">
+    <div class="progress-bar"><div class="fill" id="trial-progress-bar"></div></div>
+
+    <div class="tip-banner" id="tip-guess">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-guess-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('zener')">↻</button>
+    </div>
+
+    <div class="trial-progress" id="trial-label">Trial <strong>1</strong> / <strong>25</strong></div>
+
+    <div class="symbol-display hidden" id="symbol-display"></div>
+
+    <div class="card">
+      <h2 data-i18n="zener-guess-title">What symbol do you sense?</h2>
+      <p data-i18n="zener-guess-desc">Focus on the hidden symbol. Select what your intuition tells you.</p>
+    </div>
+
+    <div class="symbol-grid" id="guess-grid">
+      <button class="symbol-btn" data-sym="circle" onclick="selectSymbol(this)">○</button>
+      <button class="symbol-btn" data-sym="cross" onclick="selectSymbol(this)">✚</button>
+      <button class="symbol-btn" data-sym="waves" onclick="selectSymbol(this)">≋</button>
+      <button class="symbol-btn" data-sym="square" onclick="selectSymbol(this)">□</button>
+      <button class="symbol-btn" data-sym="star" onclick="selectSymbol(this)">★</button>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="quit">← Quit</button>
+      <button class="btn btn-primary" onclick="submitGuess()" data-i18n="submit-guess">🔍 Submit Guess</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="screen-result" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="tip-banner" id="tip-result">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-result-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('zener')">↻</button>
+    </div>
+
+    <div class="symbol-display revealed" id="result-symbol"></div>
+
+    <div id="result-badge" class="result-badge"></div>
+
+    <div class="card" id="guess-label-card" style="text-align:center">
+      <p id="guess-label" style="font-size:1.1rem;font-weight:600"></p>
+    </div>
+
+    <div class="stats-bar" id="session-stats">
+      <div class="mini-stat"><div class="val" id="ss-correct">0</div><div class="lbl" data-i18n="correct">Correct</div></div>
+      <div class="mini-stat"><div class="val" id="ss-total">0</div><div class="lbl" data-i18n="total">Total</div></div>
+      <div class="mini-stat"><div class="val" id="ss-pct">0%</div><div class="lbl" data-i18n="accuracy">Accuracy</div></div>
+      <div class="mini-stat"><div class="val" id="ss-chance">20%</div><div class="lbl" data-i18n="chance">Chance</div></div>
+      <div class="mini-stat"><div class="val" id="ss-over">0</div><div class="lbl" data-i18n="over-chance">Over Chance</div></div>
+    </div>
+
+    <div id="chi-indicator" class="chi-indicator"></div>
+
+    <div class="field">
+      <label for="result-notes" data-i18n="session-notes">Session Notes</label>
+      <textarea id="result-notes" data-i18n-placeholder="zener-notes-placeholder" placeholder="How did the session feel? Any patterns?"></textarea>
+    </div>
+
+    <div class="nav-row" id="result-nav">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="quit">← Quit</button>
+      <button class="btn btn-primary" id="next-trial-btn" onclick="nextTrial()" data-i18n="next-trial">▶ Next Trial</button>
+      <button class="btn btn-primary" id="save-session-btn" onclick="saveSession()" style="display:none" data-i18n="save-session">💾 Save Session</button>
+    </div>
+  </div>
+
+  <!-- HISTORY SCREEN -->
+  <div id="screen-history" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="zener-history-title">📊 Zener History</h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="stat-total">0</div><div class="label" data-i18n="total-trials">Total Trials</div></div>
+      <div class="stat-card"><div class="value" id="stat-correct">0</div><div class="label" data-i18n="correct">Correct</div></div>
+      <div class="stat-card"><div class="value" id="stat-accuracy">—</div><div class="label" data-i18n="accuracy">Accuracy</div></div>
+      <div class="stat-card"><div class="value" id="stat-sessions">0</div><div class="label" data-i18n="sessions">Sessions</div></div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="per-symbol-accuracy">Per-Symbol Accuracy</h2>
+      <div class="symbol-accuracy" id="sym-accuracy"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="chi-analysis">Chi-Square Analysis</h2>
+      <div id="chi-analysis"></div>
+    </div>
+
+    <div id="history-list"></div>
+
+    <button class="btn btn-secondary" onclick="goHome()" style="margin-top:1rem" data-i18n="back-home">← Back to Home</button>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+// ─── Zener Symbol App Logic ───────────────────────────────
+const SYMBOLS = ['circle','cross','waves','square','star'];
+const SYM_ICONS = { circle:'○', cross:'✚', waves:'≋', square:'□', star:'★' };
+
+let sessionSize = 25;
+let currentTarget = null;
+let guessSymbol = null;
+let sessionTrials = [];
+let sessionIndex = 0;
+let sessionActive = false;
+
+function loadHistory() { return loadData('zener_history'); }
+function saveHistory(data) { saveData('zener_history', data); }
+
+// ─── Session Management ───────────────────────────────────
+function startSession() {
+  sessionSize = parseInt(document.getElementById('session-size').value);
+  sessionTrials = [];
+  sessionIndex = 0;
+  sessionActive = true;
+  saveSessionState();
+  nextTrial();
+}
+
+function continueSession() {
+  const state = loadData('zener_session');
+  if (!state || !state.trials || !state.trials.length) return;
+  sessionSize = state.size;
+  sessionTrials = state.trials;
+  sessionIndex = state.index;
+  sessionActive = true;
+  nextTrial();
+}
+
+function saveSessionState() {
+  saveData('zener_session', { size: sessionSize, trials: sessionTrials, index: sessionIndex });
+}
+
+function clearSessionState() {
+  localStorage.removeItem('zener_session');
+}
+
+function nextTrial() {
+  if (sessionIndex >= sessionSize) {
+    showSessionResult();
+    return;
+  }
+
+  currentTarget = SYMBOLS[Math.floor(Math.random() * 5)];
+  guessSymbol = null;
+  document.querySelectorAll('.symbol-btn').forEach(b => b.classList.remove('active'));
+
+  // Update progress
+  const pct = (sessionIndex / sessionSize * 100);
+  document.getElementById('trial-progress-bar').style.width = pct + '%';
+  document.getElementById('trial-label').innerHTML =
+    `Trial <strong>${sessionIndex + 1}</strong> / <strong>${sessionSize}</strong>`;
+
+  // Hide symbol
+  const display = document.getElementById('symbol-display');
+  display.textContent = SYM_ICONS[currentTarget];
+  display.className = 'symbol-display hidden';
+
+  showScreen('guess');
+}
+
+function selectSymbol(btn) {
+  document.querySelectorAll('.symbol-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  guessSymbol = btn.dataset.sym;
+}
+
+function submitGuess() {
+  if (!guessSymbol) {
+    alert(t('select-symbol'));
+    return;
+  }
+
+  const correct = guessSymbol === currentTarget;
+  sessionTrials.push({ target: currentTarget, guess: guessSymbol, correct });
+  sessionIndex++;
+  saveSessionState();
+
+  // Populate result screen
+  const resultSymbol = document.getElementById('result-symbol');
+  resultSymbol.textContent = SYM_ICONS[currentTarget];
+  resultSymbol.className = 'symbol-display revealed ' + (correct ? 'correct' : 'wrong');
+
+  // Also reveal on guess screen
+  const display = document.getElementById('symbol-display');
+  display.className = 'symbol-display revealed ' + (correct ? 'correct' : 'wrong');
+
+  // Badge
+  const badge = document.getElementById('result-badge');
+  if (correct) {
+    badge.className = 'result-badge result-exact';
+    badge.textContent = '🎯 ' + t('correct');
+  } else {
+    badge.className = 'result-badge result-miss';
+    badge.textContent = '❌ ' + t('incorrect-target') + ' ' + SYM_ICONS[currentTarget];
+  }
+
+  // Show guess vs target
+  const guessLabel = document.getElementById('guess-label');
+  if (guessLabel) guessLabel.textContent = t('you-guessed') + ' ' + SYM_ICONS[guessSymbol] + '  |  ' + t('target') + ': ' + SYM_ICONS[currentTarget];
+
+  // Session stats
+  const correctCount = sessionTrials.filter(t => t.correct).length;
+  const pct = (correctCount / sessionTrials.length * 100).toFixed(1);
+  document.getElementById('ss-correct').textContent = correctCount;
+  document.getElementById('ss-total').textContent = sessionTrials.length;
+  document.getElementById('ss-pct').textContent = pct + '%';
+  document.getElementById('ss-over').textContent = (pct - 20).toFixed(1) + '%';
+
+  // Chi-square
+  computeChiSquare(sessionTrials);
+
+  // Navigate to result screen
+  showScreen('result');
+
+  // Show/hide buttons based on session progress
+  const nextBtn = document.getElementById('next-trial-btn');
+  const saveBtn = document.getElementById('save-session-btn');
+  if (sessionIndex < sessionSize) {
+    nextBtn.style.display = 'block';
+    saveBtn.style.display = 'none';
+  } else {
+    nextBtn.style.display = 'none';
+    saveBtn.style.display = 'block';
+  }
+}
+
+function showSessionResult() {
+  const correctCount = sessionTrials.filter(t => t.correct).length;
+  const pct = (correctCount / sessionTrials.length * 100).toFixed(1);
+
+  document.getElementById('ss-correct').textContent = correctCount;
+  document.getElementById('ss-total').textContent = sessionTrials.length;
+  document.getElementById('ss-pct').textContent = pct + '%';
+  document.getElementById('ss-over').textContent = (pct - 20).toFixed(1) + '%';
+
+  computeChiSquare(sessionTrials);
+
+  const badge = document.getElementById('result-badge');
+  if (pct >= 30) { badge.className = 'result-badge result-exact'; badge.textContent = '🌟 ' + t('zener-excellent'); }
+  else if (pct >= 25) { badge.className = 'result-badge result-suit'; badge.textContent = '👍 ' + t('zener-above-chance'); }
+  else if (pct >= 20) { badge.className = 'result-badge result-color'; badge.textContent = '👁 ' + t('zener-near-chance'); }
+  else { badge.className = 'result-badge result-miss'; badge.textContent = '📉 ' + t('zener-below-chance'); }
+
+  // Clear result symbol (session complete, no single target to show)
+  document.getElementById('result-symbol').textContent = '';
+  document.getElementById('result-symbol').className = 'symbol-display';
+  document.getElementById('guess-label').textContent = '';
+
+  // Show save button, hide next trial
+  document.getElementById('next-trial-btn').style.display = 'none';
+  document.getElementById('save-session-btn').style.display = 'block';
+
+  showScreen('result');
+}
+
+// ─── Chi-Square Test ──────────────────────────────────────
+function computeChiSquare(trials) {
+  const n = trials.length;
+  if (n < 10) {
+    document.getElementById('chi-indicator').className = 'chi-indicator chi-ns';
+    document.getElementById('chi-indicator').textContent = t('chi-need-10');
+    return;
+  }
+
+  const expected = n / 5;
+  const observed = { circle:0, cross:0, waves:0, square:0, star:0 };
+  trials.forEach(t => { if (t.correct) observed[t.target]++; });
+
+  // Chi-square: sum of (observed - expected)² / expected for correct guesses
+  // Simplified: use correct counts per symbol vs expected correct per symbol
+  let chi2 = 0;
+  SYMBOLS.forEach(sym => {
+    const o = observed[sym];
+    const e = expected;
+    chi2 += ((o - e) ** 2) / e;
+  });
+
+  // Critical value for df=4, p=0.05 is 9.591
+  const critical = 9.591;
+  const el = document.getElementById('chi-indicator');
+
+  if (chi2 >= critical) {
+    el.className = 'chi-indicator chi-sig';
+    el.textContent = '✅ ' + t('chi-significant') + ' χ² = ' + chi2.toFixed(2) + ' (critical: ' + critical + ')';
+  } else if (chi2 >= critical * 0.7) {
+    el.className = 'chi-indicator chi-ns';
+    el.textContent = '⚠ ' + t('chi-approaching') + ' χ² = ' + chi2.toFixed(2) + ' (critical: ' + critical + ')';
+  } else {
+    el.className = 'chi-indicator chi-low';
+    el.textContent = t('chi-not-significant') + ' χ² = ' + chi2.toFixed(2) + ' (critical: ' + critical + ')';
+  }
+}
+
+// ─── Save Session ─────────────────────────────────────────
+function saveSession() {
+  const history = loadHistory() || [];
+  const session = {
+    timestamp: Date.now(),
+    size: sessionSize,
+    trials: sessionTrials,
+    correct: sessionTrials.filter(t => t.correct).length,
+    accuracy: (sessionTrials.filter(t => t.correct).length / sessionTrials.length * 100).toFixed(1),
+    notes: document.getElementById('result-notes').value
+  };
+  history.unshift(session);
+  saveHistory(history);
+  clearSessionState();
+  sessionActive = false;
+  showScreen('welcome');
+}
+
+// ─── History ──────────────────────────────────────────────
+function renderHistory() {
+  const history = loadHistory() || [];
+  const list = document.getElementById('history-list');
+
+  let totalTrials = 0, totalCorrect = 0;
+  history.forEach(s => {
+    totalTrials += s.trials.length;
+    totalCorrect += s.correct;
+  });
+
+  document.getElementById('stat-total').textContent = totalTrials;
+  document.getElementById('stat-correct').textContent = totalCorrect;
+  document.getElementById('stat-accuracy').textContent = totalTrials ? (totalCorrect / totalTrials * 100).toFixed(1) + '%' : '—';
+  document.getElementById('stat-sessions').textContent = history.length;
+
+  // Per-symbol accuracy
+  const symCounts = { circle:{t:0,c:0}, cross:{t:0,c:0}, waves:{t:0,c:0}, square:{t:0,c:0}, star:{t:0,c:0} };
+  history.forEach(s => s.trials.forEach(t => {
+    symCounts[t.target].t++;
+    if (t.correct) symCounts[t.target].c++;
+  }));
+
+  document.getElementById('sym-accuracy').innerHTML = SYMBOLS.map(sym => {
+    const d = symCounts[sym];
+    const pct = d.t ? (d.c / d.t * 100).toFixed(0) : '—';
+    return `<div class="sym-acc"><div class="sym-icon">${SYM_ICONS[sym]}</div><div class="sym-pct">${pct}%</div><div style="font-size:0.65rem;color:var(--text-dim)">${d.t} ${t('trials')}</div></div>`;
+  }).join('');
+
+  // Chi-square for all data
+  const allTrials = [];
+  history.forEach(s => allTrials.push(...s.trials));
+  computeChiSquare(allTrials);
+  document.getElementById('chi-analysis').innerHTML = document.getElementById('chi-indicator').outerHTML;
+  document.getElementById('chi-indicator').remove();
+
+  // Session list
+  if (!history.length) {
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim)">' + t('zener-no-sessions') + '</div>';
+  } else {
+    list.innerHTML = history.map((s, i) => {
+      const pct = s.accuracy + '%';
+      const rc = parseFloat(s.accuracy) >= 25 ? 'tag-green' : parseFloat(s.accuracy) >= 20 ? 'tag-yellow' : 'tag-red';
+      return `<div class="history-item" onclick="viewSession(${i})">
+        <span class="trial-num">#${i+1}</span>
+        <span style="flex:1">${s.trials.length} ${t('trials')} — ${s.correct} ${t('correct')}</span>
+        <span class="tag ${rc}">${pct}</span>
+        <span style="font-size:0.7rem;color:var(--text-dim)">${formatDate(s.timestamp)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Check for active session
+  const state = loadData('zener_session');
+  if (state && state.trials && state.trials.length) {
+    document.getElementById('continue-btn').style.display = 'block';
+  }
+}
+
+function viewSession(index) {
+  const history = loadHistory() || [];
+  const s = history[index];
+  if (!s) return;
+
+  let html = `<h3>Session #${index + 1}</h3>`;
+  html += `<p><strong>${t('date')}:</strong> ${formatDate(s.timestamp)}</p>`;
+  html += `<p><strong>${t('trials')}:</strong> ${s.trials.length} | <strong>${t('correct')}:</strong> ${s.correct} | <strong>${t('accuracy')}:</strong> ${s.accuracy}%</p>`;
+
+  html += '<div style="margin-top:0.75rem;max-height:300px;overflow-y:auto">';
+  s.trials.forEach((t, i) => {
+    const cls = t.correct ? 'tag-green' : 'tag-red';
+    const lbl = t.correct ? '✓' : '✗';
+    html += `<div style="display:flex;align-items:center;gap:0.5rem;padding:0.25rem 0;border-bottom:1px solid var(--surface2);font-size:0.8rem">
+      <span style="color:var(--text-dim);width:1.5rem">${i+1}.</span>
+      <span>${SYM_ICONS[t.target]}</span>
+      <span style="color:var(--text-dim)">→</span>
+      <span>${SYM_ICONS[t.guess]}</span>
+      <span class="tag ${cls}" style="margin:0">${lbl}</span>
+    </div>`;
+  });
+  html += '</div>';
+
+  if (s.notes) html += `<p style="margin-top:0.75rem"><strong>${t('notes')}:</strong> ${esc(s.notes)}</p>`;
+  html += `<div style="margin-top:1rem;text-align:center"><button class="btn btn-secondary btn-sm" onclick="closeModal()">${t('close')}</button></div>`;
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  renderHistory();
+  showTip('zener');
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'history') renderHistory();
+  if (['guess','result'].includes(name)) showTip('zener');
+};
+</script>
+
+</body>
+</html>

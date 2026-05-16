@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Remote Viewing Trainer</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* RV-Trainer specific overrides */
+  .nav-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  @media (min-width: 600px) {
+    .nav-row { flex-direction: row; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="rv-title">🔮 Psychic101</span> <span data-i18n="rv-subtitle">— RV Trainer</span></h1>
+  <div id="lang-selector"></div>
+</header>
+
+<div class="nav-row">
+  <button class="nav-btn" onclick="showScreen('history')" data-i18n="history">📋 History</button>
+</div>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('rv')">↻</button>
+    </div>
+    <div class="card">
+      <div class="welcome-icon">🔮</div>
+      <h2 data-i18n="rv-title">Remote Viewing Trainer</h2>
+      <p data-i18n="rv-desc">Practice Controlled Remote Viewing (CRV) with randomized targets. Each session gives you a target code — record your impressions, then reveal the target to compare.</p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="how-it-works">How It Works</h2>
+      <ol class="steps">
+        <li><strong data-i18n="rv-step1">Get a target code</strong> — a random 8-digit number linked to a hidden image</li>
+        <li><strong data-i18n="rv-step2">Draw your ideogram</strong> — let your hand move freely to capture the gestalt</li>
+        <li><strong data-i18n="rv-step3">Record impressions</strong> — sensory data, dimensions, colors, emotions</li>
+        <li><strong data-i18n="rv-step4">Reveal & compare</strong> — see the target and rate your accuracy</li>
+        <li><strong data-i18n="rv-step5">Review & improve</strong> — track your progress over time</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="quick-tips">Quick Tips</h2>
+      <ul>
+        <li data-i18n="rv-tip1">Relax before starting — take 3 deep breaths</li>
+        <li><span data-i18n="rv-tip2">Iterate the target code silently: "Target </span><code id="tip-code">----</code><span>"</span></li>
+        <li data-i18n="rv-tip3">Record everything — even if it seems silly</li>
+        <li data-i18n="rv-tip4">Don't force or guess — let impressions come naturally</li>
+        <li data-i18n="rv-tip5">Watch for AOL (analytical overlays) — label them and move on</li>
+      </ul>
+    </div>
+
+    <button class="btn btn-primary" onclick="startSession()" data-i18n="start-new-session">
+      ✨ Start New Session
+    </button>
+  </div>
+
+  <!-- IDEOGRAM SCREEN -->
+  <div id="screen-ideogram" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 20%"></div></div>
+
+    <div class="tip-banner" id="tip-ideogram">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-ideogram-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('rv')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="step1-ideogram">Step 1 — Ideogram</h2>
+      <p data-i18n="ideogram-desc">Iterate the target code silently. Let your hand move freely on the canvas below. The resulting mark is your <strong>ideogram</strong> — the gestalt of the target.</p>
+    </div>
+
+    <div class="target-code" id="target-code-display">----</div>
+
+    <div class="ideogram-wrap">
+      <canvas id="ideogram-canvas" class="ideogram-area"></canvas>
+      <button class="clear-btn" onclick="clearCanvas()" data-i18n="close">Clear</button>
+    </div>
+
+    <div class="field">
+      <label data-i18n="ideogram-category">Ideogram Category</label>
+      <div class="category-select">
+        <button class="cat-btn" data-cat="A" onclick="selectCategory(this)">A — Motion</button>
+        <button class="cat-btn" data-cat="B" onclick="selectCategory(this)">B — Static</button>
+        <button class="cat-btn" data-cat="C" onclick="selectCategory(this)">C — Organic</button>
+        <button class="cat-btn" data-cat="D" onclick="selectCategory(this)">D — Inorganic</button>
+        <button class="cat-btn" data-cat="E" onclick="selectCategory(this)">E — Mixed</button>
+        <button class="cat-btn" data-cat="F" onclick="selectCategory(this)">F — Unknown</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="ideogram-notes" data-i18n="ideogram-notes">Ideogram Notes</label>
+      <textarea id="ideogram-notes" data-i18n-placeholder="ideogram-placeholder" placeholder="What does the ideogram suggest? Describe the shape, feel, and initial impressions..."></textarea>
+    </div>
+
+    <button class="btn btn-primary" onclick="goToSensory()" data-i18n="continue-sensory">Continue to Sensory Data →</button>
+  </div>
+
+  <!-- SENSORY DATA SCREEN -->
+  <div id="screen-sensory" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 40%"></div></div>
+
+    <div class="tip-banner" id="tip-sensory">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-sensory-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('rv')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="step2-sensory">Step 2 — Sensory Data (A/B)</h2>
+      <p data-i18n="sensory-desc">Record raw sensory impressions. What do you <strong>see, hear, feel, smell, taste</strong>? Keep it factual — no interpretation yet.</p>
+    </div>
+
+    <div class="field">
+      <label for="sensory-see" data-i18n="visual">👁 Visual</label>
+      <textarea id="sensory-see" placeholder="Shapes, colors, textures, movement..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="sensory-hear" data-i18n="auditory">👂 Auditory</label>
+      <textarea id="sensory-hear" placeholder="Sounds, tones, silence, noise levels..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="sensory-feel" data-i18n="tactile">✋ Tactile / Kinesthetic</label>
+      <textarea id="sensory-feel" placeholder="Temperature, texture, pressure, motion..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="sensory-smell" data-i18n="olfactory">👃 Olfactory</label>
+      <textarea id="sensory-smell" placeholder="Scents, odors, freshness, staleness..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="sensory-taste" data-i18n="gustatory">👅 Gustatory</label>
+      <textarea id="sensory-taste" placeholder="Flavors, tastes, dryness, moisture..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="sensory-aol" data-i18n="aol">⚠️ Analytical Overlays (AOL)</label>
+      <textarea id="sensory-aol" placeholder="Label any guesses, assumptions, or analytical thoughts. Example: "AOL: looks like a beach" — then let it go."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('ideogram')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="goToDimensions()" data-i18n="continue-dimensions">Continue to Dimensions →</button>
+    </div>
+  </div>
+
+  <!-- DIMENSIONS SCREEN -->
+  <div id="screen-dimensions" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 60%"></div></div>
+
+    <div class="tip-banner" id="tip-dimensions">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-dimensions-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('rv')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="step3-dimensions">Step 3 — Dimensions & Colors</h2>
+      <p data-i18n="dimensions-desc">Estimate the size, shape, and color palette of the target. Think in terms of relative scale.</p>
+    </div>
+
+    <div class="field">
+      <label for="dim-size" data-i18n="size-scale">Size / Scale</label>
+      <textarea id="dim-size" placeholder="Small, medium, large? How big relative to a person?"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="dim-shape" data-i18n="shape-form">Shape / Form</label>
+      <textarea id="dim-shape" placeholder="Geometric, organic, irregular, linear, circular..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="dim-colors" data-i18n="colors">Colors</label>
+      <textarea id="dim-colors" placeholder="Dominant colors, patterns, brightness, contrast..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="dim-motion" data-i18n="motion-energy">Motion / Energy</label>
+      <textarea id="dim-motion" placeholder="Static, flowing, vibrating, pulsing, still..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('sensory')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="goToEmotions()" data-i18n="continue-emotions">Continue to Emotions →</button>
+    </div>
+  </div>
+
+  <!-- EMOTIONS SCREEN -->
+  <div id="screen-emotions" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 80%"></div></div>
+
+    <div class="tip-banner" id="tip-emotions">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-emotions-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('rv')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="step4-emotions">Step 4 — Emotions & Conceptualization</h2>
+      <p data-i18n="emotions-desc">What feelings does the target evoke? What is the overall "vibe"? Now you may begin to form a conceptual understanding.</p>
+    </div>
+
+    <div class="field">
+      <label for="emo-feelings" data-i18n="emotional-tone">Emotional Tone</label>
+      <textarea id="emo-feelings" placeholder="Calm, tense, joyful, ominous, peaceful, chaotic..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="emo-vibe" data-i18n="overall-vibe">Overall Vibe / Atmosphere</label>
+      <textarea id="emo-vibe" placeholder="The general feeling or energy of the target..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="emo-concept" data-i18n="conceptualization">Conceptualization</label>
+      <textarea id="emo-concept" placeholder="What do you think this target is? Your best interpretation..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="emo-timer" data-i18n="session-duration">Session Duration</label>
+      <div class="timer">
+        <span id="timer">00:00</span>
+        <div class="timer-label">minutes:seconds</div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('dimensions')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="revealTarget()" data-i18n="reveal-target">🔍 Reveal Target</button>
+    </div>
+  </div>
+
+  <!-- FEEDBACK SCREEN -->
+  <div id="screen-feedback" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="tip-banner" id="tip-feedback">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-feedback-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('rv')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="target-revealed">🎯 Target Revealed</h2>
+      <p data-i18n="compare-impressions">Compare your impressions with the actual target. Be honest in your self-assessment.</p>
+    </div>
+
+    <img id="feedback-image" class="target-image" src="" alt="Target">
+
+    <div class="feedback-grid">
+      <div class="card">
+        <h2 data-i18n="your-impressions">Your Impressions</h2>
+        <div id="feedback-summary"></div>
+      </div>
+      <div class="card">
+        <h2 data-i18n="self-assessment">Self-Assessment</h2>
+        <div class="field">
+          <label data-i18n="accuracy-rating">Accuracy Rating</label>
+          <div class="category-select">
+            <button class="cat-btn" data-rating="1" onclick="rateAccuracy(this)">1 — Miss</button>
+            <button class="cat-btn" data-rating="2" onclick="rateAccuracy(this)">2 — Weak</button>
+            <button class="cat-btn" data-rating="3" onclick="rateAccuracy(this)">3 — Moderate</button>
+            <button class="cat-btn" data-rating="4" onclick="rateAccuracy(this)">4 — Strong</button>
+            <button class="cat-btn" data-rating="5" onclick="rateAccuracy(this)">5 — Excellent</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="feedback-notes" data-i18n="feedback-notes">What matched? What didn't?</label>
+          <textarea id="feedback-notes" placeholder="Reflect on your session. What was accurate? Where did AOL interfere?"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('emotions')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="saveSession()" data-i18n="save-session">💾 Save Session</button>
+    </div>
+  </div>
+
+  <!-- HISTORY SCREEN -->
+  <div id="screen-history" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="session-history">📊 Session History</h2>
+    </div>
+
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="value" id="stat-total">0</div>
+        <div class="label" data-i18n="sessions">Sessions</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="stat-avg">—</div>
+        <div class="label" data-i18n="avg-rating">Avg Rating</div>
+      </div>
+      <div class="stat-card">
+        <div class="value" id="stat-streak">0</div>
+        <div class="label" data-i18n="day-streak">Day Streak</div>
+      </div>
+    </div>
+
+    <ul class="session-list" id="session-list"></ul>
+
+    <button class="btn btn-secondary" onclick="goHome()" style="margin-top:16px" data-i18n="back-home">← Back to Home</button>
+  </div>
+</main>
+
+<!-- SESSION DETAIL MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+// ─── RV-Trainer App-Specific Logic ────────────────────────
+let currentSession = null;
+let selectedCategory = null;
+let selectedRating = null;
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+let canvasInitialized = false;
+
+function loadSessions() { return loadData('rv_sessions'); }
+function saveSessions(s) { saveData('rv_sessions', s); }
+
+function getImageUrl(code) {
+  const seed = parseInt(code.replace('-', '')) % 1000;
+  return 'https://picsum.photos/seed/' + seed + '/600/400';
+}
+
+function startSession() {
+  const code = generateCode();
+  currentSession = {
+    code, imageUrl: getImageUrl(code), timestamp: Date.now(),
+    ideogram: { category: null, notes: '' },
+    sensory: {}, dimensions: {}, emotions: {},
+    rating: null, feedbackNotes: '', duration: 0
+  };
+  document.getElementById('target-code-display').textContent = code;
+  document.getElementById('tip-code').textContent = code;
+  clearCanvas();
+  selectedCategory = null;
+  selectedRating = null;
+  document.querySelectorAll('textarea').forEach(t => t.value = '');
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  startTimer();
+  showScreen('ideogram');
+  requestAnimationFrame(ensureCanvasSized);
+}
+
+function goToSensory() {
+  currentSession.ideogram.category = selectedCategory;
+  currentSession.ideogram.notes = document.getElementById('ideogram-notes').value;
+  showScreen('sensory');
+}
+
+function goToDimensions() {
+  currentSession.sensory = {
+    see: document.getElementById('sensory-see').value,
+    hear: document.getElementById('sensory-hear').value,
+    feel: document.getElementById('sensory-feel').value,
+    smell: document.getElementById('sensory-smell').value,
+    taste: document.getElementById('sensory-taste').value,
+    aol: document.getElementById('sensory-aol').value
+  };
+  showScreen('dimensions');
+}
+
+function goToEmotions() {
+  currentSession.dimensions = {
+    size: document.getElementById('dim-size').value,
+    shape: document.getElementById('dim-shape').value,
+    colors: document.getElementById('dim-colors').value,
+    motion: document.getElementById('dim-motion').value
+  };
+  showScreen('emotions');
+}
+
+function revealTarget() {
+  currentSession.emotions = {
+    feelings: document.getElementById('emo-feelings').value,
+    vibe: document.getElementById('emo-vibe').value,
+    concept: document.getElementById('emo-concept').value
+  };
+  currentSession.duration = getTimerSeconds();
+  stopTimer();
+  document.getElementById('feedback-image').src = currentSession.imageUrl;
+  const summary = document.getElementById('feedback-summary');
+  let html = '';
+  if (currentSession.ideogram.notes) html += `<p><strong>Ideogram:</strong> ${esc(currentSession.ideogram.notes)}</p>`;
+  if (currentSession.sensory.see) html += `<p><strong>Visual:</strong> ${esc(currentSession.sensory.see)}</p>`;
+  if (currentSession.sensory.hear) html += `<p><strong>Auditory:</strong> ${esc(currentSession.sensory.hear)}</p>`;
+  if (currentSession.sensory.feel) html += `<p><strong>Tactile:</strong> ${esc(currentSession.sensory.feel)}</p>`;
+  if (currentSession.sensory.smell) html += `<p><strong>Olfactory:</strong> ${esc(currentSession.sensory.smell)}</p>`;
+  if (currentSession.sensory.taste) html += `<p><strong>Gustatory:</strong> ${esc(currentSession.sensory.taste)}</p>`;
+  if (currentSession.sensory.aol) html += `<p><strong>AOL:</strong> ${esc(currentSession.sensory.aol)}</p>`;
+  if (currentSession.dimensions.colors) html += `<p><strong>Colors:</strong> ${esc(currentSession.dimensions.colors)}</p>`;
+  if (currentSession.emotions.concept) html += `<p><strong>Concept:</strong> ${esc(currentSession.emotions.concept)}</p>`;
+  if (!html) html = '<p style="color:var(--text-dim)">' + t('no-data') + '</p>';
+  summary.innerHTML = html;
+  document.querySelectorAll('[data-rating]').forEach(b => b.classList.remove('active'));
+  selectedRating = null;
+  showScreen('feedback');
+}
+
+function rateAccuracy(btn) {
+  document.querySelectorAll('[data-rating]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedRating = parseInt(btn.dataset.rating);
+}
+
+function saveSession() {
+  currentSession.rating = selectedRating;
+  currentSession.feedbackNotes = document.getElementById('feedback-notes').value;
+  const sessions = loadSessions();
+  sessions.unshift(currentSession);
+  saveSessions(sessions);
+  currentSession = null;
+  showScreen('welcome');
+}
+
+// ─── Ideogram Canvas ──────────────────────────────────────
+function initCanvas() {
+  const canvas = document.getElementById('ideogram-canvas');
+  const ctx = canvas.getContext('2d');
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) return;
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    ctx.strokeStyle = '#7b68ee';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }
+  window.addEventListener('resize', resize);
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return [cx - rect.left, cy - rect.top];
+  }
+  canvas.addEventListener('mousedown', e => { isDrawing = true; [lastX, lastY] = getPos(e); });
+  canvas.addEventListener('mousemove', e => { if (!isDrawing) return; draw(e); });
+  canvas.addEventListener('mouseup', () => isDrawing = false);
+  canvas.addEventListener('mouseleave', () => isDrawing = false);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); isDrawing = true; [lastX, lastY] = getPos(e); });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!isDrawing) return; draw(e); });
+  canvas.addEventListener('touchend', () => isDrawing = false);
+  function draw(e) {
+    const [x, y] = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+    lastX = x; lastY = y;
+  }
+}
+
+function ensureCanvasSized() {
+  if (canvasInitialized) return;
+  const canvas = document.getElementById('ideogram-canvas');
+  const ctx = canvas.getContext('2d');
+  const rect = canvas.parentElement.getBoundingClientRect();
+  if (rect.width > 0 && rect.height > 0) {
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    ctx.strokeStyle = '#7b68ee';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    canvasInitialized = true;
+  }
+}
+
+function clearCanvas() {
+  ensureCanvasSized();
+  const canvas = document.getElementById('ideogram-canvas');
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function selectCategory(btn) {
+  document.querySelectorAll('.category-select .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedCategory = btn.dataset.cat;
+}
+
+// ─── History ──────────────────────────────────────────────
+function renderHistory() {
+  const sessions = loadSessions() || [];
+  const list = document.getElementById('session-list');
+  if (!sessions.length) {
+    list.innerHTML = '<li class="card" style="text-align:center;color:var(--text-dim)">' + t('no-sessions') + '</li>';
+  } else {
+    list.innerHTML = sessions.map((s, i) => {
+      const dateStr = formatDate(s.timestamp);
+      const rating = s.rating ? s.rating + '/5' : '—';
+      const rc = s.rating >= 4 ? 'tag-green' : s.rating >= 3 ? 'tag-yellow' : 'tag-red';
+      return `<li class="session-item" onclick="viewSession(${i})">
+        <span class="code">${s.code}</span>
+        <span class="date">${dateStr}</span>
+        <span class="score"><span class="tag ${rc}">${rating}</span></span>
+      </li>`;
+    }).join('');
+  }
+  document.getElementById('stat-total').textContent = sessions.length;
+  if (sessions.length) {
+    const rated = sessions.filter(s => s.rating);
+    const avg = rated.length ? (rated.reduce((a, s) => a + s.rating, 0) / rated.length).toFixed(1) : '—';
+    document.getElementById('stat-avg').textContent = avg;
+    document.getElementById('stat-streak').textContent = calcStreak(sessions);
+  } else {
+    document.getElementById('stat-avg').textContent = '—';
+    document.getElementById('stat-streak').textContent = '0';
+  }
+}
+
+function viewSession(index) {
+  const sessions = loadSessions();
+  const s = sessions[index];
+  if (!s) return;
+  const duration = s.duration ? Math.floor(s.duration/60) + 'm ' + (s.duration%60) + 's' : '—';
+  let html = `<h3>Session: ${s.code}</h3>`;
+  html += `<p><strong>${t('date')}:</strong> ${new Date(s.timestamp).toLocaleString()}</p>`;
+  html += `<p><strong>${t('duration')}:</strong> ${duration}</p>`;
+  html += `<p><strong>${t('rating')}:</strong> ${s.rating ? s.rating + '/5' : '—'}</p>`;
+  if (s.ideogram.notes) html += `<p><strong>Ideogram (${s.ideogram.category}):</strong> ${esc(s.ideogram.notes)}</p>`;
+  if (s.sensory.see) html += `<p><strong>Visual:</strong> ${esc(s.sensory.see)}</p>`;
+  if (s.sensory.hear) html += `<p><strong>Auditory:</strong> ${esc(s.sensory.hear)}</p>`;
+  if (s.sensory.feel) html += `<p><strong>Tactile:</strong> ${esc(s.sensory.feel)}</p>`;
+  if (s.sensory.smell) html += `<p><strong>Olfactory:</strong> ${esc(s.sensory.smell)}</p>`;
+  if (s.sensory.taste) html += `<p><strong>Gustatory:</strong> ${esc(s.sensory.taste)}</p>`;
+  if (s.sensory.aol) html += `<p><strong>AOL:</strong> ${esc(s.sensory.aol)}</p>`;
+  if (s.dimensions.colors) html += `<p><strong>Colors:</strong> ${esc(s.dimensions.colors)}</p>`;
+  if (s.emotions.concept) html += `<p><strong>Concept:</strong> ${esc(s.emotions.concept)}</p>`;
+  if (s.feedbackNotes) html += `<p><strong>Feedback:</strong> ${esc(s.feedbackNotes)}</p>`;
+  html += `<div style="margin-top:16px;text-align:center">`;
+  html += `<img src="${s.imageUrl}" style="max-width:100%;border-radius:8px;margin-bottom:12px">`;
+  html += `<button class="btn btn-secondary btn-sm" onclick="closeModal()">${t('close')}</button></div>`;
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  initCanvas();
+  renderHistory();
+  showTip('rv');
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'history') renderHistory();
+  if (['welcome','ideogram','sensory','dimensions','emotions','feedback'].includes(name)) showTip('rv');
+};
+</script>
+
+</body>
+</html>

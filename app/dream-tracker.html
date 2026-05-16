@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Dream Tracker</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+
+  .cat-btn { padding: 0.5rem 0.75rem; min-height: 2.5rem; border-radius: 20px; border: 1px solid var(--surface2); background: var(--surface2); color: var(--text-dim); font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+  .cat-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  @media (hover: hover) { .cat-btn:hover { border-color: var(--accent); } }
+
+  .dream-card { background: var(--surface); border: 1px solid var(--surface2); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; min-height: 3rem; transition: border-color 0.2s; }
+  @media (hover: hover) { .dream-card:hover { border-color: var(--accent); } }
+  .dream-card .dream-title { font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+  .dream-card .dream-date { font-size: 0.75rem; color: var(--text-dim); }
+  .dream-card .dream-preview { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dream-card .dream-tags { margin-top: 0.25rem; }
+  .dream-card .dream-tag { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.7rem; background: rgba(123,104,238,0.15); color: var(--accent2); margin-right: 0.25rem; }
+  .dream-card .dream-precog { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.7rem; }
+  .dream-card .dream-precog.hit { background: rgba(74,222,128,0.15); color: var(--success); }
+  .dream-card .dream-precog.miss { background: rgba(248,113,113,0.15); color: var(--danger); }
+  .dream-card .dream-precog.pending { background: rgba(251,191,36,0.15); color: var(--warn); }
+
+  .mood-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .mood-btn { padding: 0.5rem 0.75rem; min-height: 2.5rem; border-radius: 20px; border: 1px solid var(--surface2); background: var(--surface2); color: var(--text-dim); font-size: 1rem; cursor: pointer; transition: all 0.2s; }
+  .mood-btn.active { background: var(--accent); border-color: var(--accent); }
+
+  .search-input { width: 100%; background: var(--surface2); border: 1px solid var(--surface2); color: var(--text); padding: 0.75rem; border-radius: 8px; font-size: 1rem; margin-bottom: 0.75rem; }
+  .search-input:focus { outline: none; border-color: var(--accent); }
+
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 1rem; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+  @media (min-width: 600px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+  .mini-stat { background: var(--surface2); border-radius: 8px; padding: 0.75rem; text-align: center; }
+  .mini-stat .val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .mini-stat .lbl { font-size: 0.7rem; color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="dream-title">🌙 Dream Tracker</span></h1>
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+    <div id="lang-selector"></div>
+    <button class="nav-btn" onclick="showScreen('new-dream')" data-i18n="dream-new">✏️ New</button>
+    <button class="nav-btn" onclick="showScreen('dreams')" data-i18n="history">📋 History</button>
+  </div>
+</header>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('dream')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="dream-title">🌙 Dream Tracker</h2>
+      <p data-i18n="dream-desc">Log dreams, tag symbols, identify precognitive hits. Review patterns over time.</p>
+    </div>
+
+    <div class="stats-row" id="welcome-stats">
+      <div class="mini-stat"><div class="val" id="ws-total">0</div><div class="lbl" data-i18n="dream-total">Total Dreams</div></div>
+      <div class="mini-stat"><div class="val" id="ws-precog">0</div><div class="lbl" data-i18n="dream-precog">Precognitive</div></div>
+      <div class="mini-stat"><div class="val" id="ws-hits">0</div><div class="lbl" data-i18n="dream-hits">Confirmed Hits</div></div>
+      <div class="mini-stat"><div class="val" id="ws-lucid">0</div><div class="lbl" data-i18n="dream-lucid">Lucid Dreams</div></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="showScreen('new-dream')" data-i18n="dream-log-btn">🌙 Log a Dream</button>
+      <button class="btn btn-secondary" onclick="showScreen('dreams')" data-i18n="dream-view-btn">📋 View Dreams</button>
+    </div>
+  </div>
+
+  <!-- NEW DREAM SCREEN -->
+  <div id="screen-new-dream" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 50%"></div></div>
+
+    <div class="tip-banner" id="tip-new">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-new-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('dream')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="dream-new-entry">Log a Dream</h2>
+      <p data-i18n="dream-new-desc">Record your dream while it's fresh. Include as much detail as possible.</p>
+    </div>
+
+    <div class="field">
+      <label for="dream-title" data-i18n="dream-entry-title">Dream Title</label>
+      <input type="text" id="dream-title" class="text-input" data-i18n-placeholder="dream-title-ph" placeholder="e.g., Flying over a city">
+    </div>
+
+    <div class="field">
+      <label for="dream-date" data-i18n="dream-date">Date</label>
+      <input type="date" id="dream-date" class="text-input">
+    </div>
+
+    <div class="field">
+      <label data-i18n="dream-mood">Mood / Emotion</label>
+      <div class="mood-selector">
+        <button class="mood-btn" data-mood="😊" onclick="selectMood(this)" data-i18n="mood-happy">😊 Happy</button>
+        <button class="mood-btn" data-mood="😨" onclick="selectMood(this)" data-i18n="mood-fear">😨 Fear</button>
+        <button class="mood-btn" data-mood="😐" onclick="selectMood(this)" data-i18n="mood-neutral">😐 Neutral</button>
+        <button class="mood-btn" data-mood="😢" onclick="selectMood(this)" data-i18n="mood-sad">😢 Sad</button>
+        <button class="mood-btn" data-mood="🤯" onclick="selectMood(this)" data-i18n="mood-amazed">🤯 Amazed</button>
+        <button class="mood-btn" data-mood="😴" onclick="selectMood(this)" data-i18n="mood-peaceful">😴 Peaceful</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="dream-description" data-i18n="dream-description">Dream Description</label>
+      <textarea id="dream-description" class="text-input" rows="5" data-i18n-placeholder="dream-desc-ph" placeholder="Describe the dream in detail..."></textarea>
+    </div>
+
+    <div class="field">
+      <label data-i18n="dream-symbols">Symbols / Themes</label>
+      <div class="filter-bar" id="symbol-select">
+        <button class="cat-btn" data-sym="water" onclick="toggleSymbol(this)" data-i18n="sym-water">Water</button>
+        <button class="cat-btn" data-sym="flying" onclick="toggleSymbol(this)" data-i18n="sym-flying">Flying</button>
+        <button class="cat-btn" data-sym="falling" onclick="toggleSymbol(this)" data-i18n="sym-falling">Falling</button>
+        <button class="cat-btn" data-sym="chase" onclick="toggleSymbol(this)" data-i18n="sym-chase">Being Chased</button>
+        <button class="cat-btn" data-sym="teeth" onclick="toggleSymbol(this)" data-i18n="sym-teeth">Teeth</button>
+        <button class="cat-btn" data-sym="death" onclick="toggleSymbol(this)" data-i18n="sym-death">Death</button>
+        <button class="cat-btn" data-sym="birth" onclick="toggleSymbol(this)" data-i18n="sym-birth">Birth</button>
+        <button class="cat-btn" data-sym="house" onclick="toggleSymbol(this)" data-i18n="sym-house">House</button>
+        <button class="cat-btn" data-sym="journey" onclick="toggleSymbol(this)" data-i18n="sym-journey">Journey</button>
+        <button class="cat-btn" data-sym="animals" onclick="toggleSymbol(this)" data-i18n="sym-animals">Animals</button>
+        <button class="cat-btn" data-sym="deceased" onclick="toggleSymbol(this)" data-i18n="sym-deceased">Deceased Person</button>
+        <button class="cat-btn" data-sym="naked" onclick="toggleSymbol(this)" data-i18n="sym-naked">Naked</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label data-i18n="dream-type">Dream Type</label>
+      <div class="filter-bar">
+        <button class="cat-btn" data-type="normal" onclick="selectDreamType(this)" data-i18n="type-normal">Normal</button>
+        <button class="cat-btn" data-type="lucid" onclick="selectDreamType(this)" data-i18n="type-lucid">Lucid</button>
+        <button class="cat-btn" data-type="precog" onclick="selectDreamType(this)" data-i18n="type-precog">Precognitive</button>
+        <button class="cat-btn" data-type="prophetic" onclick="selectDreamType(this)" data-i18n="type-prophetic">Prophetic</button>
+        <button class="cat-btn" data-type="nightmare" onclick="selectDreamType(this)" data-i18n="type-nightmare">Nightmare</button>
+        <button class="cat-btn" data-type="recurring" onclick="selectDreamType(this)" data-i18n="type-recurring">Recurring</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="dream-precog-event" data-i18n="dream-precog-event">Precognitive Event</label>
+      <textarea id="dream-precog-event" class="text-input" rows="2" data-i18n-placeholder="dream-precog-ph" placeholder="What event did the dream predict?"></textarea>
+    </div>
+
+    <div class="field">
+      <label data-i18n="dream-precog-status">Precognitive Status</label>
+      <div class="filter-bar">
+        <button class="cat-btn" data-ps="pending" onclick="selectPrecogStatus(this)" data-i18n="precog-pending">Pending</button>
+        <button class="cat-btn" data-ps="hit" onclick="selectPrecogStatus(this)" data-i18n="precog-hit">Confirmed Hit</button>
+        <button class="cat-btn" data-ps="miss" onclick="selectPrecogStatus(this)" data-i18n="precog-miss">Miss</button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="saveDream()" data-i18n="save-dream">💾 Save Dream</button>
+    </div>
+  </div>
+
+  <!-- DREAMS LIST SCREEN -->
+  <div id="screen-dreams" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="dream-entries">🌙 Dream Log</h2>
+    </div>
+
+    <input type="text" class="search-input" id="dream-search" data-i18n-placeholder="dream-search-ph" placeholder="Search dreams..." oninput="renderDreams()">
+
+    <div class="filter-bar" id="dream-filter-bar">
+      <button class="cat-btn active" data-df="all" onclick="filterDreams(this)" data-i18n="filter-all">All</button>
+      <button class="cat-btn" data-df="lucid" onclick="filterDreams(this)" data-i18n="type-lucid">Lucid</button>
+      <button class="cat-btn" data-df="precog" onclick="filterDreams(this)" data-i18n="type-precog">Precognitive</button>
+      <button class="cat-btn" data-df="prophetic" onclick="filterDreams(this)" data-i18n="type-prophetic">Prophetic</button>
+      <button class="cat-btn" data-df="nightmare" onclick="filterDreams(this)" data-i18n="type-nightmare">Nightmare</button>
+      <button class="cat-btn" data-df="recurring" onclick="filterDreams(this)" data-i18n="type-recurring">Recurring</button>
+    </div>
+
+    <div id="dreams-list"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goHome()" data-i18n="back-home">← Back to Home</button>
+      <button class="btn btn-primary" onclick="showScreen('new-dream')" data-i18n="dream-log-btn">🌙 Log a Dream</button>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+let selectedMood = null;
+let selectedSymbols = [];
+let selectedDreamType = 'normal';
+let selectedPrecogStatus = 'pending';
+let currentFilter = 'all';
+
+function loadDreams() { return loadData('dream_entries') || []; }
+function saveDreams(data) { saveData('dream_entries', data); }
+
+function selectMood(btn) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedMood = btn.dataset.mood;
+}
+
+function toggleSymbol(btn) {
+  btn.classList.toggle('active');
+  const sym = btn.dataset.sym;
+  if (selectedSymbols.includes(sym)) selectedSymbols = selectedSymbols.filter(s => s !== sym);
+  else selectedSymbols.push(sym);
+}
+
+function selectDreamType(btn) {
+  document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedDreamType = btn.dataset.type;
+}
+
+function selectPrecogStatus(btn) {
+  document.querySelectorAll('[data-ps]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedPrecogStatus = btn.dataset.ps;
+}
+
+function filterDreams(btn) {
+  document.querySelectorAll('#dream-filter-bar .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.df;
+  renderDreams();
+}
+
+function saveDream() {
+  const title = document.getElementById('dream-title').value.trim();
+  const desc = document.getElementById('dream-description').value.trim();
+  if (!title || !desc) { alert(t('dream-fill-required')); return; }
+
+  const dream = {
+    id: Date.now(),
+    title,
+    date: document.getElementById('dream-date').value || new Date().toISOString().slice(0, 10),
+    mood: selectedMood,
+    description: desc,
+    symbols: [...selectedSymbols],
+    type: selectedDreamType,
+    precogEvent: document.getElementById('dream-precog-event').value.trim(),
+    precogStatus: selectedPrecogStatus
+  };
+
+  const dreams = loadDreams();
+  dreams.unshift(dream);
+  saveDreams(dreams);
+
+  // Clear form
+  document.getElementById('dream-title').value = '';
+  document.getElementById('dream-description').value = '';
+  document.getElementById('dream-precog-event').value = '';
+  selectedMood = null;
+  selectedSymbols = [];
+  selectedDreamType = 'normal';
+  selectedPrecogStatus = 'pending';
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#symbol-select .cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-type="normal"]').classList.add('active');
+  document.querySelectorAll('[data-ps]').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-ps="pending"]').classList.add('active');
+
+  showScreen('dreams');
+}
+
+function renderDreams() {
+  const dreams = loadDreams();
+  const search = (document.getElementById('dream-search')?.value || '').toLowerCase();
+  const list = document.getElementById('dreams-list');
+
+  let filtered = dreams;
+  if (currentFilter !== 'all') filtered = filtered.filter(d => d.type === currentFilter);
+  if (search) filtered = filtered.filter(d =>
+    d.title.toLowerCase().includes(search) ||
+    d.description.toLowerCase().includes(search) ||
+    d.symbols.some(s => s.toLowerCase().includes(search))
+  );
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim)">' + t('dream-no-entries') + '</div>';
+    return;
+  }
+
+  const typeLabels = { normal: t('type-normal'), lucid: t('type-lucid'), precog: t('type-precog'), prophetic: t('type-prophetic'), nightmare: t('type-nightmare'), recurring: t('type-recurring') };
+  const precogLabels = { pending: t('precog-pending'), hit: t('precog-hit'), miss: t('precog-miss') };
+
+  list.innerHTML = filtered.map((d, i) => {
+    const idx = dreams.indexOf(d);
+    const tags = d.symbols.map(s => `<span class="dream-tag">${s}</span>`).join('');
+    const precogBadge = d.type === 'precog' || d.type === 'prophetic'
+      ? `<span class="dream-precog ${d.precogStatus}">${precogLabels[d.precogStatus]}</span>` : '';
+    return `<div class="dream-card" onclick="viewDream(${idx})">
+      <div class="dream-title">${d.mood || ''} ${esc(d.title)}</div>
+      <div class="dream-date">${d.date}</div>
+      <div class="dream-tags">${tags} ${precogBadge}</div>
+      <div class="dream-preview">${esc(d.description)}</div>
+    </div>`;
+  }).join('');
+}
+
+function viewDream(index) {
+  const dreams = loadDreams();
+  const d = dreams[index];
+  if (!d) return;
+
+  const typeLabels = { normal: t('type-normal'), lucid: t('type-lucid'), precog: t('type-precog'), prophetic: t('type-prophetic'), nightmare: t('type-nightmare'), recurring: t('type-recurring') };
+  const precogLabels = { pending: t('precog-pending'), hit: t('precog-hit'), miss: t('precog-miss') };
+
+  let html = `<h3>${d.mood || ''} ${esc(d.title)}</h3>`;
+  html += `<p><strong>${t('dream-date')}:</strong> ${d.date}</p>`;
+  html += `<p><strong>${t('dream-type')}:</strong> ${typeLabels[d.type] || d.type}</p>`;
+  if (d.mood) html += `<p><strong>${t('dream-mood')}:</strong> ${d.mood}</p>`;
+  html += `<p><strong>${t('dream-description')}:</strong><br>${esc(d.description)}</p>`;
+  if (d.symbols.length) html += `<p><strong>${t('dream-symbols')}:</strong> ${d.symbols.join(', ')}</p>`;
+  if (d.precogEvent) html += `<p><strong>${t('dream-precog-event')}:</strong><br>${esc(d.precogEvent)}</p>`;
+  if (d.type === 'precog' || d.type === 'prophetic') html += `<p><strong>${t('dream-precog-status')}:</strong> ${precogLabels[d.precogStatus]}</p>`;
+  html += `<div style="margin-top:1rem;display:flex;gap:0.5rem;justify-content:center">`;
+  html += `<button class="btn btn-secondary btn-sm" onclick="editDream(${index})">${t('edit')}</button>`;
+  html += `<button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteDream(${index})">${t('delete')}</button>`;
+  html += `<button class="btn btn-secondary btn-sm" onclick="closeModal()">${t('close')}</button>`;
+  html += `</div>`;
+
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function editDream(index) {
+  const dreams = loadDreams();
+  const d = dreams[index];
+  if (!d) return;
+  closeModal();
+  document.getElementById('dream-title').value = d.title;
+  document.getElementById('dream-description').value = d.description;
+  document.getElementById('dream-date').value = d.date;
+  document.getElementById('dream-precog-event').value = d.precogEvent || '';
+  selectedMood = d.mood;
+  selectedSymbols = [...d.symbols];
+  selectedDreamType = d.type;
+  selectedPrecogStatus = d.precogStatus;
+
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.toggle('active', b.dataset.mood === d.mood));
+  document.querySelectorAll('#symbol-select .cat-btn').forEach(b => b.classList.toggle('active', d.symbols.includes(b.dataset.sym)));
+  document.querySelectorAll('[data-type]').forEach(b => b.classList.toggle('active', b.dataset.type === d.type));
+  document.querySelectorAll('[data-ps]').forEach(b => b.classList.toggle('active', b.dataset.ps === d.precogStatus));
+
+  dreams.splice(index, 1);
+  saveDreams(dreams);
+  showScreen('new-dream');
+}
+
+function deleteDream(index) {
+  if (!confirm(t('dream-delete-confirm'))) return;
+  const dreams = loadDreams();
+  dreams.splice(index, 1);
+  saveDreams(dreams);
+  closeModal();
+  renderDreams();
+  updateWelcomeStats();
+}
+
+function updateWelcomeStats() {
+  const dreams = loadDreams();
+  document.getElementById('ws-total').textContent = dreams.length;
+  document.getElementById('ws-precog').textContent = dreams.filter(d => d.type === 'precog' || d.type === 'prophetic').length;
+  document.getElementById('ws-hits').textContent = dreams.filter(d => d.precogStatus === 'hit').length;
+  document.getElementById('ws-lucid').textContent = dreams.filter(d => d.type === 'lucid').length;
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  updateWelcomeStats();
+  showTip('dream');
+  document.getElementById('dream-date').value = new Date().toISOString().slice(0, 10);
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'dreams') renderDreams();
+  if (['welcome','new-dream'].includes(name)) showTip('dream');
+};
+</script>
+
+</body>
+</html>

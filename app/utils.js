@@ -1,0 +1,1568 @@
+// ─── Psychic101 Shared Utilities ──────────────────────────
+
+// ─── i18n ─────────────────────────────────────────────────
+// Detect once which storage mechanism actually works, then use it exclusively
+let _storageType = null; // 'local' | 'session' | 'cookie'
+function detectStorage() {
+  if (_storageType) return _storageType;
+  try {
+    localStorage.setItem('__p101_test__', '1');
+    if (localStorage.getItem('__p101_test__') === '1') {
+      localStorage.removeItem('__p101_test__');
+      _storageType = 'local'; return 'local';
+    }
+  } catch(e) {}
+  try {
+    sessionStorage.setItem('__p101_test__', '1');
+    if (sessionStorage.getItem('__p101_test__') === '1') {
+      sessionStorage.removeItem('__p101_test__');
+      _storageType = 'session'; return 'session';
+    }
+  } catch(e) {}
+  _storageType = 'cookie'; return 'cookie';
+}
+
+function getStoredLang() {
+  const st = detectStorage();
+  if (st === 'local') { try { const v = localStorage.getItem('p101_lang'); if (v) return v; } catch(e) {} }
+  if (st === 'session') { try { const v = sessionStorage.getItem('p101_lang'); if (v) return v; } catch(e) {} }
+  if (st === 'cookie') { const m = document.cookie.match(/p101_lang=([^;]+)/); if (m) return m[1]; }
+  const params = new URLSearchParams(window.location.search);
+  return params.get('lang');
+}
+function setStoredLang(lang) {
+  const st = detectStorage();
+  if (st === 'local') { try { localStorage.setItem('p101_lang', lang); return; } catch(e) {} }
+  if (st === 'session') { try { sessionStorage.setItem('p101_lang', lang); return; } catch(e) {} }
+  document.cookie = 'p101_lang=' + lang + ';path=/;max-age=31536000';
+}
+let currentLang = getStoredLang() || 'en';
+
+const TRANSLATIONS = {
+  en: {
+    // Shared UI
+    'lang-label': 'Language',
+    'back-home': '← Back to Home',
+    'back': '← Back',
+    'quit': '← Quit',
+    'save': '💾 Save',
+    'next': 'Next →',
+    'previous': '← Previous',
+    'finish': '📊 Finish',
+    'start': 'Start',
+    'continue': '▶ Continue',
+    'reveal': '🔍 Reveal',
+    'submit': '🔍 Submit',
+    'history': '📋 History',
+    'training': '🏋 Training',
+    'close': 'Close',
+    'loading-tip': 'Loading tip...',
+    'no-data': 'No data yet.',
+    'date': 'Date',
+    'notes': 'Notes',
+    'rating': 'Rating',
+    'duration': 'Duration',
+    'accuracy': 'Accuracy',
+    'sessions': 'Sessions',
+    'total': 'Total',
+    'correct': 'Correct',
+    'chance': 'Chance',
+    'over-chance': 'Over Chance',
+    'trials': 'Trials',
+    'exact': 'Exact',
+    'same-suit': 'Same Suit',
+    'same-color': 'Same Color',
+    'miss': 'Miss',
+    'day-streak': 'Day Streak',
+    'avg-rating': 'Avg Rating',
+    'total-trials': 'Total Trials',
+    'total-rounds': 'Total Rounds',
+    'exact-matches': 'Exact Matches',
+    'exact-pct': 'Exact %',
+    'per-symbol-accuracy': 'Per-Symbol Accuracy',
+    'chi-square': 'Chi-Square Analysis',
+    'session-notes': 'Session Notes',
+    'reflection': 'Reflection',
+    'impression-notes': 'Impression Notes',
+    'feedback-notes': 'What matched? What didn\'t?',
+    'self-assessment': 'Self-Assessment',
+    'accuracy-rating': 'Accuracy Rating',
+    'your-impressions': 'Your Impressions',
+    'target-revealed': '🎯 Target Revealed',
+    'session-history': '📊 Session History',
+    'card-history': '📊 Card Guessing History',
+    'zener-history': '📊 Zener History',
+    'daily-exercises': 'Daily Training Exercises',
+    'training-log': 'Training Log',
+    'score-breakdown': 'Score Breakdown',
+    'recommended-training': 'Recommended Training',
+    'clair-profile': 'Your Clair Sense Profile',
+    'next-trial': '▶ Next Trial',
+    'save-session': '💾 Save Session',
+    'save-next': '💾 Save & Next Round',
+    'start-round': '🃏 Start New Round',
+    'start-session': '⭕ Start New Session',
+    'start-assessment': '🔮 Start Assessment',
+    'view-results': '📊 View Results',
+    'go-training': '🏋 Go to Training',
+    'start-new-session': '✨ Start New Session',
+    'continue-session': '▶ Continue Session',
+    'continue-sensory': 'Continue to Sensory Data →',
+    'continue-dimensions': 'Continue to Dimensions →',
+    'continue-emotions': 'Continue to Emotions →',
+    'reveal-target': '🔍 Reveal Target',
+    'log-complete': '✓ Log Complete',
+    'no-sessions': 'No sessions yet. Start your first session!',
+    'no-rounds': 'No rounds yet. Start guessing!',
+    'no-exercises': 'No exercises logged yet.',
+    'complete-assessment': 'Complete the assessment first to see personalized exercises.',
+    'no-assessment': 'No assessment data found. Complete the assessment first.',
+    'select-symbol': 'Please select a symbol before submitting.',
+    'select-suit-rank': 'Please select both a suit and a rank before revealing.',
+    'need-10-trials': 'Need at least 10 trials for chi-square analysis.',
+    'chi-sig': '✅ Statistically significant! χ² = {chi2} (critical: {critical})',
+    'chi-ns': '⚠ Approaching significance. χ² = {chi2} (critical: {critical})',
+    'chi-low': 'Not significant. χ² = {chi2} (critical: {critical})',
+    // Zener
+    'zener-title': '⭕ Zener Symbols',
+    'zener-subtitle': '— ESP Trainer',
+    'zener-desc': 'Classic ESP research using 5 symbols. Random chance is 20% — sustained scores above 25% are noteworthy.',
+    'zener-symbols-title': 'The 5 Zener Symbols',
+    'circle': 'Circle',
+    'cross': 'Cross',
+    'waves': 'Waves',
+    'square': 'Square',
+    'star': 'Star',
+    'trials-per-session': 'Trials per Session',
+    'what-symbol': 'What symbol do you sense?',
+    'focus-hidden': 'Focus on the hidden symbol. Select what your intuition tells you.',
+    'correct': '🎯 Correct!',
+    'incorrect': '❌ Incorrect — Target was {sym}',
+    'you-guessed': 'You guessed: {guess}  |  Target: {target}',
+    'excellent': '🌟 Excellent — Well above chance!',
+    'above-chance': '👍 Above chance — Good work!',
+    'near-chance': '👁 Near chance — Keep practicing!',
+    'below-chance': '📉 Below chance — Don\'t be discouraged.',
+    // Card
+    'card-title': '🃏 Card Guessing',
+    'card-subtitle': '— ESP Trainer',
+    'card-desc': 'Focus on the card back, then record your psychic impression of the hidden card. Test your clairvoyance!',
+    'how-to-play': 'How to Play',
+    'deck-type': 'Deck Type',
+    'full-deck': 'Full Deck (52 cards)',
+    'simplified': 'Simplified (4 suits × 10)',
+    'what-card': 'What card do you sense?',
+    'focus-card': 'Focus on the card back. Select the suit and rank your impression points to.',
+    'suit': 'Suit',
+    'rank': 'Rank',
+    'spades': 'Spades',
+    'hearts': 'Hearts',
+    'diamonds': 'Diamonds',
+    'clubs': 'Clubs',
+    'exact-match': '🎯 Exact Match!',
+    'same-suit-badge': '👍 Same Suit!',
+    'same-color-badge': '👁 Same Color',
+    'miss-badge': '❌ Miss',
+    // RV Trainer
+    'rv-title': '🔮 Psychic101',
+    'rv-subtitle': '— RV Trainer',
+    'rv-desc': 'Practice Controlled Remote Viewing (CRV) with randomized targets. Each session gives you a target code — record your impressions, then reveal the target to compare.',
+    'how-it-works': 'How It Works',
+    'rv-step1': 'Get a target code — a random 8-digit number linked to a hidden image',
+    'rv-step2': 'Draw your ideogram — let your hand move freely to capture the gestalt',
+    'rv-step3': 'Record impressions — sensory data, dimensions, colors, emotions',
+    'rv-step4': 'Reveal & compare — see the target and rate your accuracy',
+    'rv-step5': 'Review & improve — track your progress over time',
+    'quick-tips': 'Quick Tips',
+    'rv-tip1': 'Relax before starting — take 3 deep breaths',
+    'rv-tip2': 'Iterate the target code silently: "Target',
+    'rv-tip3': 'Record everything — even if it seems silly',
+    'rv-tip4': 'Don\'t force or guess — let impressions come naturally',
+    'rv-tip5': 'Watch for AOL (analytical overlays) — label them and move on',
+    'step1-ideogram': 'Step 1 — Ideogram',
+    'ideogram-desc': 'Iterate the target code silently. Let your hand move freely on the canvas below. The resulting mark is your <strong>ideogram</strong> — the gestalt of the target.',
+    'ideogram-category': 'Ideogram Category',
+    'ideogram-notes': 'Ideogram Notes',
+    'ideogram-placeholder': 'What does the ideogram suggest? Describe the shape, feel, and initial impressions...',
+    'step2-sensory': 'Step 2 — Sensory Data (A/B)',
+    'sensory-desc': 'Record raw sensory impressions. What do you <strong>see, hear, feel, smell, taste</strong>? Keep it factual — no interpretation yet.',
+    'visual': '👁 Visual',
+    'auditory': '👂 Auditory',
+    'tactile': '✋ Tactile / Kinesthetic',
+    'olfactory': '👃 Olfactory',
+    'gustatory': '👅 Gustatory',
+    'aol': '⚠️ Analytical Overlays (AOL)',
+    'step3-dimensions': 'Step 3 — Dimensions & Colors',
+    'dimensions-desc': 'Estimate the size, shape, and color palette of the target. Think in terms of relative scale.',
+    'size-scale': 'Size / Scale',
+    'shape-form': 'Shape / Form',
+    'colors': 'Colors',
+    'motion-energy': 'Motion / Energy',
+    'step4-emotions': 'Step 4 — Emotions & Conceptualization',
+    'emotions-desc': 'What feelings does the target evoke? What is the overall "vibe"? Now you may begin to form a conceptual understanding.',
+    'emotional-tone': 'Emotional Tone',
+    'overall-vibe': 'Overall Vibe / Atmosphere',
+    'conceptualization': 'Conceptualization',
+    'session-duration': 'Session Duration',
+    'compare-impressions': 'Compare your impressions with the actual target. Be honest in your self-assessment.',
+    // Clair
+    'clair-title': '👁 Clair Sense ID',
+    'clair-subtitle': '— Assessment',
+    'clair-desc': 'Discover your dominant Clair sense through a 16-question assessment. Each sense gets 2 questions rated on a 1–5 scale.',
+    'clair-senses-title': 'The 8 Clair Senses',
+    'clairvoyance': 'Clairvoyance',
+    'clairvoyance-desc': 'Clear seeing, visual impressions',
+    'clairaudience': 'Clairaudience',
+    'clairaudience-desc': 'Clear hearing, auditory impressions',
+    'clairsentience': 'Clairsentience',
+    'clairsentience-desc': 'Clear feeling, tactile/emotional sensations',
+    'claircognizance': 'Claircognizance',
+    'claircognizance-desc': 'Clear knowing, information without source',
+    'clairalience': 'Clairalience',
+    'clairalience-desc': 'Clear smelling, scent impressions',
+    'clairgustance': 'Clairgustance',
+    'clairgustance-desc': 'Clear tasting, flavor impressions',
+    'clairempathy': 'Clairempathy',
+    'clairempathy-desc': 'Clear empathy, absorbing others\' emotions',
+    'clairambience': 'Clairambience',
+    'clairambience-desc': 'Clear ambience, sensing energy of places',
+    'dominant-sense': 'Your dominant Clair sense is: {icon} {name} ({desc}).<br>This is your strongest channel for psychic perception. Focus training here first.',
+    'focus-dominant': 'Focus on strengthening your dominant sense first, then cross-train the others.',
+    'rating-never': 'Never',
+    'rating-rarely': 'Rarely',
+    'rating-sometimes': 'Sometimes',
+    'rating-often': 'Often',
+    'rating-always': 'Always',
+    'never': 'Never',
+    'rarely': 'Rarely',
+    'sometimes': 'Sometimes',
+    'often': 'Often',
+    'always': 'Always',
+    'dominant-desc': 'This is your strongest channel for psychic perception. Focus training here first.',
+    'training-focus': 'Focus on strengthening your dominant sense first, then cross-train the others.',
+    'training-exercises-below': 'Here are your personalized exercises below.',
+    'complete-assessment-first': 'Complete the assessment first to see personalized exercises.',
+    'no-exercises-logged': 'No exercises logged yet.',
+    'no-assessment-data': 'No assessment data found. Complete the assessment first.',
+    // Hub
+    'hub-title': '🔮 Psychic101',
+    'hub-subtitle': '— Suite',
+    'hero-title': 'Psychic Development Suite',
+    'hero-desc': 'Explore and develop your psychic abilities through structured practice, journaling, and analysis.',
+    'section-rv': '🎯 Remote Viewing',
+    'section-esp': '🃏 ESP Training',
+    'section-journal': '📖 Journaling & Tracking',
+    'section-prep': '🧘 Preparation & Analysis',
+    'hub-activity-title': '📋 Recent Activity',
+    'hub-entries': 'entries',
+    'hub-sessions': 'sessions',
+    'hub-no-activity': 'No activity yet. Start a session!',
+    'launch': 'Launch →',
+    'rv-trainer-title': 'Remote Viewing Trainer',
+    'rv-trainer-desc': 'Full CRV protocol: ideogram → sensory data → dimensions → emotions → reveal.',
+    'random-viewer-title': 'Random Object Viewer',
+    'random-viewer-desc': 'Blind targets from Wikipedia and random images. Practice with unpredictable subjects.',
+    'partner-title': 'Partner Platform',
+    'partner-desc': 'Coordinate sessions with a partner. One holds, one views. Compare results.',
+    'card-guess-title': 'Card Guessing Trainer',
+    'card-guess-desc': 'Guess playing cards from a shuffled deck. Track accuracy by suit and rank.',
+    // Card Guessing extra
+    'card-history-title': '📊 Session History',
+    'card-start': '▶ Start Session',
+    'card-step1': 'Choose your deck type',
+    'card-step2': 'Focus on the card back',
+    'card-step3': 'Record your impression',
+    'card-step4': 'Reveal the card',
+    'card-step5': 'Rate your accuracy',
+    'reveal-card': '🔍 Reveal Card',
+    'simplified-deck': 'Simplified Deck',
+    'zener-title-hub': 'Zener Symbol Trainer',
+    'zener-desc-hub': 'Classic ESP research with 5 Zener symbols. 25-trial sessions with chi-square analysis.',
+    // Zener extra
+    'chi-analysis': 'Chi-Square Analysis',
+    'submit-guess': 'Submit Guess',
+    'sym-circle': '○ Circle',
+    'sym-cross': '✚ Cross',
+    'sym-square': '□ Square',
+    'sym-star': '★ Star',
+    'sym-waves': '≋ Waves',
+    'zener-guess-desc': 'Focus on the hidden symbol. What do you perceive?',
+    'zener-guess-title': 'Guess the Symbol',
+    'zener-history-title': '📊 Session History',
+    'zener-start': '▶ Start Session',
+    'clair-id-title': 'Clair Sense Identifier',
+    'clair-id-desc': 'Discover your dominant Clair sense through guided exercises.',
+    'journal-title': 'Psychic Journal',
+    'journal-desc': 'Record impressions, experiences, and synchronicities. Tag and search entries.',
+    'dream-title': 'Dream Tracker',
+    'dream-desc': 'Log dreams, tag symbols, identify precognitive hits. Review patterns over time.',
+    'dream-log-btn': '📋 Dream Log',
+    'grounding-title': 'Grounding Coach',
+    'grounding-desc': 'Guided grounding: 5-4-3-2-1 technique, rooting visualization, breath work.',
+    'analyzer-title': 'Signal Line Analyzer',
+    'analyzer-desc': 'Analyze data across all apps. Track accuracy trends, AOL frequency, peak times.',
+    // Analyzer extra
+    'analyzer-overview': 'Overview',
+    'analyzer-overview-desc': 'This dashboard aggregates data from all your psychic training apps to reveal patterns and trends.',
+    'analyzer-data-sources': 'Data Sources',
+    'analyzer-accuracy': 'Accuracy by App',
+    'analyzer-peak-times': 'Peak Activity Times',
+    'analyzer-aol': 'AOL Frequency',
+    'analyzer-refresh': '🔄 Refresh',
+    'analyzer-refresh-btn': '🔄 Refresh Analysis',
+    'analyzer-loading': 'Loading data...',
+    'analyzer-aol-high': 'Strong signal — keep it up!',
+    'analyzer-aol-med': 'Moderate signal — keep practicing',
+    'analyzer-aol-low': 'Weak signal — try grounding before sessions',
+    'analyzer-no-data': 'No data yet. Start some sessions first!',
+    'analyzer-no-journal-data': 'No journal entries yet. Log some experiences first.',
+    'analyzer-records': 'records',
+    'analyzer-rv': 'RV Trainer',
+    'analyzer-card': 'Card Guessing',
+    'analyzer-zener': 'Zener Symbols',
+    'analyzer-random': 'Random Viewer',
+    'analyzer-partner': 'Partner Platform',
+    'analyzer-dial': 'Dial Trainer',
+    'os-total-sessions': 'Total Sessions',
+    'os-avg-rating': 'Avg Rating',
+    'os-journal-entries': 'Journal Entries',
+    'os-dream-entries': 'Dream Entries',
+    // Journal
+    'journal-title': '📓 Psychic Journal',
+    'journal-desc': 'Record impressions, experiences, and synchronicities. Track verification over time.',
+    'journal-new': 'New Entry',
+    'journal-new-btn': '✨ New Entry',
+    'journal-new-desc': 'Record a psychic impression, experience, or synchronicity.',
+    'journal-new-entry': 'New Entry',
+    'journal-entries': '📋 Entries',
+    'journal-view-entries': '📋 View Entries',
+    'journal-confirmed': 'Confirmed',
+    'journal-partial': 'Partial',
+    'journal-unverified': 'Unverified',
+    'entry-title': 'Title',
+    'entry-date': 'Date',
+    'entry-category': 'Category',
+    'entry-impression': 'Impression / Experience',
+    'entry-context': 'Context',
+    'entry-outcome': 'Outcome / Result',
+    'entry-verification': 'Verification',
+    'save-entry': '💾 Save Entry',
+    'cat-premonition': 'Premonition',
+    'cat-clairvoyance': 'Clairvoyance',
+    'cat-clairsentience': 'Clairsentience',
+    'cat-clairaudience': 'Clairaudience',
+    'cat-synchronicity': 'Synchronicity',
+    'cat-remote-viewing': 'Remote Viewing',
+    'cat-dream': 'Dream',
+    'cat-other': 'Other',
+    'ver-confirmed': 'Confirmed',
+    'ver-partial': 'Partial',
+    'ver-incorrect': 'Incorrect',
+    'ver-unverified': 'Unverified',
+    'filter-all': 'All',
+    // Grounding
+    'grounding-title': '🌳 Grounding Coach',
+    'grounding-desc': 'Grounding techniques to stabilize your energy before and after psychic work.',
+    'grounding-why': 'Why Ground?',
+    'grounding-why-desc': 'Grounding helps you stay centered, prevents energy drain, and improves signal clarity.',
+    'grounding-techniques': 'Techniques',
+    'grounding-history': '📊 Session History',
+    'gh-sessions': 'Sessions',
+    'tech-54321': '5-4-3-2-1 Sensory',
+    'tech-54321-desc': 'Name 5 things you see, 4 you feel, 3 you hear, 2 you smell, 1 you taste.',
+    'tech-rooting': 'Rooting Visualization',
+    'tech-rooting-desc': 'Visualize roots growing from your feet into the earth.',
+    'tech-breath': '4-7-8 Breath Work',
+    'tech-breath-desc': 'Breathe in 4s, hold 7s, exhale 8s. Repeat 4 cycles.',
+    'tech-body-scan': 'Body Scan',
+    'tech-body-scan-desc': 'Progressively relax each body part from head to toe.',
+    'senses-label': 'Name 5 things you SEE:',
+    'senses-step-see': '5 things you SEE',
+    'senses-next': 'Next →',
+    'rooting-step1': 'Visualize roots growing from your feet deep into the earth...',
+    'rooting-next': 'Next →',
+    'rooting-notes-label': 'How do you feel after grounding?',
+    'breath-desc': 'Breathe in for 4 seconds, hold for 7, exhale for 8.',
+    'breath-ready': 'Ready? Press Start to begin.',
+    'breath-start': '▶ Start',
+    'scan-step-head': 'Focus on your head. Release tension...',
+    'scan-next': 'Next →',
+    // Dream Tracker
+    'dream-title': '🌙 Dream Tracker',
+    'dream-desc': 'Log dreams, tag symbols, identify precognitive hits.',
+    'dream-new': 'New Dream',
+    'dream-new-btn': '✨ Log Dream',
+    'dream-new-desc': 'Record a dream you remember. Include symbols, emotions, and any precognitive elements.',
+    'dream-new-entry': 'New Dream Entry',
+    'dream-entries': '📋 Dream Log',
+    'dream-view-btn': '📋 View Dreams',
+    'dream-entry-title': 'Dream Entry',
+    'dream-date': 'Date',
+    'dream-description': 'Description',
+    'dream-mood': 'Mood',
+    'dream-symbols': 'Symbols',
+    'dream-type': 'Dream Type',
+    'dream-precog': 'Precognitive',
+    'dream-precog-status': 'Precognitive Status',
+    'dream-precog-event': 'Event That Confirmed/Disproved',
+    'save-dream': '💾 Save Dream',
+    'dream-total': 'Total',
+    'dream-precog': 'Precognitive',
+    'dream-hits': 'Hits',
+    'dream-lucid': 'Lucid',
+    'mood-happy': '😊 Happy',
+    'mood-fear': '😨 Fear',
+    'mood-neutral': '😐 Neutral',
+    'mood-sad': '😢 Sad',
+    'mood-amazed': '😲 Amazed',
+    'mood-peaceful': '😌 Peaceful',
+    'sym-water': '💧 Water',
+    'sym-flying': '🕊 Flying',
+    'sym-falling': '📉 Falling',
+    'sym-teeth': '🦷 Teeth',
+    'sym-naked': '👤 Naked',
+    'sym-chase': '🏃 Being Chased',
+    'sym-house': '🏠 House',
+    'sym-animals': '🐾 Animals',
+    'sym-death': '💀 Death',
+    'sym-birth': '👶 Birth',
+    'sym-deceased': '👻 Deceased Person',
+    'sym-journey': '🗺 Journey',
+    'type-normal': 'Normal',
+    'type-lucid': 'Lucid',
+    'type-precog': 'Precognitive',
+    'type-prophetic': 'Prophetic',
+    'type-nightmare': 'Nightmare',
+    'type-recurring': 'Recurring',
+    'precog-pending': 'Pending',
+    'precog-hit': 'Hit',
+    'precog-miss': 'Miss',
+    // Random Viewer
+    'random-viewer-title': '🌍 Random Object Viewer',
+    'random-viewer-desc': 'Blind targets from Wikipedia and random images. Practice with unpredictable subjects.',
+    'rv-how-to': 'How It Works',
+    'rv-step1': 'Generate a target code',
+    'rv-step2': 'Choose target type (image or article)',
+    'rv-step3': 'Focus and record impressions',
+    'rv-step4': 'Reveal the target',
+    'rv-step5': 'Rate your accuracy',
+    'rv-target-code': 'Target Code',
+    'rv-target-type': 'Target Type',
+    'tt-image': '🖼 Random Image',
+    'tt-wikipedia': '📖 Wikipedia Article',
+    'rv-generate': '🎲 Generate Target',
+    'rv-focus-instruction': 'Focus on the target code. Record your impressions below.',
+    'rv-impressions': 'Impressions',
+    'rv-reflection': 'Reflection',
+    'rv-reveal': '🔍 Reveal Target',
+    'rv-click-reveal': 'Click to reveal the target',
+    'rv-rate': 'Rate Accuracy',
+    'rv-no-rating': 'No rating given',
+    'rv-save-next': '💾 Save & Next',
+    'rv-sessions': 'Sessions',
+    'rv-avg-rating': 'Avg Rating',
+    'rv-best-rating': 'Best Rating',
+    'rv-history-title': '📊 Session History',
+    // Partner
+    'partner-title': '👥 Partner Platform',
+    'partner-desc': 'Coordinate sessions with a partner. One holds, one views. Compare results.',
+    'partner-how': 'How It Works',
+    'partner-step1': 'Choose your role (Holder or Viewer)',
+    'partner-step2': 'Holder sets a target and generates a code',
+    'partner-step3': 'Viewer enters code and records impressions',
+    'partner-step4': 'Compare results and rate accuracy',
+    'partner-choose-role': 'Choose Your Role',
+    'role-holder': '🎯 Holder',
+    'role-holder-desc': 'You set the target and compare results',
+    'role-viewer': '👁 Viewer',
+    'role-viewer-desc': 'You receive the code and record impressions',
+    'holder-set-target': 'Set Your Target',
+    'holder-set-desc': 'Think of a specific object, place, or person. Be specific.',
+    'holder-target-name': 'Target Description',
+    'holder-target-details': 'Details (optional)',
+    'holder-generate': '🎲 Generate Code',
+    'holder-share-code': 'Share This Code',
+    'holder-share-desc': 'Share this code with your viewer. Wait for them to send their impressions.',
+    'holder-viewer-notes': 'Viewer\'s Impressions',
+    'holder-wait': 'Waiting for viewer to send impressions...',
+    'holder-compare': '🔍 Compare Results',
+    'viewer-enter-code': 'Enter Session Code',
+    'viewer-enter-desc': 'Enter the code your holder gave you.',
+    'viewer-code-label': 'Session Code',
+    'viewer-start': '▶ Start Viewing',
+    'viewer-target-code': 'Target Code',
+    'viewer-focus': 'Focus on the target code. Record your impressions.',
+    'viewer-impressions': 'Impressions',
+    'viewer-sensory': 'Sensory Data',
+    'viewer-emotions': 'Emotions / Feelings',
+    'viewer-your-impressions': 'Your Impressions',
+    'viewer-share-impressions': 'Share Your Impressions',
+    'viewer-share-desc': 'Copy these impressions and send them to your holder.',
+    'viewer-done': '✅ Done — Send to Holder',
+    'viewer-finish': '🔍 Finish',
+    'comparison-title': '🔍 Comparison Results',
+    'comparison-holder': 'Holder\'s Target',
+    'comparison-viewer': 'Viewer\'s Impressions',
+    'comp-rating': 'Accuracy Rating',
+    'comp-rate-1': 'No match',
+    'comp-rate-2': 'Slight connection',
+    'comp-rate-3': 'Partial match',
+    'comp-rate-4': 'Good match',
+    'comp-rate-5': 'Excellent match!',
+    'comp-notes': 'Notes on the match',
+    'comp-save': '💾 Save Session',
+    'partner-history': '📊 Session History',
+    'partner-sessions': 'Sessions',
+    'partner-avg-rating': 'Avg Rating',
+    'partner-best': 'Best Rating',
+    // Dial Trainer
+    'dial-title': '🎯 Dial Trainer',
+    'dial-desc': 'Influence a random pointer on a -10 to +10 scale with your mind.',
+    'dial-welcome': 'Welcome to Dial Trainer',
+    'dial-instruction': 'A pointer starts at 0 and moves randomly every half-second. Choose a target (+10 or -10), then focus your mind to influence the pointer toward it.',
+    'dial-choose-target': 'Choose Your Target',
+    'dial-duration-label': 'Duration (seconds)',
+    'dial-focus-title': 'Focus on the Dial',
+    'dial-focus-desc': 'Try to influence the pointer toward',
+    'dial-current': 'Current',
+    'dial-elapsed': 'Elapsed',
+    'dial-moves': 'Moves',
+    'dial-toward': 'Toward',
+    'dial-away': 'Away',
+    'dial-neutral': 'Neutral',
+    'dial-stop': '⏹ Stop Session',
+    'dial-result': 'Session Results',
+    'dial-target': 'Target',
+    'dial-final': 'Final Position',
+    'dial-difference': 'Difference',
+    'dial-ratio': 'Toward Ratio',
+    'dial-peak': 'Peak Position',
+    'dial-strong': '🔥 Strong influence!',
+    'dial-promising': '✨ Promising signal',
+    'dial-slight': '👀 Slight influence',
+    'dial-weak': '😐 No clear signal',
+    'dial-history': '📊 History',
+    'dial-sessions': 'Sessions',
+    'dial-avg-ratio': 'Avg Toward %',
+    'dial-best': 'Best Difference',
+    'dial-start': '▶ Start Session',
+    'dial-save': '💾 Save Session'
+  },
+  he: {
+    // Shared UI
+    'lang-label': 'שפה',
+    'back-home': '← חזרה לבית',
+    'back': '← חזרה',
+    'quit': '← יציאה',
+    'save': '💾 שמירה',
+    'next': 'הבא →',
+    'previous': '← הקודם',
+    'finish': '📊 סיום',
+    'start': 'התחלה',
+    'continue': '▶ המשך',
+    'reveal': '🔍 חשיפה',
+    'submit': '🔍 שליחה',
+    'history': '📋 היסטוריה',
+    'training': '🏋 אימון',
+    'close': 'סגירה',
+    'loading-tip': 'טוען טיפ...',
+    'no-data': 'אין נתונים עדיין.',
+    'date': 'תאריך',
+    'notes': 'הערות',
+    'rating': 'דירוג',
+    'duration': 'משך',
+    'accuracy': 'דיוק',
+    'sessions': 'סשנים',
+    'total': 'סה״כ',
+    'correct': 'נכון',
+    'chance': 'הזדמנות',
+    'over-chance': 'מעל הזדמנות',
+    'trials': 'ניסיונות',
+    'exact': 'מדויק',
+    'same-suit': 'אותו סמל',
+    'same-color': 'אותו צבע',
+    'miss': 'חטא',
+    'day-streak': 'רצף ימים',
+    'avg-rating': 'דירוג ממוצע',
+    'total-trials': 'סה״כ ניסיונות',
+    'total-rounds': 'סה״כ סיבובים',
+    'exact-matches': 'התאמות מדויקות',
+    'exact-pct': 'אחוז מדויק',
+    'per-symbol-accuracy': 'דיוק לפי סמל',
+    'chi-square': 'ניתוח חי-בריבוע',
+    'session-notes': 'הערות סשן',
+    'reflection': 'הרהור',
+    'impression-notes': 'הערות רושם',
+    'feedback-notes': 'מה התאים? מה לא?',
+    'self-assessment': 'הערכה עצמית',
+    'accuracy-rating': 'דירוג דיוק',
+    'your-impressions': 'הרושמים שלך',
+    'target-revealed': '🎯 היעד חושף',
+    'session-history': '📊 היסטוריית סשנים',
+    'card-history': '📊 היסטוריית ניחוש קלפים',
+    'zener-history': '📊 היסטוריית זנר',
+    'daily-exercises': 'תרגילים יומיים',
+    'training-log': 'יומן אימון',
+    'score-breakdown': 'פירוט ציונים',
+    'recommended-training': 'אימון מומלץ',
+    'clair-profile': 'פרופיל קליר שלך',
+    'next-trial': '▶ ניסיון הבא',
+    'save-session': '💾 שמירת סשן',
+    'save-next': '💾 שמירה וסיבוב הבא',
+    'start-round': '🃏 התחל סיבוב חדש',
+    'start-session': '⭕ התחל סשן חדש',
+    'start-assessment': '🔮 התחל הערכה',
+    'view-results': '📊 צפה בתוצאות',
+    'go-training': '🏋 עבור לאימון',
+    'start-new-session': '✨ התחל סשן חדש',
+    'continue-session': '▶ המשך סשן',
+    'continue-sensory': 'המשך לנתונים חושיים →',
+    'continue-dimensions': 'המשך למידות →',
+    'continue-emotions': 'המשך לרגשות →',
+    'reveal-target': '🔍 חשוף יעד',
+    'log-complete': '✓ רשום כהושלם',
+    'no-sessions': 'אין סשנים עדיין. התחל את הסשן הראשון!',
+    'no-rounds': 'אין סיבובים עדיין. התחל לנחש!',
+    'no-exercises': 'אין תרגילים רשומים עדיין.',
+    'complete-assessment': 'השלם את ההערכה קודם כדי לראות תרגילים מותאמים.',
+    'no-assessment': 'לא נמצאו נתוני הערכה. השלם את ההערכה קודם.',
+    'select-symbol': 'אנא בחר סמל לפני שליחה.',
+    'select-suit-rank': 'אנא בחר סמל ודרג לפני חשיפה.',
+    'need-10-trials': 'נדרשים לפחות 10 ניסיונות לניתוח חי-בריבוע.',
+    'chi-sig': '✅ משמעותי סטטיסטית! χ² = {chi2} (קריטי: {critical})',
+    'chi-ns': '⚠ מתקרב למשמעותיות. χ² = {chi2} (קריטי: {critical})',
+    'chi-low': 'לא משמעותי. χ² = {chi2} (קריטי: {critical})',
+    // Zener
+    'zener-title': '⭕ סמלי זנר',
+    'zener-subtitle': '— מאמן ESP',
+    'zener-desc': 'מחקר ESP קלאסי עם 5 סמלים. סיכוי אקראי הוא 20% — ציונים מתמשכים מעל 25% ראויים לציון.',
+    'zener-symbols-title': '5 סמלי זנר',
+    'circle': 'עיגול',
+    'cross': 'צלב',
+    'waves': 'גלים',
+    'square': 'ריבוע',
+    'star': 'כוכב',
+    'trials-per-session': 'ניסיונות לסשן',
+    'what-symbol': 'איזה סמל אתה מרגיש?',
+    'focus-hidden': 'התמקד בסמל הסמוי. בחר מה האינטואיציה שלך אומרת.',
+    'correct': '🎯 נכון!',
+    'incorrect': '❌ לא נכון — היעד היה {sym}',
+    'you-guessed': 'נחשת: {guess}  |  יעד: {target}',
+    'excellent': '🌟 מצוין — הרבה מעל סיכוי!',
+    'above-chance': '👍 מעל סיכוי — עבודה טובה!',
+    'near-chance': '👁 ליד סיכוי — המשך להתאמן!',
+    'below-chance': '📉 מתחת לסיכוי — אל תתייאש.',
+    // Card
+    'card-title': '🃏 ניחוש קלפים',
+    'card-subtitle': '— מאמן ESP',
+    'card-desc': 'התמקד בגב הקלף, ואז רשום את הרושם שלך על הקלף הסמוי. בדוק את הקלרויאנס שלך!',
+    'how-to-play': 'איך משחקים',
+    'deck-type': 'סוג חפיסה',
+    'full-deck': 'חפיסה מלאה (52 קלפים)',
+    'simplified': 'מופשט (4 סמלים × 10)',
+    'what-card': 'איזה קלף אתה מרגיש?',
+    'focus-card': 'התמקד בגב הקלף. בחר סמל ודרג שהרושם שלך מצביע עליהם.',
+    'suit': 'סמל',
+    'rank': 'דרג',
+    'spades': 'מקלות',
+    'hearts': 'לבבות',
+    'diamonds': 'יהלומים',
+    'clubs': 'עלים',
+    'exact-match': '🎯 התאמה מדויקת!',
+    'same-suit-badge': '👍 אותו סמל!',
+    'same-color-badge': '👁 אותו צבע',
+    'miss-badge': '❌ חטא',
+    // RV Trainer
+    'rv-title': '🔮 Psychic101',
+    'rv-subtitle': '— מאמן RV',
+    'rv-desc': 'תרגל ראייה מרחוק מבוקרת (CRV) עם יעדים אקראיים. כל סשן נותן לך קוד יעד — רשום את הרושמים שלך, ואז חשוף את היעד להשוואה.',
+    'how-it-works': 'איך זה עובד',
+    'rv-step1': 'קבל קוד יעד — מספר אקראי של 8 ספרות מקושר לתמונה סמויה',
+    'rv-step2': 'צייר את האיידיוגרמה שלך — תן לידיך לזוז בחופשיות כדי לתפוס את הגסטלט',
+    'rv-step3': 'רשום רושמים — נתונים חושיים, מידות, צבעים, רגשות',
+    'rv-step4': 'חשוף והשווה — ראה את היעד ודרג את הדיוק שלך',
+    'rv-step5': 'סקור ושיפר — עקוב אחר ההתקדמות שלך לאורך זמן',
+    'quick-tips': 'טיפים מהירים',
+    'rv-tip1': 'הירגע לפני ההתחלה — קח 3 נשימות עמוקות',
+    'rv-tip2': 'חזור על קוד היעד בשקט: "יעד',
+    'rv-tip3': 'רשום הכל — גם אם זה נראה טיפש',
+    'rv-tip4': 'אל תכריח או תנחש — תן לרושמים לבוא באופן טבעי',
+    'rv-tip5': 'שים לב ל-AOL (כיסויים אנליטיים) — תגוב אותם והמשך',
+    'step1-ideogram': 'שלב 1 — איידיוגרמה',
+    'ideogram-desc': 'חזור על קוד היעד בשקט. תן לידיך לזוז בחופשיות על הקנבס למטה. הסימן המתקבל הוא <strong>האיידיוגרמה</strong> שלך — הגסטלט של היעד.',
+    'ideogram-category': 'קטגוריית איידיוגרמה',
+    'ideogram-notes': 'הערות איידיוגרמה',
+    'ideogram-placeholder': 'מה האיידיוגרמה מצביעה? תאר את הצורה, התחושה והרושמים הראשוניים...',
+    'step2-sensory': 'שלב 2 — נתונים חושיים (A/B)',
+    'sensory-desc': 'רשום רושמים חושיים גולמיים. מה אתה <strong>רואה, שומע, מרגיש, מריח, טועם</strong>? שמור על עובדות — עדיין ללא פרשנות.',
+    'visual': '👁 ויזואלי',
+    'auditory': '👂 שמיעה',
+    'tactile': '✋ מגע / קינסטטי',
+    'olfactory': '👃 ריח',
+    'gustatory': '👅 טעם',
+    'aol': '⚠️ כיסויים אנליטיים (AOL)',
+    'step3-dimensions': 'שלב 3 — מידות וצבעים',
+    'dimensions-desc': 'העריך את הגודל, הצורה ופלטת הצבעים של היעד. חשב במונחים של סקלה יחסית.',
+    'size-scale': 'גודל / סקלה',
+    'shape-form': 'צורה / תבנית',
+    'colors': 'צבעים',
+    'motion-energy': 'תנועה / אנרגיה',
+    'step4-emotions': 'שלב 4 — רגשות וקונספטואליזציה',
+    'emotions-desc': 'איזה רגשות היעד מעורר? מה ה-"וייב" הכללי? עכשיו אתה יכול להתחיל ליצור הבנה קונספטואלית.',
+    'emotional-tone': 'גוון רגשי',
+    'overall-vibe': 'וייב כללי / אווירה',
+    'conceptualization': 'קונספטואליזציה',
+    'session-duration': 'משך סשן',
+    'compare-impressions': 'השווה את הרושמים שלך עם היעד האמיתי. היה כן בהערכה העצמית שלך.',
+    // Clair
+    'clair-title': '👁 זיהוי קליר',
+    'clair-subtitle': '— הערכה',
+    'clair-desc': 'גלה את חוש הקליר הדומיננטי שלך דרך הערכה של 16 שאלות. כל חוש מקבל 2 שאלות מדורגות בסולם 1–5.',
+    'clair-senses-title': '8 חושי הקליר',
+    'clairvoyance': 'קלרויאנס',
+    'clairvoyance-desc': 'ראייה ברורה, רושמים ויזואליים',
+    'clairaudience': 'קלאיראודיאנס',
+    'clairaudience-desc': 'שמיעה ברורה, רושמים שמיעתיים',
+    'clairsentience': 'קלאירסנטיאנס',
+    'clairsentience-desc': 'תחושה ברורה, תחושות מגע/רגש',
+    'claircognizance': 'קלאירקוגניזנס',
+    'claircognizance-desc': 'ידע ברור, מידע ללא מקור',
+    'clairalience': 'קלאיראליאנס',
+    'clairalience-desc': 'ריח ברור, רושמי ריח',
+    'clairgustance': 'קלאירגוסטנס',
+    'clairgustance-desc': 'טעם ברור, רושמי טעם',
+    'clairempathy': 'קלאירמפתיה',
+    'clairempathy-desc': 'אמפתיה ברורה, ספיגת רגשות אחרים',
+    'clairambience': 'קלאיראמביאנס',
+    'clairambience-desc': 'אמביאנס ברור, תחושת אנרגיה של מקומות',
+    'dominant-sense': 'חוש הקליר הדומיננטי שלך הוא: {icon} {name} ({desc}).<br>זה הערוץ החזק ביותר שלך לקריאת מחשבות. התמקד באימון כאן קודם.',
+    'focus-dominant': 'התמקד בחיזוק החוש הדומיננטי קודם, ואז תרגל חושים אחרים.',
+    'rating-never': 'לעולם לא',
+    'rating-rarely': 'נדיר',
+    'rating-sometimes': 'לפעמים',
+    'rating-often': 'לרוב',
+    'rating-always': 'תמיד',
+    'never': 'לעולם לא',
+    'rarely': 'נדיר',
+    'sometimes': 'לפעמים',
+    'often': 'לרוב',
+    'always': 'תמיד',
+    'dominant-desc': 'זה הערוץ החזק ביותר שלך לקריאת מחשבות. התמקד באימון כאן קודם.',
+    'training-focus': 'התמקד בחיזוק החוש הדומיננטי קודם, ואז תרגל חושים אחרים.',
+    'training-exercises-below': 'הנה התרגילים המותאמים שלך למטה.',
+    'complete-assessment-first': 'השלם את ההערכה קודם כדי לראות תרגילים מותאמים.',
+    'no-exercises-logged': 'אין תרגילים רשומים עדיין.',
+    'no-assessment-data': 'לא נמצאו נתוני הערכה. השלם את ההערכה קודם.',
+    // Hub
+    'hub-title': '🔮 Psychic101',
+    'hub-subtitle': '— סוויטה',
+    'hero-title': 'סוויטה לפיתוח קריאת מחשבות',
+    'hero-desc': 'חקור ופתח את יכולות קריאת המחשבות שלך דרך תרגול מסודר, יומן וניתוח.',
+    'section-rv': '🎯 ראייה מרחוק',
+    'section-esp': '🃏 אימון ESP',
+    'section-journal': '📖 יומן ומעקב',
+    'section-prep': '🧘 הכנה וניתוח',
+    'hub-activity-title': '📋 פעילות אחרונה',
+    'hub-entries': 'רשומות',
+    'hub-sessions': 'סשנים',
+    'hub-no-activity': 'אין פעילות עדיין. התחל סשן!',
+    'launch': 'הפעל →',
+    'rv-trainer-title': 'מאמן ראייה מרחוק',
+    'rv-trainer-desc': 'פרוטוקול CRV מלא: איידיוגרמה → נתונים חושיים → מידות → רגשות → חשיפה.',
+    'random-viewer-title': 'צופה אובייקט אקראי',
+    'random-viewer-desc': 'יעדים עיוורים מוויקיפדיה ותמונות אקראיות. תרגל עם נושאים בלתי צפויים.',
+    'partner-title': 'פלטפורמת שותפים',
+    'partner-desc': 'תאם סשנים עם שותף. אחד מחזיק, אחד צופה. השווה תוצאות.',
+    'card-guess-title': 'מאמן ניחוש קלפים',
+    'card-guess-desc': 'נחש קלפים מחפיסה מעורבבת. עקוב אחר דיוק לפי סמל ודרג.',
+    // Card Guessing extra
+    'card-history-title': '📊 היסטוריית סשנים',
+    'card-start': '▶ התחל סשן',
+    'card-step1': 'בחר סוג חפיסה',
+    'card-step2': 'התמקד בגב הקלף',
+    'card-step3': 'רשום את הרושם שלך',
+    'card-step4': 'חשוף את הקלף',
+    'card-step5': 'דרג את הדיוק שלך',
+    'reveal-card': '🔍 חשוף קלף',
+    'simplified-deck': 'חפיסה מופשטת',
+    'zener-title-hub': 'מאמן סמלי זנר',
+    'zener-desc-hub': 'מחקר ESP קלאסי עם 5 סמלי זנר. סשנים של 25 ניסיונות עם ניתוח חי-בריבוע.',
+    // Zener extra
+    'chi-analysis': 'ניתוח חי-בריבוע',
+    'submit-guess': 'הגש ניחוש',
+    'sym-circle': '○ עיגול',
+    'sym-cross': '✚ צלב',
+    'sym-square': '□ ריבוע',
+    'sym-star': '★ כוכב',
+    'sym-waves': '≋ גלים',
+    'zener-guess-desc': 'התמקד בסמל הסמוי. מה אתה מרגיש?',
+    'zener-guess-title': 'נחש את הסמל',
+    'zener-history-title': '📊 היסטוריית סשנים',
+    'zener-start': '▶ התחל סשן',
+    'clair-id-title': 'מזהה חוש קליר',
+    'clair-id-desc': 'גלה את חוש הקליר הדומיננטי שלך דרך תרגילים מודרכים.',
+    'journal-title': 'יומן קריאת מחשבות',
+    'journal-desc': 'רשום רושמים, חוויות וסינכרוניות. תגוב וחפש רשומות.',
+    'dream-title': 'עוקב חלומות',
+    'dream-desc': 'רשום חלומות, תגוב סמלים, זהה פגיעות קדם-קוגניטיביות. סקור דפוסים לאורך זמן.',
+    'dream-log-btn': '📋 יומן חלומות',
+    'grounding-title': 'מאמן עיגון',
+    'grounding-desc': 'עיגון מודרך: טכניקת 5-4-3-2-1, ויזואליזציה שורשית, עבודת נשימה.',
+    'analyzer-title': 'מנתח קו אות',
+    'analyzer-desc': 'נתח נתונים בכל האפליקציות. עקוב אחר מגמות דיוק, תדירות AOL, שעות שיא.',
+    // Analyzer extra
+    'analyzer-overview': 'סקירה כללית',
+    'analyzer-overview-desc': 'לוח בקרה זה מרכז נתונים מכל אפליקציות אימון קריאת המחשבות שלך כדי לחשוף דפוסים ומגמות.',
+    'analyzer-data-sources': 'מקורות נתונים',
+    'analyzer-accuracy': 'דיוק לפי אפליקציה',
+    'analyzer-peak-times': 'שעות שיא',
+    'analyzer-aol': 'תדירות AOL',
+    'analyzer-refresh': '🔄 רענן',
+    'analyzer-refresh-btn': '🔄 רענן ניתוח',
+    'analyzer-loading': 'טוען נתונים...',
+    'analyzer-aol-high': 'אות חזק — המשך כך!',
+    'analyzer-aol-med': 'אות בינוני — המשך להתאמן',
+    'analyzer-aol-low': 'אות חלש — נסה עיגון לפני סשנים',
+    'analyzer-no-data': 'אין נתונים עדיין. התחל כמה סשנים קודם!',
+    'analyzer-no-journal-data': 'אין רשומות יומן עדיין. רשום כמה חוויות קודם.',
+    'analyzer-records': 'רשומות',
+    'analyzer-rv': 'מאמן RV',
+    'analyzer-card': 'ניחוש קלפים',
+    'analyzer-zener': 'סמלי זנר',
+    'analyzer-random': 'צופה אקראי',
+    'analyzer-partner': 'פלטפורמת שותפים',
+    'analyzer-dial': 'מאמן חץ',
+    'os-total-sessions': 'סה״כ סשנים',
+    'os-avg-rating': 'דירוג ממוצע',
+    'os-journal-entries': 'רשומות יומן',
+    'os-dream-entries': 'רשומות חלומות',
+    // Journal
+    'journal-title': '📓 יומן קריאת מחשבות',
+    'journal-desc': 'רשום רושמים, חוויות וסינכרוניות. עקוב אחר אימות לאורך זמן.',
+    'journal-new': 'רשומה חדשה',
+    'journal-new-btn': '✨ רשומה חדשה',
+    'journal-new-desc': 'רשום רושם קריאת מחשבות, חוויה או סינכרוניות.',
+    'journal-new-entry': 'רשומה חדשה',
+    'journal-entries': '📋 רשומות',
+    'journal-view-entries': '📋 צפה ברשומות',
+    'journal-confirmed': 'אומת',
+    'journal-partial': 'חלקי',
+    'journal-unverified': 'לא מאומת',
+    'entry-title': 'כותרת',
+    'entry-date': 'תאריך',
+    'entry-category': 'קטגוריה',
+    'entry-impression': 'רושם / חוויה',
+    'entry-context': 'הקשר',
+    'entry-outcome': 'תוצאה',
+    'entry-verification': 'אימות',
+    'save-entry': '💾 שמור רשומה',
+    'cat-premonition': 'תחזית',
+    'cat-clairvoyance': 'קלרויאנס',
+    'cat-clairsentience': 'קלאירסנטיאנס',
+    'cat-clairaudience': 'קלאיראודיאנס',
+    'cat-synchronicity': 'סינכרוניות',
+    'cat-remote-viewing': 'ראייה מרחוק',
+    'cat-dream': 'חלום',
+    'cat-other': 'אחר',
+    'ver-confirmed': 'אומת',
+    'ver-partial': 'חלקי',
+    'ver-incorrect': 'לא נכון',
+    'ver-unverified': 'לא מאומת',
+    'filter-all': 'הכל',
+    // Grounding
+    'grounding-title': '🌳 מאמן עיגון',
+    'grounding-desc': 'טכניקות עיגון לייצוב האנרגיה שלך לפני ואחרי עבודה בקריאת מחשבות.',
+    'grounding-why': 'למה לעגן?',
+    'grounding-why-desc': 'עיגון עוזר לך להישאר ממוקם, מונע נזילת אנרגיה ומשפר בהירות אות.',
+    'grounding-techniques': 'טכניקות',
+    'grounding-history': '📊 היסטוריית סשנים',
+    'gh-sessions': 'סשנים',
+    'tech-54321': '5-4-3-2-1 חושי',
+    'tech-54321-desc': 'שם 5 דברים שאתה רואה, 4 שאתה מרגיש, 3 שאתה שומע, 2 שאתה מריח, 1 שאתה טועם.',
+    'tech-rooting': 'ויזואליזציה שורשית',
+    'tech-rooting-desc': 'הדמיין שורשים צומחים מהרגליך לעומק האדמה.',
+    'tech-breath': 'נשימה 4-7-8',
+    'tech-breath-desc': 'נשום 4 שניות, החזק 7, נשוף 8. חזור 4 מחזורים.',
+    'tech-body-scan': 'סריקת גוף',
+    'tech-body-scan-desc': 'הרפד כל חלק בגוף מהראש ועד הרגליים.',
+    'senses-label': 'שם 5 דברים שאתה רואה:',
+    'senses-step-see': '5 דברים שאתה רואה',
+    'senses-next': 'הבא →',
+    'rooting-step1': 'הדמיין שורשים צומחים מהרגליך לעומק האדמה...',
+    'rooting-next': 'הבא →',
+    'rooting-notes-label': 'איך אתה מרגיש אחרי העיגון?',
+    'breath-desc': 'נשום ל-4 שניות, החזק 7, נשוף 8.',
+    'breath-ready': 'מוכן? לחץ התחלה.',
+    'breath-start': '▶ התחל',
+    'scan-step-head': 'התמקד בראש שלך. שחרר מתח...',
+    'scan-next': 'הבא →',
+    // Dream Tracker
+    'dream-title': '🌙 עוקב חלומות',
+    'dream-desc': 'רשום חלומות, תגוב סמלים, זהה פגיעות קדם-קוגניטיביות.',
+    'dream-new': 'חלום חדש',
+    'dream-new-btn': '✨ רשום חלום',
+    'dream-new-desc': 'רשום חלום שאתה זוכר. כולל סמלים, רגשות ואלמנטים קדם-קוגניטיביים.',
+    'dream-new-entry': 'רשומת חלום חדשה',
+    'dream-entries': '📋 יומן חלומות',
+    'dream-view-btn': '📋 צפה בחלומות',
+    'dream-entry-title': 'רשומת חלום',
+    'dream-date': 'תאריך',
+    'dream-description': 'תיאור',
+    'dream-mood': 'מצב רוח',
+    'dream-symbols': 'סמלים',
+    'dream-type': 'סוג חלום',
+    'dream-precog': 'קדם-קוגניטיבי',
+    'dream-precog-status': 'סטטוס קדם-קוגניטיבי',
+    'dream-precog-event': 'אירוע שאימת/הפריך',
+    'save-dream': '💾 שמור חלום',
+    'dream-total': 'סה״כ',
+    'dream-precog': 'קדם-קוגניטיבי',
+    'dream-hits': 'פגיעות',
+    'dream-lucid': 'מודע',
+    'mood-happy': '😊 שמח',
+    'mood-fear': '😨 פחד',
+    'mood-neutral': '😐 ניטרלי',
+    'mood-sad': '😢 עצוב',
+    'mood-amazed': '😲 מופתע',
+    'mood-peaceful': '😌 שליו',
+    'sym-water': '💧 מים',
+    'sym-flying': '🕊 טיסה',
+    'sym-falling': '📉 נפילה',
+    'sym-teeth': '🦷 שיניים',
+    'sym-naked': '👤 ערום',
+    'sym-chase': '🏃 מרדף',
+    'sym-house': '🏠 בית',
+    'sym-animals': '🐾 חיות',
+    'sym-death': '💀 מוות',
+    'sym-birth': '👶 לידה',
+    'sym-deceased': '👻 נפטר',
+    'sym-journey': '🗺 מסע',
+    'type-normal': 'רגיל',
+    'type-lucid': 'מודע',
+    'type-precog': 'קדם-קוגניטיבי',
+    'type-prophetic': 'נבואי',
+    'type-nightmare': 'סיוט',
+    'type-recurring': 'חוזר',
+    'precog-pending': 'ממתין',
+    'precog-hit': 'פגיעה',
+    'precog-miss': 'חטא',
+    // Random Viewer
+    'random-viewer-title': '🌍 צופה אובייקט אקראי',
+    'random-viewer-desc': 'יעדים עיוורים מוויקיפדיה ותמונות אקראיות. תרגל עם נושאים בלתי צפויים.',
+    'rv-how-to': 'איך זה עובד',
+    'rv-step1': 'צור קוד יעד',
+    'rv-step2': 'בחר סוג יעד (תמונה או מאמר)',
+    'rv-step3': 'התמקד ורשום רושמים',
+    'rv-step4': 'חשוף את היעד',
+    'rv-step5': 'דרג את הדיוק שלך',
+    'rv-target-code': 'קוד יעד',
+    'rv-target-type': 'סוג יעד',
+    'tt-image': '🖼 תמונה אקראית',
+    'tt-wikipedia': '📖 מאמר ויקיפדיה',
+    'rv-generate': '🎲 צור יעד',
+    'rv-focus-instruction': 'התמקד בקוד היעד. רשום את הרושמים שלך למטה.',
+    'rv-impressions': 'רושמים',
+    'rv-reflection': 'הרהור',
+    'rv-reveal': '🔍 חשוף יעד',
+    'rv-click-reveal': 'לחץ לחשוף את היעד',
+    'rv-rate': 'דרג דיוק',
+    'rv-no-rating': 'לא נותן דירוג',
+    'rv-save-next': '💾 שמור והבא',
+    'rv-sessions': 'סשנים',
+    'rv-avg-rating': 'דירוג ממוצע',
+    'rv-best-rating': 'דירוג הטוב ביותר',
+    'rv-history-title': '📊 היסטוריית סשנים',
+    // Partner
+    'partner-title': '👥 פלטפורמת שותפים',
+    'partner-desc': 'תאם סשנים עם שותף. אחד מחזיק, אחד צופה. השווה תוצאות.',
+    'partner-how': 'איך זה עובד',
+    'partner-step1': 'בחר תפקיד (מחזיק או צופה)',
+    'partner-step2': 'המחזיק מגדיר יעד ויוצר קוד',
+    'partner-step3': 'הצופה מזין קוד ורשם רושמים',
+    'partner-step4': 'השווה תוצאות ודרג דיוק',
+    'partner-choose-role': 'בחר תפקיד',
+    'role-holder': '🎯 מחזיק',
+    'role-holder-desc': 'אתה מגדיר את היעד ומשווה תוצאות',
+    'role-viewer': '👁 צופה',
+    'role-viewer-desc': 'אתה מקבל קוד ורשם רושמים',
+    'holder-set-target': 'גדיר יעד',
+    'holder-set-desc': 'חשוב על אובייקט, מקום או אדם ספציפי. היה ספציפי.',
+    'holder-target-name': 'תיאור יעד',
+    'holder-target-details': 'פרטים (אופציונלי)',
+    'holder-generate': '🎲 צור קוד',
+    'holder-share-code': 'שתף קוד זה',
+    'holder-share-desc': 'שתף קוד זה עם הצופה שלך. המתן שהצופה ישלח רושמים.',
+    'holder-viewer-notes': 'רושמי הצופה',
+    'holder-wait': 'ממתין לצופה לשלוח רושמים...',
+    'holder-compare': '🔍 השווה תוצאות',
+    'viewer-enter-code': 'הזן קוד סשן',
+    'viewer-enter-desc': 'הזן את הקוד שהמחזיק נתן לך.',
+    'viewer-code-label': 'קוד סשן',
+    'viewer-start': '▶ התחל צפייה',
+    'viewer-target-code': 'קוד יעד',
+    'viewer-focus': 'התמקד בקוד היעד. רשום את הרושמים שלך.',
+    'viewer-impressions': 'רושמים',
+    'viewer-sensory': 'נתונים חושיים',
+    'viewer-emotions': 'רגשות / תחושות',
+    'viewer-your-impressions': 'הרושמים שלך',
+    'viewer-share-impressions': 'שתף רושמים',
+    'viewer-share-desc': 'העתק את הרושמים האלה ושליח אותם למחזיק.',
+    'viewer-done': '✅ סיימתי — שלח למחזיק',
+    'viewer-finish': '🔍 סיים',
+    'comparison-title': '🔍 תוצאות השוואה',
+    'comparison-holder': 'יעד המחזיק',
+    'comparison-viewer': 'רושמי הצופה',
+    'comp-rating': 'דירוג דיוק',
+    'comp-rate-1': 'ללא התאמה',
+    'comp-rate-2': 'חיבור קל',
+    'comp-rate-3': 'התאמה חלקית',
+    'comp-rate-4': 'התאמה טובה',
+    'comp-rate-5': 'התאמה מצוינת!',
+    'comp-notes': 'הערות על ההתאמה',
+    'comp-save': '💾 שמור סשן',
+    'partner-history': '📊 היסטוריית סשנים',
+    'partner-sessions': 'סשנים',
+    'partner-avg-rating': 'דירוג ממוצע',
+    'partner-best': 'דירוג הטוב ביותר',
+    // Dial Trainer
+    'dial-title': '🎯 מאמן מחוג',
+    'dial-desc': 'השפע על חץ אקראי בסקאלה מ-10- עד 10+ עם המחשבה שלך.',
+    'dial-welcome': 'ברוכים הבאים למאמן מחוג',
+    'dial-instruction': 'חץ מתחיל ב-0 ונע באופן אקראי כל חצי שנייה. בחר יעד (+10 או -10), ואז התמקד כדי להשפיע על החץ לכיוונו.',
+    'dial-choose-target': 'בחר יעד',
+    'dial-duration-label': 'משך (שניות)',
+    'dial-focus-title': 'התמקד במחוג',
+    'dial-focus-desc': 'נסה להשפיע על החץ לכיוון',
+    'dial-current': 'נוכחי',
+    'dial-elapsed': 'חלף',
+    'dial-moves': 'תנועות',
+    'dial-toward': 'לכיוון',
+    'dial-away': 'הרחק',
+    'dial-neutral': 'ניטרלי',
+    'dial-stop': '⏹ עצור סשן',
+    'dial-result': 'תוצאות סשן',
+    'dial-target': 'יעד',
+    'dial-final': 'מיקום סופי',
+    'dial-difference': 'הפרש',
+    'dial-ratio': 'יחס לכיוון',
+    'dial-peak': 'מיקום שיא',
+    'dial-strong': '🔥 השפעה חזקה!',
+    'dial-promising': '✨ אות מבטיח',
+    'dial-slight': '👀 השפעה קלה',
+    'dial-weak': '😐 אין אות ברור',
+    'dial-history': '📊 היסטוריה',
+    'dial-sessions': 'סשנים',
+    'dial-avg-ratio': 'ממוצע % לכיוון',
+    'dial-best': 'הפרש הטוב ביותר',
+    'dial-start': '▶ התחל סשן',
+    'dial-save': '💾 שמור סשן'
+  }
+};
+
+// Translate a key, with optional replacements
+function t(key, replacements) {
+  let str = TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS.en[key] || key;
+  if (replacements) {
+    Object.entries(replacements).forEach(([k, v]) => {
+      str = str.replace(new RegExp(`\\{${k}\\}`, 'g'), v);
+    });
+  }
+  return str;
+}
+
+// Apply translations to all elements with data-i18n attribute
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const replacements = el.getAttribute('data-i18n-replacements')
+      ? JSON.parse(el.getAttribute('data-i18n-replacements'))
+      : null;
+    el.textContent = t(key, replacements);
+  });
+  // Also handle placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  // RTL support — apply to :root (html), header overrides with direction: ltr
+  document.documentElement.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+  document.documentElement.lang = currentLang;
+}
+
+// Language switcher
+function setLang(lang) {
+  currentLang = lang;
+  setStoredLang(lang);
+  // Re-render selector so active button updates
+  const ls = document.getElementById('lang-selector');
+  if (ls) ls.innerHTML = langSelectorHTML();
+  applyTranslations();
+}
+
+// ─── Tips Database ────────────────────────────────────────
+const TIPS = {
+  rv: {
+    en: [
+      'Relax before starting — take 3 deep breaths',
+      'Iterate the target code silently in your mind',
+      'Let the ideogram flow naturally — don\'t force it',
+      'Record everything, even if it seems silly',
+      'Watch for analytical overlays (AOL) — label them and move on',
+      'Stage A is raw sensory data — no interpretation yet',
+      'Stage B adds structure: colors, textures, temperatures',
+      'Don\'t try to name the target until Stage VI',
+      'Practice daily — consistency builds signal strength',
+      'Keep a journal of your sessions for pattern recognition',
+      'Ground yourself before each session',
+      'The first impression is often the most accurate',
+      'If signal is weak, try again later — don\'t push',
+      'Meditation improves signal clarity over time',
+      'Trust your intuition, not your intellect'
+    ],
+    he: [
+      'הירגע לפני ההתחלה — קח 3 נשימות עמוקות',
+      'חזור על קוד היעד בשקט בראש שלך',
+      'תן לאיידיוגרמה לזרום באופן טבעי — אל תכריח',
+      'רשום הכל, גם אם זה נראה טיפש',
+      'שים לב לכיסויים אנליטיים (AOL) — תגוב אותם והמשך',
+      'שלב A הוא נתונים חושיים גולמיים — עדיין ללא פרשנות',
+      'שלב B מוסיף מבנה: צבעים, מרקמים, טמפרטורות',
+      'אל תנסה לקרוא ליעד עד שלב VI',
+      'תרגל מדי יום — עקביות בונה עוצמת אות',
+      'שמור יומן של הסשנים שלך לזיהוי דפוסים',
+      'עגן את עצמך לפני כל סשן',
+      'הרושם הראשון הוא לרוב המדויק ביותר',
+      'אם האות חלש, נסה שוב מאוחר יותר — אל תלחץ',
+      'מדיטציה משפרת בהירות אות לאורך זמן',
+      'אמין באינטואיציה שלך, לא באינטלקט שלך'
+    ]
+  },
+  zener: {
+    en: [
+      'Focus on the card, not on guessing',
+      'Let the symbol appear in your mind\'s eye',
+      'Record your first impression — it\'s usually the best',
+      '20% is random chance — sustained 25%+ is noteworthy',
+      'Don\'t second-guess your initial impression',
+      'Relax between trials — don\'t rush',
+      'Track your results over time to see trends',
+      'If you feel frustrated, take a break',
+      'Practice in a quiet, distraction-free environment',
+      'Some people naturally score higher on certain symbols',
+      'Chi-square analysis helps determine statistical significance',
+      'Consistency matters more than single-session spikes',
+      'Ground yourself before starting a session',
+      'Visualize the symbols clearly before guessing',
+      'Trust your gut feeling'
+    ],
+    he: [
+      'התמקד בקלף, לא בניחוש',
+      'תן לסמל להופיע בעיניים שלך',
+      'רשום את הרושם הראשון — הוא לרוב הטוב ביותר',
+      '20% הוא סיכוי אקראי — 25%+ מתמשך ראוי לציון',
+      'אל תנחש מחדש את הרושם הראשוני שלך',
+      'הירגע בין ניסיונות — אל תמהר',
+      'עקוב אחר התוצאות שלך לאורך זמן כדי לראות מגמות',
+      'אם אתה מרגיש מתוסכל, קח הפסקה',
+      'תרגל בסביבה שקטה וללא הסחות דעת',
+      'לחלק מהאנשים יש ציונים גבוהים יותר באופן טבעי על סמלים מסוימים',
+      'ניתוח חי-בריבוע עוזר לקבוע משמעותיות סטטיסטית',
+      'עקביות חשובה יותר מפיצוצים של סשן בודד',
+      'עגן את עצמך לפני התחלת סשן',
+      'הדמיין את הסמלים בבירור לפני ניחוש',
+      'אמין בתחושת הבטן שלך'
+    ]
+  },
+  card: {
+    en: [
+      'Focus on the card back design — let impressions flow',
+      'Visualize the suit first, then the rank',
+      'Color impressions (red/black) can be a good starting point',
+      'Record your impression before revealing — no changing!',
+      'Exact matches are rare — same suit or color is still a hit',
+      'Practice with the simplified deck first if you\'re new',
+      'Don\'t analyze — just feel',
+      'Track your accuracy by suit to find strengths',
+      'Some people are better at suits, others at ranks',
+      'Relax between rounds — don\'t force impressions',
+      'The card back pattern can sometimes give subtle cues',
+      'Trust your first instinct',
+      'Ground yourself before each round',
+      'If you see a number, trust it even if it seems wrong',
+      'Consistency over time is the real measure of ability'
+    ],
+    he: [
+      'התמקד בעיצוב גב הקלף — תן לרושמים לזרום',
+      'הדמיין את הסמל קודם, ואז את הדרג',
+      'רושמי צבע (אדום/שחור) יכולים להיות נקודת התחלה טובה',
+      'רשום את הרושם שלך לפני החשיפה — אין שינויים!',
+      'התאמות מדויקות נדירות — אותו סמל או צבע הוא עדיין פגיעה',
+      'תרגל עם החפיסה המופשטת קודם אם אתה חדש',
+      'אל תנתח — פשוט תרגיש',
+      'עקוב אחר הדיוק שלך לפי סמל כדי למצוא חוזקות',
+      'לחלק מהאנשים טוב יותר בסמלים, לאחרים בדרגים',
+      'הירגע בין סיבובים — אל תכריח רושמים',
+      'דוגמת גב הקלף לפעמים יכולה לתת רמזים עדינים',
+      'אמין באינסטינקט הראשון שלך',
+      'עגן את עצמך לפני כל סיבוב',
+      'אם אתה רואה מספר, אמין בו גם אם זה נראה לא נכון',
+      'עקביות לאורך זמן היא המדד האמיתי ליכולת'
+    ]
+  },
+  clair: {
+    en: [
+      'Be honest in your self-assessment — there are no wrong answers',
+      'Your dominant sense is your natural gift — nurture it',
+      'Cross-train other senses for balanced development',
+      'Claircognizance is the most common — don\'t dismiss it',
+      'Clairempathy can be draining — learn boundary techniques',
+      'Practice daily exercises to strengthen your senses',
+      'Keep a training log to track your progress',
+      'Some senses develop faster than others — be patient',
+      'Meditation helps all Clair senses develop',
+      'Grounding is essential, especially for clairempaths',
+      'Your profile may change over time as you develop',
+      'Trust your impressions — they are valid regardless of score',
+      'Journaling helps identify patterns in your abilities',
+      'Working with a partner can accelerate development',
+      'Be gentle with yourself — this is a lifelong journey'
+    ],
+    he: [
+      'היה כן בהערכה העצמית — אין תשובות לא נכונות',
+      'החוש הדומיננטי שלך הוא המתנה הטבעית שלך — גדל אותו',
+      'תרגל חושים אחרים לפיתוח מאוזן',
+      'קלאירקוגניזנס הוא הנפוץ ביותר — אל תזניח אותו',
+      'קלאירמפתיה יכולה להיות מתישה — למד טכניקות גבולות',
+      'תרגל תרגילים יומיים לחיזוק החושים שלך',
+      'שמור יומן אימון לעקוב אחר ההתקדמות שלך',
+      'חלק מהחושים מתפתחים מהר יותר מאחרים — היה סבלני',
+      'מדיטציה עוזרת לכל חושי הקליר להתפתח',
+      'עיגון חיוני, במיוחד עבור קלאירמפתים',
+      'הפרופיל שלך עשוי להשתנות לאורך זמן כשאתה מתפתח',
+      'אמין ברושמים שלך — הם תקפים ללא קשר לציון',
+      'כתיבת יומן עוזרת לזהות דפוסים ביכולות שלך',
+      'עבודה עם שותף יכולה להאיץ פיתוח',
+      'היה עדין איתך עצמך — זו מסע לכל החיים'
+    ]
+  },
+  analyzer: {
+    en: [
+      'Track your data over time — patterns emerge with consistency',
+      'High AOL frequency means strong signal — celebrate it',
+      'Look for peak times — practice when your signal is strongest',
+      'Journal entries help calibrate your accuracy perception',
+      'Confirmed entries are your best data points',
+      'Don\'t obsess over numbers — trust your experience',
+      'Grounding before sessions improves overall accuracy',
+      'Compare apps to find your strongest modality',
+      'Dream precognitive hits are powerful confirmation',
+      'Partner sessions reveal blind spots in your perception',
+      'Review your data weekly for insights',
+      'Accuracy trends matter more than single sessions',
+      'If accuracy drops, check your grounding routine',
+      'Signal strength varies — some days are better than others',
+      'Use this data to refine your practice routine'
+    ],
+    he: [
+      'עקוב אחר הנתונים שלך לאורך זמן — דפוסים מופיעים עם עקביות',
+      'תדירות AOL גבוהה אומרת אות חזק — חגוג את זה',
+      'חפש שעות שיא — תרגל כשהאות שלך חזק ביותר',
+      'רשומות יומן עוזרות לכייל את תפיסת הדיוק שלך',
+      'רשומות מאומתות הן נקודות הנתונים הטובות ביותר שלך',
+      'אל תתמקד במספרים — אמין בחוויה שלך',
+      'עיגון לפני סשנים משפר דיוק כללי',
+      'השווה אפליקציות כדי למצוא את המודאליות החזקה ביותר שלך',
+      'פגיעות קדם-קוגניטיביות בחלומות הן אימות חזק',
+      'סשני שותפים חושפים נקודות עיוורון בתפיסה שלך',
+      'סקור את הנתונים שלך שבועית לתובנות',
+      'מגמות דיוק חשובות יותר מסשנים בודדים',
+      'אם הדיוק יורד, בדוק את שגרת העיגון שלך',
+      'עוצמת האות משתנה — יש ימים טובים יותר מאחרים',
+      'השתמש בנתונים האלה לשיפור שגרת התרגול שלך'
+    ]
+  },
+  journal: {
+    en: [
+      'Write down impressions immediately — memory fades fast',
+      'Label entries with verification status to track accuracy',
+      'Look for patterns across weeks — synchronicities reveal themselves',
+      'Record even small hits — they build confidence',
+      'Use categories to find your strongest modality',
+      'Review old entries — you may spot connections you missed',
+      'Be honest with verification — partial counts too',
+      'Journaling itself sharpens your awareness',
+      'Note the time and place — context matters',
+      'Track emotional state — it affects perception'
+    ],
+    he: [
+      'רשום רושמים מיד — הזיכרון דוהה מהר',
+      'סמן רשומות עם סטטוס אימות כדי לעקוב אחר דיוק',
+      'חפש דפוסים לאורך שבועות — סינכרוניות חושפות את עצמן',
+      'רשום גם פגיעות קטנות — הן בונות ביטחון',
+      'השתמש בקטגוריות כדי למצוא את המודאליות החזקה ביותר שלך',
+      'סקור רשומות ישנות — ייתכן שתגלה קשרים שפספסת',
+      'היה כן עם אימות — חלקי גם סופר',
+      'כתיבת יומן מחדה את המודעות שלך',
+      'רשום את הזמן והמקום — הקשר חשוב',
+      'עקוב אחר מצב רגשי — הוא משפיע על התפיסה'
+    ]
+  },
+  grounding: {
+    en: [
+      'Ground before every session — it stabilizes your signal',
+      'The 5-4-3-2-1 technique is great for quick resets',
+      'Rooting visualization helps anchor your energy',
+      'Breath work calms the analytical mind',
+      'Body scan releases tension that blocks perception',
+      'Consistency matters more than duration',
+      'Ground after sessions too — it helps integrate the experience',
+      'Try different techniques to find what works for you',
+      'Even 2 minutes of grounding makes a difference',
+      'Track your grounding sessions to build the habit'
+    ],
+    he: [
+      'עגן לפני כל סשן — זה מייצב את האות שלך',
+      'טכניקת 5-4-3-2-1 מצוינת לאיפוס מהיר',
+      'ויזואליזציה של שורשים עוזרת לעגן את האנרגיה שלך',
+      'עבודת נשימה מרגיעה את המוח האנליטי',
+      'סריקת גוף משחררת מתח שחוסם תפיסה',
+      'עקביות חשובה יותר מאורך זמן',
+      'עגן גם אחרי סשנים — זה עוזר לאינטגרציה',
+      'נסה טכניקות שונות כדי למצוא מה עובד לך',
+      'גם 2 דקות עיגון עושות הבדל',
+      'עקוב אחר סשני עיגון כדי לבנות הרגל'
+    ]
+  },
+  dream: {
+    en: [
+      'Keep a notebook by your bed — write immediately upon waking',
+      'Set an intention before sleep: "I will remember my dreams"',
+      'Tag symbols — they often repeat with meaning',
+      'Track precognitive dreams — they are powerful confirmation',
+      'Lucid dreaming can be trained with reality checks',
+      'Mood in dreams often reflects waking life stress',
+      'Water symbols often relate to emotions',
+      'Flying dreams can indicate freedom or escape desires',
+      'Review dreams weekly for patterns',
+      'Don\'t dismiss nightmares — they carry important messages'
+    ],
+    he: [
+      'שמור מחברת ליד המיטה — רשום מיד בהתעוררות',
+      'הגדר כוונה לפני שינה: "אזכור את החלומות שלי"',
+      'סמן סמלים — הם לרוב חוזרים עם משמעות',
+      'עקוב אחר חלומות קדם-קוגניטיביים — הם אימות חזק',
+      'חלום ער יכול להיות מתורגל עם בדיקות מציאות',
+      'מצב רגשי בחלומות משקף לרוב מתח בחיים',
+      'סמלי מים קשורים לרוב לרגשות',
+      'חלומות טיסה יכולים להעיד על רצון לחופש',
+      'סקור חלומות שבועית לדפוסים',
+      'אל תזני לילות רע — הם נושאים מסרים חשובים'
+    ]
+  },
+  'random-viewer': {
+    en: [
+      'Let the image load before you start guessing',
+      'Record impressions before looking — honesty is key',
+      'Rate accuracy honestly — it calibrates your perception',
+      'Try both image and article targets for variety',
+      'Notice if certain target types are easier for you',
+      'Don\'t force connections — let impressions flow naturally',
+      'Compare your impressions after reveal — note surprises',
+      'Practice regularly — consistency builds skill',
+      'Use the timer to keep sessions focused',
+      'Track your average rating over time'
+    ],
+    he: [
+      'תן לתמונה להטען לפני שאתה מתחין לנחש',
+      'רשום רושמים לפני הצפייה — כנות היא המפתח',
+      'דרג דיוק בכנות — זה מכייל את התפיסה שלך',
+      'נסה יעדי תמונה ומאמר לגיוון',
+      'שים לב אם סוגי יעדים מסוימים קלים יותר לך',
+      'אל תכריח קשרים — תן לרושמים לזרום באופן טבעי',
+      'השווה רושמים אחרי חשיפה — רשום הפתעות',
+      'תרגל באופן סדיר — עקביות בונה מיומנות',
+      'השתמש בטיימר כדי לשמור על סשנים ממוקדים',
+      'עקוב אחר הדירוג הממוצע שלך לאורך זמן'
+    ]
+  },
+  partner: {
+    en: [
+      'Clear communication with your partner is essential',
+      'The holder should describe the target objectively',
+      'The viewer should record impressions without filtering',
+      'Compare results side-by-side for best insight',
+      'Rate accuracy together — it builds trust',
+      'Try switching roles each session',
+      'Partner sessions reveal blind spots in perception',
+      'Don\'t discuss the target until after impressions are recorded',
+      'Use a neutral environment free from distractions',
+      'Track your partner session accuracy over time'
+    ],
+    he: [
+      'תקשורת ברורה עם השותף שלך היא חיונית',
+      'המחזיק צריך לתאר את היעד באופן אובייקטיבי',
+      'הצופה צריך לרשום רושמים ללא סינון',
+      'השווה תוצאות זו לצד זו לתובנה הטובה ביותר',
+      'דרג דיוק יחד — זה בונה אמון',
+      'נסה להחליף תפקידים בכל סשן',
+      'סשני שותפים חושפים נקודות עיוורון בתפיסה',
+      'אל תדבר על היעד עד אחרי שרשמת רושמים',
+      'השתמש בסביבה ניטרלית ללא הסחות דעת',
+      'עקוב אחר דיוק סשני השותפים שלך לאורך זמן'
+    ]
+  },
+  dial: {
+    en: [
+      'Ground yourself before starting — a calm mind influences better',
+      'Visualize the pointer moving toward your target',
+      'Don\'t watch the numbers — focus on the feeling of direction',
+      'Emotion amplifies intent — feel the target position',
+      'Aim for consistency, not perfection',
+      'Above 50% toward ratio means you\'re doing something',
+      'Try both +10 and -10 to compare your natural bias',
+      'Short sessions (30s) are great for warm-up',
+      'Long sessions (300s) reveal sustained influence',
+      'Track your toward ratio over time to see progress'
+    ],
+    he: [
+      'עגן את עצמך לפני ההתחלה — מוח רגוע משפיע טוב יותר',
+      'דמיין את החץ נע לכיוון היעד שלך',
+      'אל תסתכל על המספרים — התמקד בתחושת הכיוון',
+      'רגש ממחזק כוונה — תפוס את מיקום היעד',
+      'שאף לעקביות, לא למושלמות',
+      'מעל 50% יחס לכיוון אומר שאתה עושה משהו',
+      'נסה גם +10 וגם -10 כדי להשוות הטיה טבעית',
+      'סשנים קצרים (30 שניות) מצוינים לחימום',
+      'סשנים ארוכים (300 שניות) חושפים השפעה מתמשכת',
+      'עקוב אחר יחס הכיוון לאורך זמן כדי לראות התקדמות'
+    ]
+  }
+};
+
+let lastTipIndex = {};
+
+function getRandomTip(app) {
+  const tips = TIPS[app]?.[currentLang] || TIPS[app]?.en || [];
+  if (!tips.length) return '';
+  if (!lastTipIndex[app]) lastTipIndex[app] = -1;
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * tips.length);
+  } while (idx === lastTipIndex[app] && tips.length > 1);
+  lastTipIndex[app] = idx;
+  return tips[idx];
+}
+
+function showTip(app) {
+  const tip = getRandomTip(app);
+  // Find the tip element inside the currently active screen
+  const activeScreen = document.querySelector('.screen.active');
+  const el = activeScreen ? activeScreen.querySelector('.tip-text') : document.querySelector('.tip-text');
+  if (el) el.textContent = tip || t('loading-tip');
+}
+
+function refreshTip(app) {
+  showTip(app);
+}
+
+// ─── Storage Helpers ──────────────────────────────────────
+function loadData(key) {
+  const st = detectStorage();
+  if (st === 'local') { try { const v = localStorage.getItem(key); if (v) return JSON.parse(v); } catch(e) {} }
+  if (st === 'session') { try { const v = sessionStorage.getItem(key); if (v) return JSON.parse(v); } catch(e) {} }
+  return null;
+}
+function saveData(key, data) {
+  const st = detectStorage();
+  if (st === 'local') { try { localStorage.setItem(key, JSON.stringify(data)); return; } catch(e) {} }
+  if (st === 'session') { try { sessionStorage.setItem(key, JSON.stringify(data)); return; } catch(e) {} }
+  console.warn('saveData: no storage available for', key);
+}
+
+// ─── Navigation ───────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById('screen-' + name);
+  if (screen) screen.classList.add('active');
+}
+function goHome() {
+  window.location.href = 'index.html?lang=' + getStoredLang();
+}
+
+// ─── Timer ────────────────────────────────────────────────
+let timerInterval = null;
+let timerStart = null;
+
+function startTimer() {
+  timerStart = Date.now();
+  timerInterval = setInterval(updateTimer, 1000);
+}
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+function getTimerSeconds() {
+  return timerStart ? Math.floor((Date.now() - timerStart) / 1000) : 0;
+}
+function formatDuration(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+function updateTimer() {
+  const el = document.getElementById('timer');
+  if (el) el.textContent = formatDuration(getTimerSeconds());
+}
+
+// ─── Utilities ────────────────────────────────────────────
+function formatDate(ts) {
+  return new Date(ts).toLocaleString();
+}
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+function generateCode() {
+  return Array.from({length: 8}, () => randomInt(0, 9)).join('');
+}
+
+// ─── Modal ────────────────────────────────────────────────
+function openModal(html) {
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+function closeModal(e) {
+  if (e && e.target !== e.currentTarget) return;
+  document.getElementById('modal-overlay').classList.remove('active');
+}
+
+// ─── Streak Calculator ────────────────────────────────────
+function calcStreak(dates) {
+  if (!dates.length) return 0;
+  const unique = [...new Set(dates.map(d => new Date(d).toDateString()))].sort().reverse();
+  let streak = 0;
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  const start = unique[0] === today || unique[0] === yesterday ? 0 : -1;
+  if (start === -1) return 0;
+  for (let i = 0; i < unique.length; i++) {
+    const expected = new Date(Date.now() - (start + i) * 86400000).toDateString();
+    if (unique[i] === expected) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// ─── Language Selector HTML ───────────────────────────────
+function langSelectorHTML() {
+  // Always re-read in case it changed from another page
+  currentLang = getStoredLang() || 'en';
+  return `<div class="lang-selector">
+    <span class="lang-label">${t('lang-label')}</span>
+    <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="setLang('en')">EN</button>
+    <button class="lang-btn ${currentLang === 'he' ? 'active' : ''}" onclick="setLang('he')">HE</button>
+  </div>`;
+}

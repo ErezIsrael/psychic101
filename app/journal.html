@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Psychic Journal</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+  .cat-btn { padding: 0.5rem 0.75rem; min-height: 2.5rem; border-radius: 20px; border: 1px solid var(--surface2); background: var(--surface2); color: var(--text-dim); font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+  .cat-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  @media (hover: hover) { .cat-btn:hover { border-color: var(--accent); } }
+  .entry-card { background: var(--surface); border: 1px solid var(--surface2); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; cursor: pointer; min-height: 3rem; transition: border-color 0.2s; }
+  @media (hover: hover) { .entry-card:hover { border-color: var(--accent); } }
+  .entry-card .entry-title { font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+  .entry-card .entry-date { font-size: 0.75rem; color: var(--text-dim); }
+  .entry-card .entry-preview { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .entry-card .entry-cat { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.7rem; background: rgba(123,104,238,0.15); color: var(--accent2); margin-right: 0.375rem; }
+  .entry-card .entry-verified { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.7rem; }
+  .entry-card .entry-verified.confirmed { background: rgba(74,222,128,0.15); color: var(--success); }
+  .entry-card .entry-verified.partial { background: rgba(251,191,36,0.15); color: var(--warn); }
+  .entry-card .entry-verified.incorrect { background: rgba(248,113,113,0.15); color: var(--danger); }
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 0.375rem; margin-bottom: 1rem; }
+  .search-input { width: 100%; background: var(--surface2); border: 1px solid var(--surface2); color: var(--text); padding: 0.75rem; border-radius: 8px; font-size: 1rem; margin-bottom: 0.75rem; }
+  .search-input:focus { outline: none; border-color: var(--accent); }
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+  @media (min-width: 600px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+  .mini-stat { background: var(--surface2); border-radius: 8px; padding: 0.75rem; text-align: center; }
+  .mini-stat .val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .mini-stat .lbl { font-size: 0.7rem; color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="journal-title">📓 Psychic Journal</span></h1>
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+    <div id="lang-selector"></div>
+    <button class="nav-btn" onclick="showScreen('new-entry')" data-i18n="journal-new">✏️ New</button>
+    <button class="nav-btn" onclick="showScreen('entries')" data-i18n="history">📋 History</button>
+  </div>
+</header>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('journal')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="journal-title">📓 Psychic Journal</h2>
+      <p data-i18n="journal-desc">Record impressions, experiences, and synchronicities. Tag and search entries.</p>
+    </div>
+
+    <div class="stats-row" id="welcome-stats">
+      <div class="mini-stat"><div class="val" id="ws-total">0</div><div class="lbl" data-i18n="journal-entries">Entries</div></div>
+      <div class="mini-stat"><div class="val" id="ws-confirmed">0</div><div class="lbl" data-i18n="journal-confirmed">Confirmed</div></div>
+      <div class="mini-stat"><div class="val" id="ws-partial">0</div><div class="lbl" data-i18n="journal-partial">Partial</div></div>
+      <div class="mini-stat"><div class="val" id="ws-unverified">0</div><div class="lbl" data-i18n="journal-unverified">Unverified</div></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="showScreen('new-entry')" data-i18n="journal-new-btn">✏️ New Entry</button>
+      <button class="btn btn-secondary" onclick="showScreen('entries')" data-i18n="journal-view-entries">📋 View Entries</button>
+    </div>
+  </div>
+
+  <!-- NEW ENTRY SCREEN -->
+  <div id="screen-new-entry" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 50%"></div></div>
+
+    <div class="tip-banner" id="tip-new">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-new-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('journal')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="journal-new-entry">New Journal Entry</h2>
+      <p data-i18n="journal-new-desc">Document your psychic experience. Be specific about what you sensed and when.</p>
+    </div>
+
+    <div class="field">
+      <label for="entry-title" data-i18n="entry-title">Title</label>
+      <input type="text" id="entry-title" class="text-input" data-i18n-placeholder="entry-title-ph" placeholder="e.g., Premonition about phone call">
+    </div>
+
+    <div class="field">
+      <label data-i18n="entry-category">Category</label>
+      <div class="filter-bar" id="category-select">
+        <button class="cat-btn" data-cat="premonition" onclick="selectCategory(this)" data-i18n="cat-premonition">Premonition</button>
+        <button class="cat-btn" data-cat="clairvoyance" onclick="selectCategory(this)" data-i18n="cat-clairvoyance">Clairvoyance</button>
+        <button class="cat-btn" data-cat="clairsentience" onclick="selectCategory(this)" data-i18n="cat-clairsentience">Clairsentience</button>
+        <button class="cat-btn" data-cat="clairaudience" onclick="selectCategory(this)" data-i18n="cat-clairaudience">Clairaudience</button>
+        <button class="cat-btn" data-cat="synchronicity" onclick="selectCategory(this)" data-i18n="cat-synchronicity">Synchronicity</button>
+        <button class="cat-btn" data-cat="remote-viewing" onclick="selectCategory(this)" data-i18n="cat-remote-viewing">Remote Viewing</button>
+        <button class="cat-btn" data-cat="dream" onclick="selectCategory(this)" data-i18n="cat-dream">Dream</button>
+        <button class="cat-btn" data-cat="other" onclick="selectCategory(this)" data-i18n="cat-other">Other</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="entry-date" data-i18n="entry-date">Date/Time</label>
+      <input type="datetime-local" id="entry-date" class="text-input">
+    </div>
+
+    <div class="field">
+      <label for="entry-impression" data-i18n="entry-impression">Impression / Sensation</label>
+      <textarea id="entry-impression" class="text-input" rows="4" data-i18n-placeholder="entry-impression-ph" placeholder="What did you see, feel, hear, or sense?"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="entry-context" data-i18n="entry-context">Context</label>
+      <textarea id="entry-context" class="text-input" rows="3" data-i18n-placeholder="entry-context-ph" placeholder="What were you doing? Where were you?"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="entry-outcome" data-i18n="entry-outcome">Outcome / Verification</label>
+      <textarea id="entry-outcome" class="text-input" rows="3" data-i18n-placeholder="entry-outcome-ph" placeholder="Did anything happen to confirm or deny this?"></textarea>
+    </div>
+
+    <div class="field">
+      <label data-i18n="entry-verification">Verification Status</label>
+      <div class="filter-bar">
+        <button class="cat-btn" data-ver="unverified" onclick="selectVerification(this)" data-i18n="ver-unverified">Unverified</button>
+        <button class="cat-btn" data-ver="confirmed" onclick="selectVerification(this)" data-i18n="ver-confirmed">Confirmed</button>
+        <button class="cat-btn" data-ver="partial" onclick="selectVerification(this)" data-i18n="ver-partial">Partial</button>
+        <button class="cat-btn" data-ver="incorrect" onclick="selectVerification(this)" data-i18n="ver-incorrect">Incorrect</button>
+      </div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="saveEntry()" data-i18n="save-entry">💾 Save Entry</button>
+    </div>
+  </div>
+
+  <!-- ENTRIES LIST SCREEN -->
+  <div id="screen-entries" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="journal-entries">📓 Journal Entries</h2>
+    </div>
+
+    <input type="text" class="search-input" id="search-input" data-i18n-placeholder="search-entries" placeholder="Search entries..." oninput="renderEntries()">
+
+    <div class="filter-bar" id="filter-bar">
+      <button class="cat-btn active" data-filter="all" onclick="filterEntries(this)" data-i18n="filter-all">All</button>
+      <button class="cat-btn" data-filter="premonition" onclick="filterEntries(this)" data-i18n="cat-premonition">Premonition</button>
+      <button class="cat-btn" data-filter="clairvoyance" onclick="filterEntries(this)" data-i18n="cat-clairvoyance">Clairvoyance</button>
+      <button class="cat-btn" data-filter="clairsentience" onclick="filterEntries(this)" data-i18n="cat-clairsentience">Clairsentience</button>
+      <button class="cat-btn" data-filter="clairaudience" onclick="filterEntries(this)" data-i18n="cat-clairaudience">Clairaudience</button>
+      <button class="cat-btn" data-filter="synchronicity" onclick="filterEntries(this)" data-i18n="cat-synchronicity">Synchronicity</button>
+      <button class="cat-btn" data-filter="remote-viewing" onclick="filterEntries(this)" data-i18n="cat-remote-viewing">Remote Viewing</button>
+      <button class="cat-btn" data-filter="dream" onclick="filterEntries(this)" data-i18n="cat-dream">Dream</button>
+      <button class="cat-btn" data-filter="other" onclick="filterEntries(this)" data-i18n="cat-other">Other</button>
+    </div>
+
+    <div id="entries-list"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goHome()" data-i18n="back-home">← Back to Home</button>
+      <button class="btn btn-primary" onclick="showScreen('new-entry')" data-i18n="journal-new-btn">✏️ New Entry</button>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+const CATEGORIES = ['premonition','clairvoyance','clairsentience','clairaudience','synchronicity','remote-viewing','dream','other'];
+const VERIFICATIONS = ['unverified','confirmed','partial','incorrect'];
+
+let selectedCategory = null;
+let selectedVerification = 'unverified';
+let currentFilter = 'all';
+
+function loadEntries() { return loadData('journal_entries') || []; }
+function saveEntries(data) { saveData('journal_entries', data); }
+
+function selectCategory(btn) {
+  document.querySelectorAll('#category-select .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedCategory = btn.dataset.cat;
+}
+
+function selectVerification(btn) {
+  document.querySelectorAll('[data-ver]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedVerification = btn.dataset.ver;
+}
+
+function filterEntries(btn) {
+  document.querySelectorAll('#filter-bar .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentFilter = btn.dataset.filter;
+  renderEntries();
+}
+
+function saveEntry() {
+  const title = document.getElementById('entry-title').value.trim();
+  const impression = document.getElementById('entry-impression').value.trim();
+  if (!title || !impression) { alert(t('journal-fill-required')); return; }
+
+  const entry = {
+    id: Date.now(),
+    title,
+    category: selectedCategory || 'other',
+    date: document.getElementById('entry-date').value || new Date().toISOString(),
+    impression,
+    context: document.getElementById('entry-context').value.trim(),
+    outcome: document.getElementById('entry-outcome').value.trim(),
+    verification: selectedVerification
+  };
+
+  const entries = loadEntries();
+  entries.unshift(entry);
+  saveEntries(entries);
+
+  // Clear form
+  document.getElementById('entry-title').value = '';
+  document.getElementById('entry-impression').value = '';
+  document.getElementById('entry-context').value = '';
+  document.getElementById('entry-outcome').value = '';
+  document.getElementById('entry-date').value = '';
+  selectedCategory = null;
+  selectedVerification = 'unverified';
+  document.querySelectorAll('#category-select .cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('[data-ver]').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-ver="unverified"]').classList.add('active');
+
+  showScreen('entries');
+}
+
+function renderEntries() {
+  const entries = loadEntries();
+  const search = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const list = document.getElementById('entries-list');
+
+  let filtered = entries;
+  if (currentFilter !== 'all') filtered = filtered.filter(e => e.category === currentFilter);
+  if (search) filtered = filtered.filter(e =>
+    e.title.toLowerCase().includes(search) ||
+    e.impression.toLowerCase().includes(search) ||
+    (e.context && e.context.toLowerCase().includes(search))
+  );
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim)">' + t('journal-no-entries') + '</div>';
+    return;
+  }
+
+  const catLabels = { premonition: t('cat-premonition'), clairvoyance: t('cat-clairvoyance'), clairsentience: t('cat-clairsentience'), clairaudience: t('cat-clairaudience'), synchronicity: t('cat-synchronicity'), 'remote-viewing': t('cat-remote-viewing'), dream: t('cat-dream'), other: t('cat-other') };
+  const verLabels = { unverified: t('ver-unverified'), confirmed: t('ver-confirmed'), partial: t('ver-partial'), incorrect: t('ver-incorrect') };
+
+  list.innerHTML = filtered.map((e, i) => {
+    const idx = entries.indexOf(e);
+    return `<div class="entry-card" onclick="viewEntry(${idx})">
+      <div class="entry-title">${esc(e.title)}</div>
+      <div class="entry-date">${formatDate(e.id)}</div>
+      <div style="margin-top:0.25rem">
+        <span class="entry-cat">${catLabels[e.category] || e.category}</span>
+        <span class="entry-verified ${e.verification}">${verLabels[e.verification] || e.verification}</span>
+      </div>
+      <div class="entry-preview">${esc(e.impression)}</div>
+    </div>`;
+  }).join('');
+}
+
+function viewEntry(index) {
+  const entries = loadEntries();
+  const e = entries[index];
+  if (!e) return;
+
+  const catLabels = { premonition: t('cat-premonition'), clairvoyance: t('cat-clairvoyance'), clairsentience: t('cat-clairsentience'), clairaudience: t('cat-clairaudience'), synchronicity: t('cat-synchronicity'), 'remote-viewing': t('cat-remote-viewing'), dream: t('cat-dream'), other: t('cat-other') };
+  const verLabels = { unverified: t('ver-unverified'), confirmed: t('ver-confirmed'), partial: t('ver-partial'), incorrect: t('ver-incorrect') };
+
+  let html = `<h3>${esc(e.title)}</h3>`;
+  html += `<p><strong>${t('entry-date')}:</strong> ${formatDate(e.id)}</p>`;
+  html += `<p><strong>${t('entry-category')}:</strong> ${catLabels[e.category] || e.category}</p>`;
+  html += `<p><strong>${t('entry-verification')}:</strong> ${verLabels[e.verification] || e.verification}</p>`;
+  html += `<p><strong>${t('entry-impression')}:</strong><br>${esc(e.impression)}</p>`;
+  if (e.context) html += `<p><strong>${t('entry-context')}:</strong><br>${esc(e.context)}</p>`;
+  if (e.outcome) html += `<p><strong>${t('entry-outcome')}:</strong><br>${esc(e.outcome)}</p>`;
+  html += `<div style="margin-top:1rem;display:flex;gap:0.5rem;justify-content:center">`;
+  html += `<button class="btn btn-secondary btn-sm" onclick="editEntry(${index})">${t('edit')}</button>`;
+  html += `<button class="btn btn-sm" style="background:var(--danger);color:#fff" onclick="deleteEntry(${index})">${t('delete')}</button>`;
+  html += `<button class="btn btn-secondary btn-sm" onclick="closeModal()">${t('close')}</button>`;
+  html += `</div>`;
+
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+function editEntry(index) {
+  const entries = loadEntries();
+  const e = entries[index];
+  if (!e) return;
+  closeModal();
+  document.getElementById('entry-title').value = e.title;
+  document.getElementById('entry-impression').value = e.impression;
+  document.getElementById('entry-context').value = e.context || '';
+  document.getElementById('entry-outcome').value = e.outcome || '';
+  document.getElementById('entry-date').value = e.date || '';
+  selectedCategory = e.category;
+  selectedVerification = e.verification;
+  document.querySelectorAll('#category-select .cat-btn').forEach(b => { b.classList.toggle('active', b.dataset.cat === e.category); });
+  document.querySelectorAll('[data-ver]').forEach(b => { b.classList.toggle('active', b.dataset.ver === e.verification); });
+  // Remove old entry
+  entries.splice(index, 1);
+  saveEntries(entries);
+  showScreen('new-entry');
+}
+
+function deleteEntry(index) {
+  if (!confirm(t('journal-delete-confirm'))) return;
+  const entries = loadEntries();
+  entries.splice(index, 1);
+  saveEntries(entries);
+  closeModal();
+  renderEntries();
+  updateWelcomeStats();
+}
+
+function updateWelcomeStats() {
+  const entries = loadEntries();
+  document.getElementById('ws-total').textContent = entries.length;
+  document.getElementById('ws-confirmed').textContent = entries.filter(e => e.verification === 'confirmed').length;
+  document.getElementById('ws-partial').textContent = entries.filter(e => e.verification === 'partial').length;
+  document.getElementById('ws-unverified').textContent = entries.filter(e => e.verification === 'unverified' || e.verification === 'incorrect').length;
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  updateWelcomeStats();
+  showTip('journal');
+  // Set default date
+  const now = new Date();
+  document.getElementById('entry-date').value = now.toISOString().slice(0, 16);
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'entries') renderEntries();
+  if (['welcome','new-entry'].includes(name)) showTip('journal');
+};
+</script>
+
+</body>
+</html>

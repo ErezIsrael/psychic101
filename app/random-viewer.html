@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Random Object Viewer</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+
+  .target-image {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 1rem;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface2);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--surface2);
+  }
+
+  .target-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .target-image .placeholder {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-dim);
+  }
+
+  .target-image .placeholder .icon { font-size: 3rem; margin-bottom: 0.5rem; }
+
+  .target-image.hidden-target {
+    background: linear-gradient(135deg, #1a1a3e, #2a2a5e);
+    cursor: pointer;
+  }
+
+  .target-image.hidden-target .placeholder .icon { font-size: 4rem; }
+
+  .rating-stars { display: flex; gap: 0.25rem; justify-content: center; margin: 0.5rem 0; }
+  .star-btn { font-size: 1.5rem; background: none; border: none; cursor: pointer; padding: 0.25rem; min-height: 2.5rem; min-width: 2.5rem; }
+  .star-btn.active { color: var(--warn); }
+  .star-btn:not(.active) { color: var(--text-dim); }
+
+  .session-item { background: var(--surface); border: 1px solid var(--surface2); border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem; min-height: 3rem; }
+  .session-item .thumb { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--surface2); }
+  .session-item .info { flex: 1; }
+  .session-item .info .target-text { font-size: 0.85rem; color: var(--text); }
+  .session-item .info .date-text { font-size: 0.7rem; color: var(--text-dim); }
+  .session-item .rating-text { flex-shrink: 0; font-weight: 600; color: var(--accent); }
+
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+  @media (min-width: 600px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+  .mini-stat { background: var(--surface2); border-radius: 8px; padding: 0.75rem; text-align: center; }
+  .mini-stat .val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .mini-stat .lbl { font-size: 0.7rem; color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="random-viewer-title">🌍 Random Object Viewer</span></h1>
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+    <div id="lang-selector"></div>
+    <button class="nav-btn" onclick="showScreen('history')" data-i18n="history">📋 History</button>
+  </div>
+</header>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('random-viewer')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="random-viewer-title">🌍 Random Object Viewer</h2>
+      <p data-i18n="random-viewer-desc">Blind targets from Wikipedia and random images. Practice with unpredictable subjects.</p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="rv-how-to">How to Use</h2>
+      <ol class="steps">
+        <li data-i18n="rv-step1">Generate a random target code</li>
+        <li data-i18n="rv-step2">Focus and record your impressions</li>
+        <li data-i18n="rv-step3">Reveal the target image</li>
+        <li data-i18n="rv-step4">Rate your accuracy</li>
+        <li data-i18n="rv-step5">Review and compare</li>
+      </ol>
+    </div>
+
+    <div class="field">
+      <label data-i18n="rv-target-type">Target Type</label>
+      <div class="category-select">
+        <button class="cat-btn active" data-tt="image" onclick="selectTargetType(this)" data-i18n="tt-image">Random Image</button>
+        <button class="cat-btn" data-tt="wikipedia" onclick="selectTargetType(this)" data-i18n="tt-wikipedia">Wikipedia Article</button>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="generateTarget()" data-i18n="rv-generate">🌍 Generate Target</button>
+  </div>
+
+  <!-- VIEWING SCREEN -->
+  <div id="screen-viewing" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 33%"></div></div>
+
+    <div class="tip-banner" id="tip-viewing">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-viewing-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('random-viewer')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2><span data-i18n="rv-target-code">Target:</span> <span id="target-code-display"></span></h2>
+      <p data-i18n="rv-focus-instruction">Focus on the target code. Record your impressions before revealing.</p>
+    </div>
+
+    <div class="target-image hidden-target" id="hidden-target" onclick="revealTarget()">
+      <div class="placeholder">
+        <div class="icon">🔮</div>
+        <div data-i18n="rv-click-reveal">Click to reveal target</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="viewing-notes" data-i18n="rv-impressions">Impressions</label>
+      <textarea id="viewing-notes" class="text-input" rows="5" data-i18n-placeholder="rv-impressions-ph" placeholder="Colors, shapes, textures, emotions, locations..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="revealTarget()" data-i18n="rv-reveal">🔍 Reveal Target</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="screen-result" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 66%"></div></div>
+
+    <div class="tip-banner" id="tip-result">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-result-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('random-viewer')">↻</button>
+    </div>
+
+    <div class="target-image" id="result-target">
+      <div class="placeholder">
+        <div class="icon">🖼</div>
+        <div id="result-target-name"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="rv-rate">Rate Your Accuracy</h2>
+      <div class="rating-stars" id="rating-stars">
+        <button class="star-btn" data-rating="1" onclick="setRating(1)">★</button>
+        <button class="star-btn" data-rating="2" onclick="setRating(2)">★</button>
+        <button class="star-btn" data-rating="3" onclick="setRating(3)">★</button>
+        <button class="star-btn" data-rating="4" onclick="setRating(4)">★</button>
+        <button class="star-btn" data-rating="5" onclick="setRating(5)">★</button>
+      </div>
+      <div style="text-align:center;font-size:0.85rem;color:var(--text-dim)" id="rating-label" data-i18n="rv-no-rating">No rating</div>
+    </div>
+
+    <div class="field">
+      <label for="result-notes" data-i18n="rv-reflection">Reflection</label>
+      <textarea id="result-notes" class="text-input" rows="3" data-i18n-placeholder="rv-reflection-ph" placeholder="What matched? What was off?"></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('viewing')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="saveSession()" data-i18n="rv-save-next">💾 Save &amp; Next</button>
+    </div>
+  </div>
+
+  <!-- HISTORY SCREEN -->
+  <div id="screen-history" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="rv-history-title">📊 Viewing History</h2>
+    </div>
+
+    <div class="stats-row">
+      <div class="mini-stat"><div class="val" id="hs-total">0</div><div class="lbl" data-i18n="rv-sessions">Sessions</div></div>
+      <div class="mini-stat"><div class="val" id="hs-avg">—</div><div class="lbl" data-i18n="rv-avg-rating">Avg Rating</div></div>
+      <div class="mini-stat"><div class="val" id="hs-streak">0</div><div class="lbl" data-i18n="day-streak">Day Streak</div></div>
+      <div class="mini-stat"><div class="val" id="hs-high">0</div><div class="lbl" data-i18n="rv-best-rating">Best Rating</div></div>
+    </div>
+
+    <div id="history-list"></div>
+
+    <button class="btn btn-secondary" onclick="goHome()" style="margin-top:1rem" data-i18n="back-home">← Back to Home</button>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+// ─── Random Object Viewer ─────────────────────────────────
+let targetType = 'image';
+let currentTarget = null;
+let currentRating = 0;
+
+function loadHistory() { return loadData('rv_history') || []; }
+function saveHistory(data) { saveData('rv_history', data); }
+
+function selectTargetType(btn) {
+  document.querySelectorAll('[data-tt]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  targetType = btn.dataset.tt;
+}
+
+function generateTarget() {
+  const code = generateCode();
+  if (targetType === 'image') {
+    // Use picsum for random images
+    const seed = Math.floor(Math.random() * 1000);
+    currentTarget = {
+      code,
+      type: 'image',
+      url: `https://picsum.photos/seed/${seed}/400/300`,
+      name: `Random Image #${seed}`
+    };
+  } else {
+    // Wikipedia random article
+    currentTarget = {
+      code,
+      type: 'wikipedia',
+      url: '',
+      name: '',
+      loading: true
+    };
+    fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary')
+      .then(r => r.json())
+      .then(data => {
+        currentTarget.name = data.title;
+        currentTarget.url = data.thumbnail?.source || '';
+        currentTarget.loading = false;
+        currentTarget.extract = data.extract;
+      })
+      .catch(() => {
+        currentTarget.name = 'Wikipedia Random';
+        currentTarget.loading = false;
+      });
+  }
+
+  document.getElementById('target-code-display').textContent = code;
+  document.getElementById('viewing-notes').value = '';
+  document.getElementById('hidden-target').innerHTML = `<div class="placeholder"><div class="icon">🔮</div><div data-i18n="rv-click-reveal">${t('rv-click-reveal')}</div></div>`;
+  document.getElementById('hidden-target').className = 'target-image hidden-target';
+  showScreen('viewing');
+}
+
+function revealTarget() {
+  const container = document.getElementById('result-target');
+  if (currentTarget.type === 'image' && currentTarget.url) {
+    container.innerHTML = `<img src="${currentTarget.url}" alt="Target" style="width:100%;height:auto">`;
+  } else {
+    container.innerHTML = `<div class="placeholder"><div class="icon">📖</div><div>${esc(currentTarget.name || 'Loading...')}</div></div>`;
+  }
+  document.getElementById('result-target-name').textContent = currentTarget.name || '';
+  currentRating = 0;
+  updateRatingDisplay();
+  showScreen('result');
+}
+
+function setRating(r) {
+  currentRating = r;
+  updateRatingDisplay();
+}
+
+function updateRatingDisplay() {
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', parseInt(b.dataset.rating) <= currentRating);
+  });
+  const labels = ['', t('rv-rate-1'), t('rv-rate-2'), t('rv-rate-3'), t('rv-rate-4'), t('rv-rate-5')];
+  document.getElementById('rating-label').textContent = currentRating ? labels[currentRating] : t('rv-no-rating');
+}
+
+function saveSession() {
+  if (!currentRating) { alert(t('rv-rate-required')); return; }
+
+  const entry = {
+    id: Date.now(),
+    code: currentTarget.code,
+    type: currentTarget.type,
+    target: currentTarget.name,
+    url: currentTarget.url,
+    impressions: document.getElementById('viewing-notes').value,
+    rating: currentRating,
+    reflection: document.getElementById('result-notes').value
+  };
+
+  const history = loadHistory();
+  history.unshift(entry);
+  saveHistory(history);
+  currentRating = 0;
+  showScreen('welcome');
+}
+
+function renderHistory() {
+  const history = loadHistory();
+  const list = document.getElementById('history-list');
+
+  if (!history.length) {
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim)">' + t('rv-no-sessions') + '</div>';
+  } else {
+    list.innerHTML = history.map((h, i) => {
+      const thumb = h.url ? `<img class="thumb" src="${h.url}" alt="">` : `<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-size:1.5rem">📖</div>`;
+      return `<div class="session-item" onclick="viewSession(${i})">
+        ${thumb}
+        <div class="info">
+          <div class="target-text">${esc(h.target)} (${h.code})</div>
+          <div class="date-text">${formatDate(h.id)}</div>
+        </div>
+        <div class="rating-text">${'★'.repeat(h.rating)}${'☆'.repeat(5 - h.rating)}</div>
+      </div>`;
+    }).join('');
+  }
+
+  const total = history.length;
+  const avg = total ? (history.reduce((s, h) => s + h.rating, 0) / total).toFixed(1) : '—';
+  const best = total ? Math.max(...history.map(h => h.rating)) : 0;
+  document.getElementById('hs-total').textContent = total;
+  document.getElementById('hs-avg').textContent = avg;
+  document.getElementById('hs-streak').textContent = calcStreak(history);
+  document.getElementById('hs-high').textContent = best;
+}
+
+function viewSession(index) {
+  const history = loadHistory();
+  const h = history[index];
+  if (!h) return;
+
+  let html = `<h3>${esc(h.target)}</h3>`;
+  html += `<p><strong>${t('date')}:</strong> ${formatDate(h.id)}</p>`;
+  html += `<p><strong>${t('rv-target-code')}:</strong> ${h.code}</p>`;
+  html += `<p><strong>${t('rv-rating')}:</strong> ${'★'.repeat(h.rating)}${'☆'.repeat(5 - h.rating)}</p>`;
+  if (h.impressions) html += `<p><strong>${t('rv-impressions')}:</strong><br>${esc(h.impressions)}</p>`;
+  if (h.reflection) html += `<p><strong>${t('rv-reflection')}:</strong><br>${esc(h.reflection)}</p>`;
+  html += `<div style="margin-top:1rem;text-align:center"><button class="btn btn-secondary btn-sm" onclick="closeModal()">${t('close')}</button></div>`;
+
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  showTip('random-viewer');
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'history') renderHistory();
+  if (['welcome','viewing','result'].includes(name)) showTip('random-viewer');
+};
+</script>
+
+</body>
+</html>

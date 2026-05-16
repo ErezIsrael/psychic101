@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Grounding Coach</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+
+  .technique-card {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    min-height: 3rem;
+    transition: border-color 0.2s;
+  }
+  @media (hover: hover) { .technique-card:hover { border-color: var(--accent); } }
+  .technique-card .tech-icon { font-size: 1.5rem; margin-right: 0.5rem; }
+  .technique-card .tech-title { font-weight: 600; color: var(--text); }
+  .technique-card .tech-desc { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+  .step-list { counter-reset: step; }
+  .step-item {
+    counter-increment: step;
+    padding: 0.75rem 0.75rem 0.75rem 3rem;
+    position: relative;
+    margin-bottom: 0.5rem;
+    background: var(--surface2);
+    border-radius: 8px;
+    min-height: 3rem;
+  }
+  .step-item::before {
+    counter-increment: step;
+    content: counter(step);
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .step-item.completed { opacity: 0.6; }
+  .step-item.completed::before { background: var(--success); }
+  .step-item.active { border: 1px solid var(--accent); }
+  .step-item.active::before { background: var(--warn); }
+
+  .breath-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--accent), transparent);
+    margin: 1rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    transition: transform 4s ease-in-out;
+  }
+  .breath-circle.inhale { transform: scale(1.3); }
+  .breath-circle.exhale { transform: scale(0.8); }
+
+  .timer-display {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    margin: 0.5rem 0;
+  }
+
+  .progress-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .progress-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--surface2);
+    transition: background 0.3s;
+  }
+  .progress-dot.done { background: var(--success); }
+  .progress-dot.current { background: var(--warn); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="grounding-title">🌳 Grounding Coach</span></h1>
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+    <div id="lang-selector"></div>
+    <button class="nav-btn" onclick="showScreen('history')" data-i18n="history">📋 History</button>
+  </div>
+</header>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('grounding')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="grounding-title">🌳 Grounding Coach</h2>
+      <p data-i18n="grounding-desc">Guided grounding: 5-4-3-2-1 technique, rooting visualization, breath work.</p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="grounding-why">Why Ground?</h2>
+      <p data-i18n="grounding-why-desc">Grounding stabilizes your energy before psychic work. It prevents overwhelm, improves signal clarity, and protects your wellbeing.</p>
+    </div>
+
+    <h2 class="section-title" data-i18n="grounding-techniques">Techniques</h2>
+    <div class="technique-card" onclick="startTechnique('five-senses')">
+      <span class="tech-icon">👁</span>
+      <span class="tech-title" data-i18n="tech-54321">5-4-3-2-1 Sensory Grounding</span>
+      <span class="tech-desc" data-i18n="tech-54321-desc">Notice 5 things you see, 4 you feel, 3 you hear, 2 you smell, 1 you taste.</span>
+    </div>
+    <div class="technique-card" onclick="startTechnique('rooting')">
+      <span class="tech-icon">🌳</span>
+      <span class="tech-title" data-i18n="tech-rooting">Rooting Visualization</span>
+      <span class="tech-desc" data-i18n="tech-rooting-desc">Imagine roots growing from your feet deep into the earth.</span>
+    </div>
+    <div class="technique-card" onclick="startTechnique('breath')">
+      <span class="tech-icon">🌬</span>
+      <span class="tech-title" data-i18n="tech-breath">Breath Work</span>
+      <span class="tech-desc" data-i18n="tech-breath-desc">4-7-8 breathing: inhale 4s, hold 7s, exhale 8s.</span>
+    </div>
+    <div class="technique-card" onclick="startTechnique('body-scan')">
+      <span class="tech-icon">🧘</span>
+      <span class="tech-title" data-i18n="tech-body-scan">Body Scan</span>
+      <span class="tech-desc" data-i18n="tech-body-scan-desc">Systematically relax each part of your body from head to toe.</span>
+    </div>
+  </div>
+
+  <!-- 5-4-3-2-1 SCREEN -->
+  <div id="screen-five-senses" class="screen">
+    <div class="progress-bar"><div class="fill" id="senses-progress" style="width: 0%"></div></div>
+
+    <div class="tip-banner" id="tip-senses">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-senses-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('grounding')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="tech-54321">5-4-3-2-1 Sensory Grounding</h2>
+      <p id="senses-instruction" data-i18n="senses-step-see">Notice 5 things you can SEE around you</p>
+    </div>
+
+    <div class="field">
+      <label id="senses-label" data-i18n="senses-label">What do you notice?</label>
+      <textarea id="senses-input" class="text-input" rows="3" data-i18n-placeholder="senses-ph" placeholder="Type what you observe..."></textarea>
+    </div>
+
+    <div class="progress-dots" id="senses-dots">
+      <div class="progress-dot current"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="nextSenseStep()" data-i18n="senses-next">Next →</button>
+    </div>
+  </div>
+
+  <!-- ROOTING SCREEN -->
+  <div id="screen-rooting" class="screen">
+    <div class="progress-bar"><div class="fill" id="rooting-progress" style="width: 0%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="tech-rooting">Rooting Visualization</h2>
+      <p id="rooting-instruction" data-i18n="rooting-step1">Close your eyes. Feel your feet on the ground.</p>
+    </div>
+
+    <div class="progress-dots" id="rooting-dots">
+      <div class="progress-dot current"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="field">
+      <label for="rooting-notes" data-i18n="rooting-notes-label">What do you feel?</label>
+      <textarea id="rooting-notes" class="text-input" rows="3" data-i18n-placeholder="rooting-ph" placeholder="Describe the sensations..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="nextRootingStep()" data-i18n="rooting-next">Next Step →</button>
+    </div>
+  </div>
+
+  <!-- BREATH SCREEN -->
+  <div id="screen-breath" class="screen">
+    <div class="progress-bar"><div class="fill" id="breath-progress" style="width: 0%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="tech-breath">4-7-8 Breath Work</h2>
+      <p data-i18n="breath-desc">Inhale for 4 seconds, hold for 7, exhale for 8. Repeat for 4 cycles.</p>
+    </div>
+
+    <div class="breath-circle" id="breath-circle">
+      <span id="breath-text" data-i18n="breath-ready">Ready</span>
+    </div>
+
+    <div class="timer-display" id="breath-timer">0:00</div>
+
+    <div class="progress-dots" id="breath-dots">
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+      <div class="progress-dot"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="stopBreath()" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" id="breath-start-btn" onclick="startBreath()" data-i18n="breath-start">🌬 Start Breathing</button>
+    </div>
+  </div>
+
+  <!-- BODY SCAN SCREEN -->
+  <div id="screen-body-scan" class="screen">
+    <div class="progress-bar"><div class="fill" id="scan-progress" style="width: 0%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="tech-body-scan">Body Scan</h2>
+      <p id="scan-instruction" data-i18n="scan-step-head">Focus on your head. Notice any tension. Breathe into it and release.</p>
+    </div>
+
+    <div class="step-list" id="scan-steps"></div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="nextScanStep()" data-i18n="scan-next">Next Area →</button>
+    </div>
+  </div>
+
+  <!-- HISTORY SCREEN -->
+  <div id="screen-history" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="grounding-history">📊 Grounding History</h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="gh-total">0</div><div class="label" data-i18n="gh-sessions">Sessions</div></div>
+      <div class="stat-card"><div class="value" id="gh-streak">0</div><div class="label" data-i18n="day-streak">Day Streak</div></div>
+    </div>
+
+    <div id="gh-list"></div>
+
+    <button class="btn btn-secondary" onclick="goHome()" style="margin-top:1rem" data-i18n="back-home">← Back to Home</button>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+// ─── 5-4-3-2-1 ────────────────────────────────────────────
+const SENSE_STEPS = [
+  { key: 'senses-step-see', count: 5, label: 'senses-label-see' },
+  { key: 'senses-step-feel', count: 4, label: 'senses-label-feel' },
+  { key: 'senses-step-hear', count: 3, label: 'senses-label-hear' },
+  { key: 'senses-step-smell', count: 2, label: 'senses-label-smell' },
+  { key: 'senses-step-taste', count: 1, label: 'senses-label-taste' }
+];
+let sensesStep = 0;
+let sensesNotes = [];
+
+function startTechnique(tech) {
+  if (tech === 'five-senses') {
+    sensesStep = 0;
+    sensesNotes = [];
+    updateSenseStep();
+    showScreen('five-senses');
+  } else if (tech === 'rooting') {
+    rootingStep = 0;
+    updateRootingStep();
+    showScreen('rooting');
+  } else if (tech === 'breath') {
+    breathCycle = 0;
+    breathPhase = 'idle';
+    document.getElementById('breath-circle').className = 'breath-circle';
+    document.getElementById('breath-text').textContent = t('breath-ready');
+    document.getElementById('breath-timer').textContent = '0:00';
+    document.getElementById('breath-dots').querySelectorAll('.progress-dot').forEach(d => d.className = 'progress-dot');
+    showScreen('breath');
+  } else if (tech === 'body-scan') {
+    scanStep = 0;
+    updateScanStep();
+    showScreen('body-scan');
+  }
+}
+
+function updateSenseStep() {
+  const step = SENSE_STEPS[sensesStep];
+  document.getElementById('senses-instruction').textContent = t(step.key);
+  document.getElementById('senses-progress').style.width = ((sensesStep / 5) * 100) + '%';
+  document.getElementById('senses-input').value = '';
+
+  const dots = document.getElementById('senses-dots').querySelectorAll('.progress-dot');
+  dots.forEach((d, i) => {
+    d.className = 'progress-dot' + (i < sensesStep ? ' done' : '') + (i === sensesStep ? ' current' : '');
+  });
+}
+
+function nextSenseStep() {
+  const input = document.getElementById('senses-input').value.trim();
+  sensesNotes.push(input);
+  sensesStep++;
+  if (sensesStep >= 5) {
+    logSession('5-4-3-2-1', sensesNotes.join(' | '));
+    showScreen('welcome');
+    return;
+  }
+  updateSenseStep();
+}
+
+// ─── Rooting ──────────────────────────────────────────────
+const ROOTING_STEPS = [
+  'rooting-step1', 'rooting-step2', 'rooting-step3', 'rooting-step4', 'rooting-step5'
+];
+let rootingStep = 0;
+
+function updateRootingStep() {
+  document.getElementById('rooting-instruction').textContent = t(ROOTING_STEPS[rootingStep]);
+  document.getElementById('rooting-progress').style.width = ((rootingStep / 5) * 100) + '%';
+
+  const dots = document.getElementById('rooting-dots').querySelectorAll('.progress-dot');
+  dots.forEach((d, i) => {
+    d.className = 'progress-dot' + (i < rootingStep ? ' done' : '') + (i === rootingStep ? ' current' : '');
+  });
+}
+
+function nextRootingStep() {
+  rootingStep++;
+  if (rootingStep >= 5) {
+    logSession('Rooting', document.getElementById('rooting-notes').value);
+    showScreen('welcome');
+    return;
+  }
+  updateRootingStep();
+}
+
+// ─── Breath Work ──────────────────────────────────────────
+let breathInterval = null;
+let breathCycle = 0;
+let breathPhase = 'idle';
+let breathTimer = 0;
+
+function startBreath() {
+  breathCycle = 0;
+  breathPhase = 'inhale';
+  document.getElementById('breath-start-btn').disabled = true;
+  runBreathCycle();
+}
+
+function runBreathCycle() {
+  if (breathCycle >= 4) {
+    stopBreath();
+    logSession('Breath Work', '4 cycles completed');
+    showScreen('welcome');
+    return;
+  }
+
+  const circle = document.getElementById('breath-circle');
+  const text = document.getElementById('breath-text');
+  const dots = document.getElementById('breath-dots').querySelectorAll('.progress-dot');
+
+  if (breathPhase === 'inhale') {
+    circle.className = 'breath-circle inhale';
+    text.textContent = t('breath-inhale');
+    breathTimer = 4;
+    breathInterval = setInterval(() => {
+      breathTimer--;
+      document.getElementById('breath-timer').textContent = '0:' + String(breathTimer).padStart(2, '0');
+      if (breathTimer <= 0) {
+        clearInterval(breathInterval);
+        breathPhase = 'hold';
+        runBreathCycle();
+      }
+    }, 1000);
+  } else if (breathPhase === 'hold') {
+    text.textContent = t('breath-hold');
+    breathTimer = 7;
+    breathInterval = setInterval(() => {
+      breathTimer--;
+      document.getElementById('breath-timer').textContent = '0:' + String(breathTimer).padStart(2, '0');
+      if (breathTimer <= 0) {
+        clearInterval(breathInterval);
+        breathPhase = 'exhale';
+        runBreathCycle();
+      }
+    }, 1000);
+  } else if (breathPhase === 'exhale') {
+    circle.className = 'breath-circle exhale';
+    text.textContent = t('breath-exhale');
+    breathTimer = 8;
+    breathInterval = setInterval(() => {
+      breathTimer--;
+      document.getElementById('breath-timer').textContent = '0:' + String(breathTimer).padStart(2, '0');
+      if (breathTimer <= 0) {
+        clearInterval(breathInterval);
+        circle.className = 'breath-circle';
+        breathCycle++;
+        dots[breathCycle - 1].className = 'progress-dot done';
+        document.getElementById('breath-progress').style.width = ((breathCycle / 4) * 100) + '%';
+        breathPhase = 'inhale';
+        runBreathCycle();
+      }
+    }, 1000);
+  }
+}
+
+function stopBreath() {
+  if (breathInterval) clearInterval(breathInterval);
+  breathPhase = 'idle';
+  document.getElementById('breath-start-btn').disabled = false;
+  document.getElementById('breath-circle').className = 'breath-circle';
+  document.getElementById('breath-text').textContent = t('breath-ready');
+}
+
+// ─── Body Scan ────────────────────────────────────────────
+const SCAN_AREAS = ['scan-step-head','scan-step-face','scan-step-neck','scan-step-shoulders','scan-step-arms','scan-step-chest','scan-step-stomach','scan-step-legs','scan-step-feet'];
+let scanStep = 0;
+
+function updateScanStep() {
+  document.getElementById('scan-instruction').textContent = t(SCAN_AREAS[scanStep]);
+  document.getElementById('scan-progress').style.width = ((scanStep / SCAN_AREAS.length) * 100) + '%';
+
+  const stepsEl = document.getElementById('scan-steps');
+  stepsEl.innerHTML = SCAN_AREAS.map((key, i) =>
+    `<div class="step-item ${i < scanStep ? 'completed' : ''} ${i === scanStep ? 'active' : ''}">${t(key)}</div>`
+  ).join('');
+}
+
+function nextScanStep() {
+  scanStep++;
+  if (scanStep >= SCAN_AREAS.length) {
+    logSession('Body Scan', 'Full scan completed');
+    showScreen('welcome');
+    return;
+  }
+  updateScanStep();
+}
+
+// ─── History ──────────────────────────────────────────────
+function loadGH() { return loadData('grounding_history') || []; }
+function saveGH(data) { saveData('grounding_history', data); }
+
+function logSession(technique, notes) {
+  const history = loadGH();
+  history.unshift({ id: Date.now(), technique, notes });
+  saveGH(history);
+}
+
+function renderGH() {
+  const history = loadGH();
+  document.getElementById('gh-total').textContent = history.length;
+  document.getElementById('gh-streak').textContent = calcStreak(history);
+
+  const list = document.getElementById('gh-list');
+  if (!history.length) {
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim)">' + t('grounding-no-sessions') + '</div>';
+    return;
+  }
+
+  list.innerHTML = history.map(h =>
+    `<div class="session-item">
+      <div class="session-title">${esc(h.technique)}</div>
+      <div class="session-date">${formatDate(h.id)}</div>
+      ${h.notes ? `<div class="session-notes">${esc(h.notes)}</div>` : ''}
+    </div>`
+  ).join('');
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  showTip('grounding');
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'history') renderGH();
+  if (['welcome','five-senses','rooting','breath','body-scan'].includes(name)) showTip('grounding');
+};
+</script>
+
+</body>
+</html>

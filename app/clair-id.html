@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Clair Sense Identifier</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+
+  /* ─── Rating Slider ────────────────────────────────── */
+  .rating-row {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: var(--radius);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .rating-row .q-text {
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .rating-row .q-clair {
+    font-size: 0.7rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .rating-row input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    height: 6px;
+  }
+
+  .rating-row .rating-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+  }
+
+  .rating-row .rating-value {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 0.25rem;
+  }
+
+  /* ─── Bar Chart ────────────────────────────────────── */
+  .bar-chart { margin-bottom: 1rem; }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .bar-label {
+    width: 9rem;
+    font-size: 0.8rem;
+    color: var(--text);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 24px;
+    background: var(--surface2);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    min-width: 2rem;
+  }
+
+  .bar-fill.dominant { background: var(--accent); }
+  .bar-fill.secondary { background: var(--accent2); opacity: 0.7; }
+  .bar-fill.tertiary { background: var(--text-dim); opacity: 0.4; }
+
+  /* ─── Exercise Card ────────────────────────────────── */
+  .exercise-card {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .exercise-card h3 {
+    color: var(--accent2);
+    margin-bottom: 0.5rem;
+  }
+
+  .exercise-card p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 0.5rem;
+  }
+
+  .exercise-card .exercise-tag {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: rgba(123,104,238,0.15);
+    color: var(--accent2);
+    margin-right: 0.375rem;
+    margin-bottom: 0.375rem;
+  }
+
+  /* ─── Progress Dots ────────────────────────────────── */
+  .progress-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .progress-dots .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--surface2);
+    transition: background 0.2s;
+  }
+
+  .progress-dots .dot.done { background: var(--accent); }
+  .progress-dots .dot.current { background: var(--accent2); box-shadow: 0 0 0 2px var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="clair-title">👁 Clair Sense ID</span> <span data-i18n="clair-subtitle">— Assessment</span></h1>
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+    <div id="lang-selector"></div>
+    <button class="nav-btn" onclick="showScreen('training')" data-i18n="training">🏋 Training</button>
+  </div>
+</header>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('clair')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="clair-title">Clair Sense Identifier</h2>
+      <p data-i18n="clair-desc">Discover your dominant Clair sense through a 16-question assessment. Each sense gets 2 questions rated on a 1–5 scale.</p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="clair-senses-title">The 8 Clair Senses</h2>
+      <ul>
+        <li>👁 <strong data-i18n="clairvoyance">Clairvoyance</strong> — <span data-i18n="clairvoyance-desc">Clear seeing, visual impressions</span></li>
+        <li>👂 <strong data-i18n="clairaudience">Clairaudience</strong> — <span data-i18n="clairaudience-desc">Clear hearing, auditory impressions</span></li>
+        <li>✋ <strong data-i18n="clairsentience">Clairsentience</strong> — <span data-i18n="clairsentience-desc">Clear feeling, tactile/emotional sensations</span></li>
+        <li>💡 <strong data-i18n="claircognizance">Claircognizance</strong> — <span data-i18n="claircognizance-desc">Clear knowing, information without source</span></li>
+        <li>👃 <strong data-i18n="clairalience">Clairalience</strong> — <span data-i18n="clairalience-desc">Clear smelling, scent impressions</span></li>
+        <li>👅 <strong data-i18n="clairgustance">Clairgustance</strong> — <span data-i18n="clairgustance-desc">Clear tasting, flavor impressions</span></li>
+        <li>💜 <strong data-i18n="clairempathy">Clairempathy</strong> — <span data-i18n="clairempathy-desc">Clear empathy, absorbing others' emotions</span></li>
+        <li>🌐 <strong data-i18n="clairambience">Clairambience</strong> — <span data-i18n="clairambience-desc">Clear ambience, sensing energy of places</span></li>
+      </ul>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-primary" onclick="startAssessment()" data-i18n="start-assessment">🔮 Start Assessment</button>
+      <button class="btn btn-secondary" onclick="showResults()" id="results-btn" style="display:none" data-i18n="view-results">📊 View Results</button>
+    </div>
+  </div>
+
+  <!-- ASSESSMENT SCREEN -->
+  <div id="screen-assessment" class="screen">
+    <div class="progress-bar"><div class="fill" id="assess-progress"></div></div>
+
+    <div class="tip-banner" id="tip-assessment">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-assessment-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('clair')">↻</button>
+    </div>
+
+    <div class="progress-dots" id="progress-dots"></div>
+
+    <div class="rating-row" id="question-card">
+      <div class="q-clair" id="q-clair"></div>
+      <div class="q-text" id="q-text"></div>
+      <input type="range" min="1" max="5" value="3" id="q-slider" oninput="updateSlider(this.value)">
+      <div class="rating-labels">
+        <span data-i18n="never">Never</span><span data-i18n="rarely">Rarely</span><span data-i18n="sometimes">Sometimes</span><span data-i18n="often">Often</span><span data-i18n="always">Always</span>
+      </div>
+      <div class="rating-value" id="q-value">3</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="prevQuestion()" data-i18n="previous">← Previous</button>
+      <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" data-i18n="next">Next →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="screen-results" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="tip-banner" id="tip-results">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-results-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('clair')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="clair-profile">Your Clair Sense Profile</h2>
+      <p id="dominant-text"></p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="score-breakdown">Score Breakdown</h2>
+      <div class="bar-chart" id="bar-chart"></div>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="recommended-training">Recommended Training</h2>
+      <p data-i18n="training-focus">Focus on strengthening your dominant sense first, then cross-train the others.</p>
+      <div id="training-recs"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="showScreen('training')" data-i18n="go-training">🏋 Go to Training</button>
+    </div>
+  </div>
+
+  <!-- TRAINING SCREEN -->
+  <div id="screen-training" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="tip-banner" id="tip-training">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-training-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('clair')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="daily-exercises">Daily Training Exercises</h2>
+      <p id="training-intro"></p>
+    </div>
+
+    <div id="exercise-list"></div>
+
+    <div class="card">
+      <h2 data-i18n="training-log">Training Log</h2>
+      <div id="training-log"></div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="goHome()" style="margin-top:1rem" data-i18n="back-home">← Back to Home</button>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+// ─── Clair Sense Identifier Logic ─────────────────────────
+const CLAIR_SENSES = [
+  { id:'clairvoyance', icon:'👁', name:'Clairvoyance', desc:'Clear seeing' },
+  { id:'clairaudience', icon:'👂', name:'Clairaudience', desc:'Clear hearing' },
+  { id:'clairsentience', icon:'✋', name:'Clairsentience', desc:'Clear feeling' },
+  { id:'claircognizance', icon:'💡', name:'Claircognizance', desc:'Clear knowing' },
+  { id:'clairalience', icon:'👃', name:'Clairalience', desc:'Clear smelling' },
+  { id:'clairgustance', icon:'👅', name:'Clairgustance', desc:'Clear tasting' },
+  { id:'clairempathy', icon:'💜', name:'Clairempathy', desc:'Clear empathy' },
+  { id:'clairambience', icon:'🌐', name:'Clairambience', desc:'Clear ambience' }
+];
+
+const QUESTIONS = [
+  { clair:'clairvoyance', text:'I see images in my mind\'s eye when thinking about people or places.' },
+  { clair:'clairvoyance', text:'I get visual flashes or impressions about things I haven\'t experienced yet.' },
+  { clair:'clairaudience', text:'I hear sounds, tones, or voices that others around me don\'t seem to notice.' },
+  { clair:'clairaudience', text:'Information sometimes comes to me as if someone is whispering it to me.' },
+  { clair:'clairsentience', text:'I feel physical sensations (tingling, warmth, pressure) without an obvious cause.' },
+  { clair:'clairsentience', text:'I can sense the emotional state of people just by being near them.' },
+  { clair:'claircognizance', text:'I "just know" things without being able to explain how I know them.' },
+  { clair:'claircognizance', text:'Information appears in my mind suddenly, fully formed, without logical reasoning.' },
+  { clair:'clairalience', text:'I smell scents or odors that others around me don\'t seem to detect.' },
+  { clair:'clairalience', text:'Scent impressions come to me when thinking about people, places, or events.' },
+  { clair:'clairgustance', text:'I taste flavors in my mouth that don\'t correspond to anything I\'ve eaten.' },
+  { clair:'clairgustance', text:'Taste impressions appear when I\'m thinking about or sensing something.' },
+  { clair:'clairempathy', text:'I absorb the emotions of others and feel drained after being around certain people.' },
+  { clair:'clairempathy', text:'I can tell how someone is feeling even when they try to hide it.' },
+  { clair:'clairambience', text:'I sense the energy or "vibe" of a room or place when I enter it.' },
+  { clair:'clairambience', text:'Different locations feel distinctly different to me, beyond just the physical environment.' }
+];
+
+const EXERCISES = {
+  clairvoyance: [
+    { title:'Card Guessing', desc:'Use the Card Guessing Trainer. Focus on the card back and try to see the hidden card. Record what you visualize.', tags:['clairvoyance','ESP'] },
+    { title:'Blind Object ID', desc:'Have someone place an object in a closed box. Try to see its shape, color, and material with your mind\'s eye.', tags:['clairvoyance','practice'] },
+    { title:'Distant Viewing', desc:'Pick a location you know well. Close your eyes and try to visualize it. Note details you "see" and compare.', tags:['clairvoyance','remote viewing'] }
+  ],
+  clairaudience: [
+    { title:'Tone Matching', desc:'Have a partner play a random tone. Try to identify it by psychic impression before hearing it.', tags:['clairaudience','ESP'] },
+    { title:'Message Reception', desc:'Sit quietly for 5 minutes. Listen for any sounds, words, or tones that seem to come from within.', tags:['clairaudience','meditation'] },
+    { title:'Blind Sound ID', desc:'Have someone play a sound while you face away. Try to identify it psychically before hearing it.', tags:['clairaudience','practice'] }
+  ],
+  clairsentience: [
+    { title:'Texture Guessing', desc:'Have someone hold an object with different textures. Try to feel its texture through your hands without touching it.', tags:['clairsentience','ESP'] },
+    { title:'Emotion Reading', desc:'Sit with someone and try to sense their emotional state. Compare after.', tags:['clairsentience','practice'] },
+    { title:'Temperature Sense', desc:'Have someone hold something hot or cold. Try to sense the temperature without touching.', tags:['clairsentience','practice'] }
+  ],
+  claircognizance: [
+    { title:'Yes/No Gut Check', desc:'Have someone think of a yes/no question. Try to "just know" the answer. Compare.', tags:['claircognizance','ESP'] },
+    { title:'Rapid Intuition Quiz', desc:'Quick-fire questions: "Is the person behind me wearing red?" Test your instant knowing.', tags:['claircognizance','practice'] },
+    { title:'Number Guessing', desc:'Have someone think of a number 1-10. Try to claircognize it. Record accuracy.', tags:['claircognizance','ESP'] }
+  ],
+  clairalience: [
+    { title:'Scent Association', desc:'Think of a person and note any scents that come to mind. Ask them later about their perfume/cologne.', tags:['clairalience','practice'] },
+    { title:'Blind Scent ID', desc:'Have someone hold a scented object. Try to identify the scent psychically.', tags:['clairalience','ESP'] },
+    { title:'Place Scents', desc:'Think of a location and note any scents. Visit later and compare.', tags:['clairalience','remote viewing'] }
+  ],
+  clairgustance: [
+    { title:'Flavor Association', desc:'Think of a meal you had recently. Note any taste impressions that arise.', tags:['clairgustance','practice'] },
+    { title:'Food Guessing', desc:'Have someone think of a food. Try to taste it psychically.', tags:['clairgustance','ESP'] },
+    { title:'Drink Identification', desc:'Have someone hold a drink. Try to identify what it is by taste impression.', tags:['clairgustance','practice'] }
+  ],
+  clairempathy: [
+    { title:'Emotion Journaling', desc:'After social interactions, journal the emotions you sensed vs. what people actually felt.', tags:['clairempathy','journaling'] },
+    { title:'Boundary Exercise', desc:'Visualize a light shield around you. Practice distinguishing your emotions from others\'.', tags:['clairempathy','grounding'] },
+    { title:'Empathy Calibration', desc:'Rate people\'s moods on a 1-10 scale. Compare with their actual self-reported mood.', tags:['clairempathy','practice'] }
+  ],
+  clairambience: [
+    { title:'Room Energy Assessment', desc:'Enter a new room and note the energy you sense. Compare with others\' impressions.', tags:['clairambience','practice'] },
+    { title:'Location Comparison', desc:'Visit 3 different places. Rate the energy of each. Note patterns.', tags:['clairambience','remote viewing'] },
+    { title:'Place History Sense', desc:'Visit an old building. Note any impressions about its history. Research and compare.', tags:['clairambience','psychometry'] }
+  ]
+};
+
+let currentQuestion = 0;
+let answers = new Array(16).fill(3);
+let assessmentResults = null;
+
+function loadAssessment() { return loadData('clair_assessment'); }
+function saveAssessment(data) { saveData('clair_assessment', data); }
+function loadTrainingLog() { return loadData('clair_training_log'); }
+function saveTrainingLog(data) { saveData('clair_training_log', data); }
+
+// ─── Assessment ───────────────────────────────────────────
+function startAssessment() {
+  currentQuestion = 0;
+  answers = new Array(16).fill(3);
+  renderQuestion();
+  showScreen('assessment');
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQuestion];
+  const clair = CLAIR_SENSES.find(s => s.id === q.clair);
+  document.getElementById('q-clair').textContent = clair.icon + ' ' + clair.name;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-slider').value = answers[currentQuestion];
+  document.getElementById('q-value').textContent = answers[currentQuestion];
+
+  // Progress
+  const pct = (currentQuestion / 16 * 100);
+  document.getElementById('assess-progress').style.width = pct + '%';
+
+  // Dots
+  let dots = '';
+  for (let i = 0; i < 16; i++) {
+    let cls = '';
+    if (i < currentQuestion) cls = 'done';
+    else if (i === currentQuestion) cls = 'current';
+    dots += `<div class="dot ${cls}"></div>`;
+  }
+  document.getElementById('progress-dots').innerHTML = dots;
+
+  // Button text
+  document.getElementById('next-btn').textContent = currentQuestion === 15 ? '📊 ' + t('finish') : 'Next →';
+}
+
+function updateSlider(val) {
+  document.getElementById('q-value').textContent = val;
+  answers[currentQuestion] = parseInt(val);
+}
+
+function nextQuestion() {
+  if (currentQuestion < 15) {
+    currentQuestion++;
+    renderQuestion();
+  } else {
+    finishAssessment();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+
+function finishAssessment() {
+  // Compute scores per sense
+  const scores = {};
+  CLAIR_SENSES.forEach(s => scores[s.id] = 0);
+  QUESTIONS.forEach((q, i) => {
+    scores[q.clair] += answers[i];
+  });
+
+  // Average per sense (max 10 since 2 questions × 5)
+  CLAIR_SENSES.forEach(s => scores[s.id] /= 2); // avg per sense (max 5)
+
+  // Find dominant
+  let dominant = CLAIR_SENSES[0].id;
+  let maxScore = 0;
+  CLAIR_SENSES.forEach(s => {
+    if (scores[s.id] > maxScore) { maxScore = scores[s.id]; dominant = s.id; }
+  });
+
+  assessmentResults = { scores, dominant, date: new Date().toISOString() };
+  saveAssessment(assessmentResults);
+
+  renderResults();
+  showScreen('results');
+}
+
+function showResults() {
+  assessmentResults = loadAssessment();
+  if (!assessmentResults || !assessmentResults.scores) {
+    alert(t('no-assessment-data'));
+    return;
+  }
+  renderResults();
+  showScreen('results');
+}
+
+function renderResults() {
+  if (!assessmentResults) return;
+  const { scores, dominant } = assessmentResults;
+  const domSense = CLAIR_SENSES.find(s => s.id === dominant);
+
+  document.getElementById('dominant-text').innerHTML =
+    `<strong>${t('dominant-sense')} ${domSense.icon} ${domSense.name}</strong> (${domSense.desc}).<br>
+     ${t('dominant-desc')}`;
+
+  // Bar chart — sort by score descending
+  const sorted = [...CLAIR_SENSES].sort((a, b) => scores[b.id] - scores[a.id]);
+  const maxScore = Math.max(...Object.values(scores));
+
+  document.getElementById('bar-chart').innerHTML = sorted.map((s, i) => {
+    const pct = (scores[s.id] / 5 * 100).toFixed(0);
+    const cls = i === 0 ? 'dominant' : i < 3 ? 'secondary' : 'tertiary';
+    return `<div class="bar-row">
+      <div class="bar-label">${s.icon} ${s.name}</div>
+      <div class="bar-track">
+        <div class="bar-fill ${cls}" style="width:${pct}%">${scores[s.id].toFixed(1)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Training recommendations
+  const recs = EXERCISES[dominant] || [];
+  document.getElementById('training-recs').innerHTML = recs.map(e =>
+    `<div class="exercise-card">
+      <h3>${e.title}</h3>
+      <p>${e.desc}</p>
+      <div>${e.tags.map(t => `<span class="exercise-tag">${t}</span>`).join('')}</div>
+    </div>`
+  ).join('');
+}
+
+// ─── Training ─────────────────────────────────────────────
+function renderTraining() {
+  const data = loadAssessment();
+  if (!data || !data.scores) {
+    document.getElementById('training-intro').textContent = t('complete-assessment-first');
+    document.getElementById('exercise-list').innerHTML = '';
+  } else {
+    const dom = data.dominant;
+    const domSense = CLAIR_SENSES.find(s => s.id === dom);
+    document.getElementById('training-intro').innerHTML =
+      `${t('dominant-sense')}: <strong>${domSense.icon} ${domSense.name}</strong>. ${t('training-exercises-below')}`;
+
+    // Show dominant exercises first, then one from each other sense
+    let exercises = [...(EXERCISES[dom] || [])];
+    CLAIR_SENSES.forEach(s => {
+      if (s.id !== dom && EXERCISES[s.id]) {
+        exercises.push(EXERCISES[s.id][0]);
+      }
+    });
+
+    document.getElementById('exercise-list').innerHTML = exercises.map((e, i) => {
+      const clair = CLAIR_SENSES.find(s => EXERCISES[s.id] && EXERCISES[s.id].includes(e));
+      return `<div class="exercise-card">
+        <h3>${e.title}</h3>
+        <p>${e.desc}</p>
+        <div>${e.tags.map(t => `<span class="exercise-tag">${t}</span>`).join('')}</div>
+        <button class="btn btn-sm btn-secondary" style="margin-top:0.5rem" onclick="logExercise('${e.title}')">✓ ${t('log-complete')}</button>
+      </div>`;
+    }).join('');
+  }
+
+  // Training log
+  const log = loadTrainingLog();
+  if (!log.length) {
+    document.getElementById('training-log').innerHTML = '<p style="color:var(--text-dim);font-size:0.85rem">' + t('no-exercises-logged') + '</p>';
+  } else {
+    document.getElementById('training-log').innerHTML = log.slice(0, 10).map(entry =>
+      `<div class="history-item">
+        <span class="info">
+          <div class="guess-text">${esc(entry.exercise)}</div>
+          <div class="date-text">${formatDate(entry.timestamp)}</div>
+        </span>
+      </div>`
+    ).join('');
+  }
+}
+
+function logExercise(title) {
+  const log = loadTrainingLog();
+  log.unshift({ exercise: title, timestamp: Date.now() });
+  saveTrainingLog(log);
+  renderTraining();
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  showTip('clair');
+  // Check for saved assessment
+  const data = loadAssessment();
+  if (data && data.scores) {
+    document.getElementById('results-btn').style.display = 'block';
+  }
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'training') renderTraining();
+  if (['assessment','results'].includes(name)) showTip('clair');
+};
+</script>
+
+</body>
+</html>

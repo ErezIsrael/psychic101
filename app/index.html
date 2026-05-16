@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Psychic Development Suite</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="hub-title">🔮 Psychic101</span> <span data-i18n="hub-subtitle">— Suite</span></h1>
+  <div id="lang-selector"></div>
+</header>
+
+<main>
+  <div class="hero">
+    <h2 data-i18n="hero-title">Psychic Development Suite</h2>
+    <p data-i18n="hero-desc">Explore and develop your psychic abilities through structured practice, journaling, and analysis.</p>
+  </div>
+
+  <h2 class="section-title" data-i18n="section-rv">🎯 Remote Viewing</h2>
+  <div class="app-grid">
+    <a class="app-card" href="rv-trainer.html">
+      <span class="app-icon">🔮</span>
+      <span class="app-title" data-i18n="rv-trainer-title">Remote Viewing Trainer</span>
+      <span class="app-desc" data-i18n="rv-trainer-desc">Full CRV protocol: ideogram → sensory data → dimensions → emotions → reveal.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+    <a class="app-card" href="random-viewer.html">
+      <span class="app-icon">🌍</span>
+      <span class="app-title" data-i18n="random-viewer-title">Random Object Viewer</span>
+      <span class="app-desc" data-i18n="random-viewer-desc">Blind targets from Wikipedia and random images. Practice with unpredictable subjects.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+    <a class="app-card" href="partner.html">
+      <span class="app-icon">👥</span>
+      <span class="app-title" data-i18n="partner-title">Partner Platform</span>
+      <span class="app-desc" data-i18n="partner-desc">Coordinate sessions with a partner. One holds, one views. Compare results.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+  </div>
+
+  <h2 class="section-title" data-i18n="section-esp">🃏 ESP Training</h2>
+  <div class="app-grid">
+    <a class="app-card" href="card-guess.html">
+      <span class="app-icon">🃏</span>
+      <span class="app-title" data-i18n="card-guess-title">Card Guessing Trainer</span>
+      <span class="app-desc" data-i18n="card-guess-desc">Guess playing cards from a shuffled deck. Track accuracy by suit and rank.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+    <a class="app-card" href="zener.html">
+      <span class="app-icon">⭕</span>
+      <span class="app-title" data-i18n="zener-title-hub">Zener Symbol Trainer</span>
+      <span class="app-desc" data-i18n="zener-desc-hub">Classic ESP research with 5 Zener symbols. 25-trial sessions with chi-square analysis.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+    <a class="app-card" href="clair-id.html">
+      <span class="app-icon">👁</span>
+      <span class="app-title" data-i18n="clair-id-title">Clair Sense Identifier</span>
+      <span class="app-desc" data-i18n="clair-id-desc">Discover your dominant Clair sense through guided exercises.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+    <a class="app-card" href="dial-trainer.html">
+      <span class="app-icon">🎯</span>
+      <span class="app-title" data-i18n="dial-title">Dial Trainer</span>
+      <span class="app-desc" data-i18n="dial-desc">Influence a random pointer on a -10 to +10 scale with your mind.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+  </div>
+
+  <h2 class="section-title" data-i18n="section-journal">📖 Journaling &amp; Tracking</h2>
+  <div class="app-grid">
+    <a class="app-card" href="journal.html">
+      <span class="app-icon">📓</span>
+      <span class="app-title" data-i18n="journal-title">Psychic Journal</span>
+      <span class="app-desc" data-i18n="journal-desc">Record impressions, experiences, and synchronicities. Tag and search entries.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+    <a class="app-card" href="dream-tracker.html">
+      <span class="app-icon">🌙</span>
+      <span class="app-title" data-i18n="dream-title">Dream Tracker</span>
+      <span class="app-desc" data-i18n="dream-desc">Log dreams, tag symbols, identify precognitive hits. Review patterns over time.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+  </div>
+
+  <h2 class="section-title" data-i18n="section-prep">🧘 Preparation &amp; Analysis</h2>
+  <div class="app-grid">
+    <a class="app-card" href="grounding.html">
+      <span class="app-icon">🌳</span>
+      <span class="app-title" data-i18n="grounding-title">Grounding Coach</span>
+      <span class="app-desc" data-i18n="grounding-desc">Guided grounding: 5-4-3-2-1 technique, rooting visualization, breath work.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+    <a class="app-card" href="analyzer.html">
+      <span class="app-icon">📊</span>
+      <span class="app-title" data-i18n="analyzer-title">Signal Line Analyzer</span>
+      <span class="app-desc" data-i18n="analyzer-desc">Analyze data across all apps. Track accuracy trends, AOL frequency, peak times.</span>
+      <span class="app-link" data-i18n="launch">Launch →</span>
+    </a>
+  </div>
+
+  <h2 class="section-title" data-i18n="hub-activity-title">📋 Recent Activity</h2>
+  <div id="activity-list" class="activity-list"></div>
+</main>
+
+<script src="utils.js"></script>
+<script>
+// ─── App registry for activity summary ────────────────────
+const APPS = [
+  { key: 'rv_sessions', label: 'analyzer-rv', icon: '🔮', scoreFn: (arr) => arr.length ? (arr.reduce((s,e) => s + (e.rating||0), 0) / arr.length).toFixed(1) + '⭐' : '—' },
+  { key: 'rv_history', label: 'analyzer-random', icon: '🌍', scoreFn: (arr) => arr.length ? (arr.reduce((s,e) => s + (e.rating||0), 0) / arr.length).toFixed(1) + '⭐' : '—' },
+  { key: 'partner_history', label: 'analyzer-partner', icon: '👥', scoreFn: (arr) => arr.length ? (arr.reduce((s,e) => s + (e.rating||0), 0) / arr.length).toFixed(1) + '⭐' : '—' },
+  { key: 'card_guess_history', label: 'analyzer-card', icon: '🃏', scoreFn: (arr) => arr.length ? Math.round(arr.reduce((s,e) => s + (e.accuracy||0), 0) / arr.length) + '%' : '—' },
+  { key: 'zener_history', label: 'analyzer-zener', icon: '⭕', scoreFn: (arr) => arr.length ? Math.round(arr.reduce((s,e) => s + (e.accuracy||0), 0) / arr.length) + '%' : '—' },
+  { key: 'dial_history', label: 'analyzer-dial', icon: '🎯', scoreFn: (arr) => arr.length ? (arr.reduce((s,e) => s + (e.towardRatio||0), 0) / arr.length).toFixed(0) + '%' : '—' },
+  { key: 'journal_entries', label: 'analyzer-journal', icon: '📓', scoreFn: (arr) => arr.length ? arr.length + ' ' + t('hub-entries') : '—' },
+  { key: 'dream_entries', label: 'analyzer-dream', icon: '🌙', scoreFn: (arr) => arr.length ? arr.length + ' ' + t('hub-entries') : '—' },
+  { key: 'grounding_history', label: 'analyzer-grounding', icon: '🌳', scoreFn: (arr) => arr.length ? arr.length + ' ' + t('hub-sessions') : '—' },
+];
+
+function renderActivity() {
+  const list = document.getElementById('activity-list');
+  let items = [];
+
+  APPS.forEach(app => {
+    const data = loadData(app.key) || [];
+    if (!data.length) return;
+    const last = data[data.length - 1];
+    const dateStr = last.timestamp ? formatDate(last.timestamp) : '—';
+    const score = app.scoreFn(data);
+    items.push({
+      icon: app.icon,
+      label: t(app.label),
+      count: data.length,
+      score: score,
+      date: dateStr
+    });
+  });
+
+  if (!items.length) {
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim);padding:1.5rem">' + (t('hub-no-activity') || 'No activity yet. Start a session!') + '</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => `
+    <div class="activity-item">
+      <span class="activity-icon">${item.icon}</span>
+      <span class="activity-label">${item.label}</span>
+      <span class="activity-score">${item.score}</span>
+      <span class="activity-meta">${item.count} ${t('hub-sessions')} · ${item.date}</span>
+    </div>
+  `).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  renderActivity();
+  // Append ?lang=XX to all app links so language persists across pages
+  document.querySelectorAll('.app-card').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const href = a.getAttribute('href');
+      if (href && href.endsWith('.html')) {
+        const sep = href.includes('?') ? '&' : '?';
+        a.setAttribute('href', href + sep + 'lang=' + getStoredLang());
+      }
+    });
+  });
+});
+</script>
+
+</body>
+</html>

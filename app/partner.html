@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Partner Platform</title>
+<link rel="stylesheet" href="styles.css">
+<style>
+  .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
+  @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+
+  .role-card {
+    background: var(--surface);
+    border: 2px solid var(--surface2);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    text-align: center;
+    min-height: 3rem;
+    transition: all 0.2s;
+  }
+  .role-card:hover { border-color: var(--accent); }
+  .role-card .role-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+  .role-card .role-title { font-weight: 700; font-size: 1.1rem; }
+  .role-card .role-desc { font-size: 0.85rem; color: var(--text-dim); margin-top: 0.25rem; }
+
+  .target-display {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--accent);
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  @media (min-width: 600px) { .comparison-grid { grid-template-columns: 1fr 1fr; } }
+
+  .comparison-col {
+    background: var(--surface);
+    border: 1px solid var(--surface2);
+    border-radius: var(--radius);
+    padding: 1rem;
+  }
+
+  .comparison-col h3 { margin-bottom: 0.5rem; font-size: 0.9rem; }
+  .comparison-col .impressions { font-size: 0.85rem; color: var(--text-dim); white-space: pre-wrap; }
+
+  .match-badge {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+  .match-high { background: rgba(74,222,128,0.15); color: var(--success); border: 1px solid rgba(74,222,128,0.3); }
+  .match-med { background: rgba(251,191,36,0.15); color: var(--warn); border: 1px solid rgba(251,191,36,0.3); }
+  .match-low { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+
+  .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+  @media (min-width: 600px) { .stats-row { grid-template-columns: repeat(4, 1fr); } }
+  .mini-stat { background: var(--surface2); border-radius: 8px; padding: 0.75rem; text-align: center; }
+  .mini-stat .val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .mini-stat .lbl { font-size: 0.7rem; color: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span data-i18n="partner-title">👥 Partner Platform</span></h1>
+  <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+    <div id="lang-selector"></div>
+    <button class="nav-btn" onclick="showScreen('history')" data-i18n="history">📋 History</button>
+  </div>
+</header>
+
+<main>
+  <!-- WELCOME SCREEN -->
+  <div id="screen-welcome" class="screen active">
+    <div class="tip-banner" id="tip-welcome">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-welcome-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('partner')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="partner-title">👥 Partner Platform</h2>
+      <p data-i18n="partner-desc">Coordinate sessions with a partner. One holds, one views. Compare results.</p>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="partner-how">How It Works</h2>
+      <ol class="steps">
+        <li data-i18n="partner-step1">Choose your role: Holder or Viewer</li>
+        <li data-i18n="partner-step2">Holder picks a target and shares the code</li>
+        <li data-i18n="partner-step3">Viewer records impressions without seeing the target</li>
+        <li data-i18n="partner-step4">Compare results and rate accuracy</li>
+      </ol>
+    </div>
+
+    <h2 class="section-title" data-i18n="partner-choose-role">Choose Your Role</h2>
+    <div class="role-card" onclick="startAsHolder()">
+      <div class="role-icon">🎯</div>
+      <div class="role-title" data-i18n="role-holder">Holder</div>
+      <div class="role-desc" data-i18n="role-holder-desc">You select the target and share the code with your viewer.</div>
+    </div>
+    <div class="role-card" onclick="startAsViewer()">
+      <div class="role-icon">🔮</div>
+      <div class="role-title" data-i18n="role-viewer">Viewer</div>
+      <div class="role-desc" data-i18n="role-viewer-desc">You receive the code and send impressions without seeing the target.</div>
+    </div>
+  </div>
+
+  <!-- HOLDER: SET TARGET -->
+  <div id="screen-holder-target" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 33%"></div></div>
+
+    <div class="tip-banner" id="tip-holder">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-holder-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('partner')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="holder-set-target">Set Your Target</h2>
+      <p data-i18n="holder-set-desc">Think of a specific object, place, or image. Be precise.</p>
+    </div>
+
+    <div class="field">
+      <label for="holder-target-name" data-i18n="holder-target-name">Target Description</label>
+      <input type="text" id="holder-target-name" class="text-input" data-i18n-placeholder="holder-target-ph" placeholder="e.g., The Eiffel Tower at sunset">
+    </div>
+
+    <div class="field">
+      <label for="holder-target-details" data-i18n="holder-target-details">Details (for comparison)</label>
+      <textarea id="holder-target-details" class="text-input" rows="3" data-i18n-placeholder="holder-details-ph" placeholder="Key features, colors, context..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="generateSessionCode()" data-i18n="holder-generate">🎯 Generate Code</button>
+    </div>
+  </div>
+
+  <!-- HOLDER: SHARE CODE -->
+  <div id="screen-holder-share" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 66%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="holder-share-code">Share This Code</h2>
+      <p data-i18n="holder-share-desc">Send this code to your viewer. Do NOT reveal the target.</p>
+    </div>
+
+    <div class="target-display" id="share-code-display"></div>
+
+    <div class="card">
+      <p data-i18n="holder-wait">Wait for your viewer to complete their session, then compare results.</p>
+    </div>
+
+    <div class="field">
+      <label for="holder-viewer-notes" data-i18n="holder-viewer-notes">Viewer's Impressions</label>
+      <textarea id="holder-viewer-notes" class="text-input" rows="4" data-i18n-placeholder="holder-viewer-ph" placeholder="Paste the viewer's impressions here..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="compareResults()" data-i18n="holder-compare">🔍 Compare Results</button>
+    </div>
+  </div>
+
+  <!-- VIEWER: ENTER CODE -->
+  <div id="screen-viewer-code" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 33%"></div></div>
+
+    <div class="tip-banner" id="tip-viewer">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" id="tip-viewer-text" data-i18n="loading-tip">Loading tip...</span>
+      <button class="tip-refresh" onclick="refreshTip('partner')">↻</button>
+    </div>
+
+    <div class="card">
+      <h2 data-i18n="viewer-enter-code">Enter Session Code</h2>
+      <p data-i18n="viewer-enter-desc">Enter the code your holder shared with you.</p>
+    </div>
+
+    <div class="field">
+      <label for="viewer-code-input" data-i18n="viewer-code-label">Session Code</label>
+      <input type="text" id="viewer-code-input" class="text-input" data-i18n-placeholder="viewer-code-ph" placeholder="e.g., RV-4A7B">
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="startViewing()" data-i18n="viewer-start">🔮 Start Viewing</button>
+    </div>
+  </div>
+
+  <!-- VIEWER: RECORD IMPRESSIONS -->
+  <div id="screen-viewing" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 66%"></div></div>
+
+    <div class="card">
+      <h2><span data-i18n="viewer-target-code">Target:</span> <span id="viewer-code-display"></span></h2>
+      <p data-i18n="viewer-focus">Focus on the code and record all impressions.</p>
+    </div>
+
+    <div class="field">
+      <label for="viewer-impressions" data-i18n="viewer-impressions">Impressions</label>
+      <textarea id="viewer-impressions" class="text-input" rows="5" data-i18n-placeholder="viewer-impressions-ph" placeholder="Colors, shapes, textures, emotions, locations..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="viewer-sensory" data-i18n="viewer-sensory">Sensory Data</label>
+      <textarea id="viewer-sensory" class="text-input" rows="3" data-i18n-placeholder="viewer-sensory-ph" placeholder="Visual, auditory, tactile, olfactory..."></textarea>
+    </div>
+
+    <div class="field">
+      <label for="viewer-emotions" data-i18n="viewer-emotions">Emotions / Concepts</label>
+      <textarea id="viewer-emotions" class="text-input" rows="3" data-i18n-placeholder="viewer-emotions-ph" placeholder="Feelings, moods, abstract concepts..."></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="finishViewing()" data-i18n="viewer-finish">✅ Finish Viewing</button>
+    </div>
+  </div>
+
+  <!-- VIEWER: SHARE IMPRESSIONS -->
+  <div id="screen-viewer-share" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="viewer-share-impressions">Share Your Impressions</h2>
+      <p data-i18n="viewer-share-desc">Send these to your holder for comparison.</p>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="viewer-your-impressions">Your Impressions</h3>
+      <div id="viewer-summary" style="white-space:pre-wrap;color:var(--text-dim);font-size:0.9rem"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+      <button class="btn btn-primary" onclick="showScreen('welcome')" data-i18n="viewer-done">✅ Done</button>
+    </div>
+  </div>
+
+  <!-- COMPARISON SCREEN -->
+  <div id="screen-comparison" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="comparison-title">🔍 Comparison Results</h2>
+    </div>
+
+    <div id="match-badge" class="match-badge"></div>
+
+    <div class="comparison-grid">
+      <div class="comparison-col">
+        <h3 data-i18n="comparison-holder">🎯 Holder's Target</h3>
+        <div class="impressions" id="comp-holder"></div>
+      </div>
+      <div class="comparison-col">
+        <h3 data-i18n="comparison-viewer">🔮 Viewer's Impressions</h3>
+        <div class="impressions" id="comp-viewer"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="comp-rating" data-i18n="comp-rating">Accuracy Rating</label>
+      <div class="category-select">
+        <button class="cat-btn" data-rate="1" onclick="setCompRating(1)" data-i18n="comp-rate-1">1 — No Match</button>
+        <button class="cat-btn" data-rate="2" onclick="setCompRating(2)" data-i18n="comp-rate-2">2 — Weak</button>
+        <button class="cat-btn" data-rate="3" onclick="setCompRating(3)" data-i18n="comp-rate-3">3 — Moderate</button>
+        <button class="cat-btn" data-rate="4" onclick="setCompRating(4)" data-i18n="comp-rate-4">4 — Strong</button>
+        <button class="cat-btn" data-rate="5" onclick="setCompRating(5)" data-i18n="comp-rate-5">5 — Excellent</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="comp-notes" data-i18n="comp-notes">Notes</label>
+      <textarea id="comp-notes" class="text-input" rows="3" data-i18n-placeholder="comp-notes-ph" placeholder="What matched? What was off?"></textarea>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" onclick="goHome()" data-i18n="back-home">← Back to Home</button>
+      <button class="btn btn-primary" onclick="saveSession()" data-i18n="comp-save">💾 Save Session</button>
+    </div>
+  </div>
+
+  <!-- HISTORY SCREEN -->
+  <div id="screen-history" class="screen">
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+
+    <div class="card">
+      <h2 data-i18n="partner-history">📊 Partner Session History</h2>
+    </div>
+
+    <div class="stats-row">
+      <div class="mini-stat"><div class="val" id="ph-total">0</div><div class="lbl" data-i18n="partner-sessions">Sessions</div></div>
+      <div class="mini-stat"><div class="val" id="ph-avg">—</div><div class="lbl" data-i18n="partner-avg-rating">Avg Rating</div></div>
+      <div class="mini-stat"><div class="val" id="ph-streak">0</div><div class="lbl" data-i18n="day-streak">Day Streak</div></div>
+      <div class="mini-stat"><div class="val" id="ph-best">0</div><div class="lbl" data-i18n="partner-best">Best Rating</div></div>
+    </div>
+
+    <div id="ph-list"></div>
+
+    <button class="btn btn-secondary" onclick="goHome()" style="margin-top:1rem" data-i18n="back-home">← Back to Home</button>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
+</div>
+
+<script src="utils.js"></script>
+<script>
+// ─── Partner Platform ─────────────────────────────────────
+let sessionCode = '';
+let holderTarget = '';
+let holderDetails = '';
+let viewerImpressions = '';
+let viewerSensory = '';
+let viewerEmotions = '';
+let compRating = 0;
+
+function loadHistory() { return loadData('partner_history') || []; }
+function saveHistory(data) { saveData('partner_history', data); }
+
+// ─── Holder Flow ──────────────────────────────────────────
+function startAsHolder() { showScreen('holder-target'); }
+
+function generateSessionCode() {
+  holderTarget = document.getElementById('holder-target-name').value.trim();
+  holderDetails = document.getElementById('holder-target-details').value.trim();
+  if (!holderTarget) { alert(t('holder-target-required')); return; }
+  sessionCode = generateCode();
+  document.getElementById('share-code-display').textContent = sessionCode;
+  showScreen('holder-share');
+}
+
+function compareResults() {
+  const viewerNotes = document.getElementById('holder-viewer-notes').value.trim();
+  if (!viewerNotes) { alert(t('holder-viewer-required')); return; }
+
+  document.getElementById('comp-holder').textContent = holderTarget + (holderDetails ? '\n' + holderDetails : '');
+  document.getElementById('comp-viewer').textContent = viewerNotes;
+  compRating = 0;
+  document.querySelectorAll('[data-rate]').forEach(b => b.classList.remove('active'));
+  document.getElementById('comp-notes').value = '';
+  updateMatchBadge();
+  showScreen('comparison');
+}
+
+// ─── Viewer Flow ──────────────────────────────────────────
+function startAsViewer() { showScreen('viewer-code'); }
+
+function startViewing() {
+  const code = document.getElementById('viewer-code-input').value.trim();
+  if (!code) { alert(t('viewer-code-required')); return; }
+  sessionCode = code;
+  document.getElementById('viewer-code-display').textContent = code;
+  document.getElementById('viewer-impressions').value = '';
+  document.getElementById('viewer-sensory').value = '';
+  document.getElementById('viewer-emotions').value = '';
+  showScreen('viewing');
+}
+
+function finishViewing() {
+  viewerImpressions = document.getElementById('viewer-impressions').value.trim();
+  viewerSensory = document.getElementById('viewer-sensory').value.trim();
+  viewerEmotions = document.getElementById('viewer-emotions').value.trim();
+
+  let summary = '';
+  if (viewerImpressions) summary += `**Impressions:**\n${viewerImpressions}\n\n`;
+  if (viewerSensory) summary += `**Sensory:**\n${viewerSensory}\n\n`;
+  if (viewerEmotions) summary += `**Emotions:**\n${viewerEmotions}`;
+
+  document.getElementById('viewer-summary').textContent = summary || t('viewer-no-data');
+  showScreen('viewer-share');
+}
+
+// ─── Comparison ───────────────────────────────────────────
+function setCompRating(r) {
+  compRating = r;
+  document.querySelectorAll('[data-rate]').forEach(b => b.classList.toggle('active', parseInt(b.dataset.rate) === r));
+  updateMatchBadge();
+}
+
+function updateMatchBadge() {
+  const badge = document.getElementById('match-badge');
+  if (!compRating) { badge.textContent = t('comp-rate-prompt'); badge.className = 'match-badge'; return; }
+  const labels = ['', t('comp-rate-1'), t('comp-rate-2'), t('comp-rate-3'), t('comp-rate-4'), t('comp-rate-5')];
+  const cls = compRating <= 2 ? 'match-low' : compRating <= 3 ? 'match-med' : 'match-high';
+  badge.textContent = labels[compRating];
+  badge.className = 'match-badge ' + cls;
+}
+
+function saveSession() {
+  if (!compRating) { alert(t('comp-rating-required')); return; }
+
+  const entry = {
+    id: Date.now(),
+    code: sessionCode,
+    target: holderTarget,
+    targetDetails: holderDetails,
+    impressions: viewerImpressions,
+    sensory: viewerSensory,
+    emotions: viewerEmotions,
+    rating: compRating,
+    notes: document.getElementById('comp-notes').value
+  };
+
+  const history = loadHistory();
+  history.unshift(entry);
+  saveHistory(history);
+  compRating = 0;
+  showScreen('welcome');
+}
+
+function renderHistory() {
+  const history = loadHistory();
+  const list = document.getElementById('ph-list');
+
+  if (!history.length) {
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim)">' + t('partner-no-sessions') + '</div>';
+  } else {
+    list.innerHTML = history.map((h, i) =>
+      `<div class="session-item" onclick="viewPartnerSession(${i})">
+        <div class="info">
+          <div class="session-title">${esc(h.target)} (${h.code})</div>
+          <div class="session-date">${formatDate(h.id)}</div>
+        </div>
+        <div class="rating-text">${'★'.repeat(h.rating)}${'☆'.repeat(5 - h.rating)}</div>
+      </div>`
+    ).join('');
+  }
+
+  const total = history.length;
+  const avg = total ? (history.reduce((s, h) => s + h.rating, 0) / total).toFixed(1) : '—';
+  const best = total ? Math.max(...history.map(h => h.rating)) : 0;
+  document.getElementById('ph-total').textContent = total;
+  document.getElementById('ph-avg').textContent = avg;
+  document.getElementById('ph-streak').textContent = calcStreak(history);
+  document.getElementById('ph-best').textContent = best;
+}
+
+function viewPartnerSession(index) {
+  const history = loadHistory();
+  const h = history[index];
+  if (!h) return;
+
+  let html = `<h3>${esc(h.target)}</h3>`;
+  html += `<p><strong>${t('date')}:</strong> ${formatDate(h.id)}</p>`;
+  html += `<p><strong>${t('partner-code')}:</strong> ${h.code}</p>`;
+  html += `<p><strong>${t('comp-rating')}:</strong> ${'★'.repeat(h.rating)}${'☆'.repeat(5 - h.rating)}</p>`;
+  if (h.targetDetails) html += `<p><strong>${t('holder-target-details')}:</strong><br>${esc(h.targetDetails)}</p>`;
+  if (h.impressions) html += `<p><strong>${t('viewer-impressions')}:</strong><br>${esc(h.impressions)}</p>`;
+  if (h.notes) html += `<p><strong>${t('comp-notes')}:</strong><br>${esc(h.notes)}</p>`;
+  html += `<div style="margin-top:1rem;text-align:center"><button class="btn btn-secondary btn-sm" onclick="closeModal()">${t('close')}</button></div>`;
+
+  document.getElementById('modal-content').innerHTML = html;
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  showTip('partner');
+});
+
+const _showScreen = showScreen;
+showScreen = function(name) {
+  _showScreen(name);
+  if (name === 'history') renderHistory();
+  if (['welcome','holder-target','holder-share','viewer-code','viewing'].includes(name)) showTip('partner');
+};
+</script>
+
+</body>
+</html>
