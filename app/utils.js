@@ -26,19 +26,17 @@ function getStoredLang() {
   const st = detectStorage();
   if (st === 'local') { try { const v = localStorage.getItem('p101_lang'); if (v) return v; } catch(e) {} }
   if (st === 'session') { try { const v = sessionStorage.getItem('p101_lang'); if (v) return v; } catch(e) {} }
-  if (st === 'cookie') { try { const m = document.cookie.match(/p101_lang=([^;]+)/); if (m) return m[1]; } catch(e) {} }
-  try { const params = new URLSearchParams(window.location.search); const l = params.get('lang'); if (l) return l; } catch(e) {}
-  return null;
+  if (st === 'cookie') { const m = document.cookie.match(/p101_lang=([^;]+)/); if (m) return m[1]; }
+  const params = new URLSearchParams(window.location.search);
+  return params.get('lang');
 }
 function setStoredLang(lang) {
   const st = detectStorage();
   if (st === 'local') { try { localStorage.setItem('p101_lang', lang); return; } catch(e) {} }
   if (st === 'session') { try { sessionStorage.setItem('p101_lang', lang); return; } catch(e) {} }
-  try { document.cookie = 'p101_lang=' + lang + ';path=/;max-age=31536000'; } catch(e) {}
+  document.cookie = 'p101_lang=' + lang + ';path=/;max-age=31536000';
 }
 let currentLang = getStoredLang() || 'en';
-// Safety net: if currentLang is null/undefined, default to 'en'
-if (!currentLang) currentLang = 'en';
 
 const TRANSLATIONS = {
   en: {
@@ -688,7 +686,6 @@ const TRANSLATIONS = {
     'legal-copyright': '© 2026 Psychic101. All rights reserved.',
     'legal-disclaimer': 'Psychic101 is provided for educational and entertainment purposes only. No medical, scientific, or psychological claims are made.',
     'legal-bug-link': '🐛 Report a Bug',
-    'legal-game-link': '🚀 Hidden Game',
     'legal-privacy-link': 'Privacy Policy',
     'legal-terms-link': 'Terms of Service',
     'legal-access-link': 'Accessibility',
@@ -1340,7 +1337,6 @@ const TRANSLATIONS = {
     'legal-copyright': '© 2026 Psychic101. כל הזכויות שמורות.',
     'legal-disclaimer': 'Psychic101 מסופק למטרות חינוכיות ובידור בלבד. לא נעשות טענות רפואיות, מדעיות או פסיכולוגיות.',
     'legal-bug-link': '🐛 דווח על באג',
-    'legal-game-link': '🚀 משחק',
     'legal-privacy-link': 'מדיניות פרטיות',
     'legal-terms-link': 'תנאי שירות',
     'legal-access-link': 'נגישות',
@@ -1360,24 +1356,22 @@ function t(key, replacements) {
 
 // Apply translations to all elements with data-i18n attribute
 function applyTranslations() {
-  try {
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      const replacements = el.getAttribute('data-i18n-replacements')
-        ? JSON.parse(el.getAttribute('data-i18n-replacements'))
-        : null;
-      const translated = t(key, replacements);
-      // Use innerHTML so <strong>, <a>, etc. render correctly
-      el.innerHTML = translated;
-    });
-    // Also handle placeholders
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-      el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
-    });
-    // RTL support — apply to :root (html), header overrides with direction: ltr
-    document.documentElement.dir = currentLang === 'he' ? 'rtl' : 'ltr';
-    document.documentElement.lang = currentLang;
-  } catch(e) { console.error('applyTranslations error:', e); }
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const replacements = el.getAttribute('data-i18n-replacements')
+      ? JSON.parse(el.getAttribute('data-i18n-replacements'))
+      : null;
+    const translated = t(key, replacements);
+    // Use innerHTML so <strong>, <a>, etc. render correctly
+    el.innerHTML = translated;
+  });
+  // Also handle placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+  });
+  // RTL support — apply to :root (html), header overrides with direction: ltr
+  document.documentElement.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+  document.documentElement.lang = currentLang;
 }
 
 // Language switcher
@@ -1863,20 +1857,11 @@ function calcStreak(dates) {
 
 // ─── Language Selector HTML ───────────────────────────────
 function langSelectorHTML() {
-  try {
-    // Always re-read in case it changed from another page
-    currentLang = getStoredLang() || 'en';
-    return `<div class="lang-selector">
-      <span class="lang-label">${t('lang-label')}</span>
-      <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="setLang('en')">EN</button>
-      <button class="lang-btn ${currentLang === 'he' ? 'active' : ''}" onclick="setLang('he')">HE</button>
-    </div>`;
-  } catch(e) {
-    currentLang = 'en';
-    return `<div class="lang-selector">
-      <span class="lang-label">Language:</span>
-      <button class="lang-btn active" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" onclick="setLang('he')">HE</button>
-    </div>`;
-  }
+  // Always re-read in case it changed from another page
+  currentLang = getStoredLang() || 'en';
+  return `<div class="lang-selector">
+    <span class="lang-label">${t('lang-label')}</span>
+    <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="setLang('en')">EN</button>
+    <button class="lang-btn ${currentLang === 'he' ? 'active' : ''}" onclick="setLang('he')">HE</button>
+  </div>`;
 }

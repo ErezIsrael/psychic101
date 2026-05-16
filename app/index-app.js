@@ -46,7 +46,6 @@ function renderActivity() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  try {
   document.getElementById('lang-selector').innerHTML = langSelectorHTML();
   applyTranslations();
   renderActivity();
@@ -60,22 +59,4 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-  } catch(e) {
-    console.error('index-app error:', e);
-    const dbg = document.getElementById('debug-error');
-    if (dbg) {
-      dbg.style.display = 'block';
-      dbg.textContent = 'Error: ' + e.message + ' at ' + e.stack;
-    }
-  }
 });
-
-// Global error handler to catch any runtime errors
-window.onerror = function(msg, url, line, col, error) {
-  const dbg = document.getElementById('debug-error');
-  if (dbg) {
-    dbg.style.display = 'block';
-    dbg.textContent = 'Error: ' + msg + '\nLine: ' + line + '\n' + (error ? error.stack : '');
-  }
-  console.error('Global error:', msg, url, line, col, error);
-};
