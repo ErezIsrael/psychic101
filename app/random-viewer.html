@@ -244,7 +244,8 @@ function generateTarget() {
       name: '',
       loading: true
     };
-    fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary')
+    const wikiLang = currentLang === 'he' ? 'he' : 'en';
+    fetch(`https://${wikiLang}.wikipedia.org/api/rest_v1/page/random/summary`)
       .then(r => r.json())
       .then(data => {
         currentTarget.name = data.title;
