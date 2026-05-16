@@ -503,6 +503,10 @@
     <input id="lb-name-input" type="text" maxlength="12" placeholder="Pilot" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 12px;color:#fff;font-size:1rem;text-align:center;width:160px;outline:none">
     <button id="lb-submit" style="background:linear-gradient(135deg,#ffd93d,#ff9f43);border:none;border-radius:50px;padding:6px 24px;font-size:0.8rem;font-weight:700;color:#000;cursor:pointer;text-transform:uppercase">Save Score</button>
   </div>
+  <div id="go-leaderboard" style="display:none;flex-direction:column;align-items:center;gap:6px;margin-bottom:1em;width:100%;max-width:320px">
+    <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:#ffd93d;font-weight:700">High Scores</div>
+    <div id="go-lb-list" style="font-size:0.8rem;color:rgba(255,255,255,0.7);width:100%"></div>
+  </div>
   <button id="restart-btn">Play Again</button>
 </div>
 
@@ -901,7 +905,7 @@ function exitToMenu() {
   state = STATE.MENU;
   score = 0; stagesCleared = 0; enemies.length = 0; bullets.length = 0; bosses.length = 0;
   powerups.length = 0; particles.length = 0; floatingTexts.length = 0; enemyBullets.length = 0; mines.length = 0;
-  trails.length = 0; stageEvent = null; stageEventTimer = 0;
+  trailPoints.length = 0; stageEvent = null; stageEventTimer = 0;
   shopPurchased = {}; stageUpgrades = {};
   streak = 0; streakMultiplier = 1; streakTimer = 0;
   superMeter = 0; weaponFlags = 0; weaponTimer = 0; tempWeaponFlags = 0; shopWeaponFlags = 0;
@@ -1486,8 +1490,20 @@ function gameOver() {
       }
       lbEntry.style.display = 'none';
       lbEntryActive = false;
-      document.getElementById('game-over').classList.remove('show');
-      exitToMenu();
+      // Show leaderboard in game-over screen
+      const goLb = document.getElementById('go-leaderboard');
+      const goLbList = document.getElementById('go-lb-list');
+      const scoreLb = loadLB('lb_score');
+      if (scoreLb.length > 0) {
+        goLbList.innerHTML = scoreLb.map((e, i) =>
+          '<div style="display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.06)">' +
+          '<span>' + (i + 1) + '. ' + e.name + '</span>' +
+          '<span style="color:#ffd93d;font-weight:700">' + e.score + '</span>' +
+          '<span style="color:rgba(255,255,255,0.3);font-size:0.65rem">S' + e.stages + '</span></div>'
+        ).join('');
+        goLb.style.display = 'flex';
+      }
+      document.getElementById('game-over').classList.add('show');
     };
     lbInput.onkeydown = (e) => { if (e.key === 'Enter') lbSubmit.click(); };
     setTimeout(() => lbInput.focus(), 100);
