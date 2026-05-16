@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accessibility Statement — Psychic101</title>
+<meta name="description" content="Accessibility statement for Psychic101. Our commitment to IS 5568 and WCAG 2.1 AA compliance.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <h1 style="margin:0"><a href="index.html" style="text-decoration:none;color:inherit"><span data-i18n="hub-title">🔮 Psychic101</span></a></h1>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <a href="index.html" class="nav-btn btn-sm" data-i18n="back-home">← Back to Home</a>
+      <div id="lang-selector"></div>
+    </div>
+  </div>
+</header>
+
+<main id="main-content">
+  <div class="card">
+    <h2>Accessibility Statement</h2>
+    <p><strong>Last updated:</strong> May 2026</p>
+
+    <h3>Our Commitment</h3>
+    <p>Psychic101 is committed to ensuring digital accessibility for people with disabilities. We are continually improving the user experience for everyone and strive to conform to the <strong>Web Content Accessibility Guidelines (WCAG) 2.1 Level AA</strong> and the Israeli standard <strong>IS 5568</strong>.</p>
+
+    <h3>Current Accessibility Features</h3>
+    <ul>
+      <li><strong>Semantic HTML:</strong> Pages use proper heading hierarchy, <code>&lt;header&gt;</code>, <code>&lt;main&gt;</code>, and <code>&lt;footer&gt;</code> landmarks.</li>
+      <li><strong>Skip Navigation:</strong> A "Skip to content" link is provided on all pages for keyboard and screen reader users.</li>
+      <li><strong>Keyboard Accessibility:</strong> All interactive elements are operable via keyboard navigation.</li>
+      <li><strong>Focus Indicators:</strong> Visible focus outlines are provided for all interactive elements.</li>
+      <li><strong>Color Contrast:</strong> Text and background colors meet WCAG AA contrast ratio requirements (minimum 4.5:1 for normal text).</li>
+      <li><strong>Responsive Design:</strong> The site works on phones, tablets, and desktops with appropriate touch targets (minimum 48×48px).</li>
+      <li><strong>Language Declaration:</strong> The <code>lang</code> attribute is set correctly on all pages and updates dynamically when switching between English and Hebrew.</li>
+      <li><strong>RTL Support:</strong> Full right-to-left layout support for Hebrew, including proper text direction and mirrored UI elements.</li>
+      <li><strong>Screen Reader Compatibility:</strong> ARIA attributes and semantic markup assist screen reader users.</li>
+    </ul>
+
+    <h3>Known Limitations</h3>
+    <ul>
+      <li>Some interactive canvas elements (ideogram drawing, dial trainer) may present challenges for screen reader users. We are working on providing alternative text descriptions.</li>
+      <li>Complex data visualizations in the Signal Line Analyzer may not be fully accessible to all assistive technologies.</li>
+    </ul>
+
+    <h3>Feedback</h3>
+    <p>We welcome your feedback on the accessibility of Psychic101. If you encounter accessibility barriers, please let us know:</p>
+    <ul>
+      <li>Open an issue on our <a href="https://github.com/ErezIsrael/psychic101" target="_blank">GitHub repository</a></li>
+    </ul>
+
+    <h3>Evaluation</h3>
+    <p>The Psychic101 accessibility evaluation process includes:</p>
+    <ul>
+      <li>Self-review against WCAG 2.1 AA and IS 5568 criteria</li>
+      <li>Automated accessibility testing tools</li>
+      <li>Manual testing with keyboard navigation and screen readers</li>
+    </ul>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <p class="copyright">© 2026 Psychic101. All rights reserved.</p>
+    <nav class="footer-nav">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="accessibility.html">Accessibility</a>
+    </nav>
+    <p class="disclaimer">Psychic101 is provided for educational and entertainment purposes only. No medical, scientific, or psychological claims are made.</p>
+  </div>
+</footer>
+
+<script src="utils.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+});
+</script>
+</body>
+</html>

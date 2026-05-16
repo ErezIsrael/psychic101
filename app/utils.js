@@ -570,6 +570,14 @@ const TRANSLATIONS = {
     'about-tech-3': 'Mobile-first responsive design — works on phones, tablets, and desktops.',
     'about-tech-4': 'Bilingual support — English and Hebrew (RTL).',
     'about-tech-5': 'Open source — available on <a href="https://github.com/ErezIsrael/psychic101" target="_blank">GitHub</a>.',
+    // Legal pages
+    'legal-privacy-title': 'Privacy Policy',
+    'legal-terms-title': 'Terms of Service',
+    'legal-accessibility-title': 'Accessibility Statement',
+    'legal-last-updated': 'Last updated',
+    'legal-privacy-heading': 'Privacy Policy',
+    'legal-terms-heading': 'Terms of Service',
+    'legal-accessibility-heading': 'Accessibility Statement',
   },
   he: {
     // Shared UI
@@ -1102,6 +1110,14 @@ const TRANSLATIONS = {
     'about-tech-3': 'עיצוב רספונסיבי מובייל-פירסט — עובד על טלפונים, טאבלטים ומחשבים.',
     'about-tech-4': 'תמיכה דו-לשונית — אנגלית ועברית (RTL).',
     'about-tech-5': 'קוד פתוח — זמין ב-<a href="https://github.com/ErezIsrael/psychic101" target="_blank">GitHub</a>.',
+    // Legal pages
+    'legal-privacy-title': 'מדיניות פרטיות',
+    'legal-terms-title': 'תנאי שירות',
+    'legal-accessibility-title': 'הצהרת נגישות',
+    'legal-last-updated': 'עודכן לאחרונה',
+    'legal-privacy-heading': 'מדיניות פרטיות',
+    'legal-terms-heading': 'תנאי שירות',
+    'legal-accessibility-heading': 'הצהרת נגישות',
   }
 };
 

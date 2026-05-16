@@ -4,3 +4,15 @@ Thumbs.db
 
 # Node modules (if any added later)
 node_modules/
+
+# Environment & secrets
+.env
+.env.local
+*.key
+*.pem
+*.crt
+.git-credentials
+
+# Build output
+dist/
+build/

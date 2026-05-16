@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>תנאי שירות — Psychic101</title>
+<meta name="description" content="תנאי שירות ל-Psychic101.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">דלג לתוכן</a>
+
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <h1 style="margin:0"><a href="index.html" style="text-decoration:none;color:inherit"><span data-i18n="hub-title">🔮 Psychic101</span></a></h1>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <a href="index.html" class="nav-btn btn-sm" data-i18n="back-home">← חזרה לבית</a>
+      <div id="lang-selector"></div>
+    </div>
+  </div>
+</header>
+
+<main id="main-content">
+  <div class="card">
+    <h2 data-i18n="legal-terms-heading">תנאי שירות</h2>
+    <p><strong data-i18n="legal-last-updated">עודכן לאחרונה:</strong> מאי 2026</p>
+
+    <h3>1. אופי השירות</h3>
+    <p>Psychic101 הוא אוסף כלים לאימון מבוססי דפדפן שנועדו <strong>למטרות חינוכיות ובידור בלבד</strong>. האפליקציות מספקות תרגילים מסודרים בהשראת שיטות מחקר היסטוריות בפסיכולוגיה פסיכית.</p>
+
+    <h3>2. ללא טענות רפואיות או מדעיות</h3>
+    <p>Psychic101 <strong>אינו</strong> עושה טענות רפואיות, מדעיות או פסיכולוגיות. יכולות פסיכיות, ESP וראייה מרחוק <strong>אינן מוכחות מדעית</strong> ואין להסתמך עליהן לקבלת החלטות מעשיות, אבחון רפואי או ייעוץ מקצועי.</p>
+
+    <h3>3. ללא אחריות לתוצאות</h3>
+    <p>תוצאות מתרגילי האימון <strong>אינן מובטחות</strong>. חוויות אישיות משתנות במידה רבה. מדדי הדיוק המסופקים על ידי האפליקציות הם למטרות מעקב עצמי בלבד ואין לפרש אותם כראיה ליכולת פסיכית.</p>
+
+    <h3>4. נתוני משתמש</h3>
+    <p>כל הנתונים שנוצרו על ידי השימוש שלך ב-Psychic101 מאוחסנים <strong>מקומית בדפדפן שלך</strong>. אנו אינו אוספים, מעבירים או מאחסנים נתונים אישיים על שרתים. ראה את <a href="privacy-he.html">מדיניות הפרטיות</a> שלנו לפרטים.</p>
+
+    <h3>5. קניין רוחני</h3>
+    <p>הקוד, העיצוב והתוכן המקורי של Psychic101 הם רכושו של מחבר הפרויקט. הפרויקט זמין תחת רישיון קוד פתוח ב-<a href="https://github.com/ErezIsrael/psychic101" target="_blank">GitHub</a>. שיטות האימון המתוארות מבוססות על מחקר פסיכולוגי פסיכי זמין לציבור.</p>
+
+    <h3>6. הגבלת אחריות</h3>
+    <p>Psychic101 מסופק "כפי שהוא" ללא אחריות מסוג כלשהו. המחברים אינם אחראים לנזקים, אובדנים או השפעות שליליות הנובעות משימוש בתוכנה זו. אתה משתמש ב-Psychic101 על אחריותך האישית.</p>
+
+    <h3>7. דיני החלים</h3>
+    <p>תנאים אלו כפופים לחוקי מדינת ישראל. כל מחלוקות ייפתרו בבתי המשפט של ישראל.</p>
+
+    <h3>8. שינויים בתנאים אלו</h3>
+    <p>תנאים אלו עשויים להתעדכן מעת לעת. שינויים יישקפו במאגר הפרויקט ובדף זה.</p>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <p class="copyright">© 2026 Psychic101. כל הזכויות שמורות.</p>
+    <nav class="footer-nav">
+      <a href="privacy-he.html">מדיניות פרטיות</a>
+      <a href="terms-he.html">תנאי שירות</a>
+      <a href="accessibility-he.html">נגישות</a>
+    </nav>
+    <p class="disclaimer">Psychic101 מסופק למטרות חינוכיות ובידור בלבד. לא נעשות טענות רפואיות, מדעיות או פסיכולוגיות.</p>
+  </div>
+</footer>
+
+<script src="utils.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  currentLang = 'he';
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+});
+</script>
+</body>
+</html>
