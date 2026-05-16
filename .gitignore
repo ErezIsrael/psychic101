@@ -16,3 +16,8 @@ node_modules/
 # Build output
 dist/
 build/
+
+# Documentation (local reference only)
+research.md
+TRAINING_TECHNIQUES.md
+NOTES.md
