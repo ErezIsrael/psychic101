@@ -31,7 +31,7 @@
         <label data-i18n="dial-choose-target">Choose Your Target</label>
         <div class="nav-row" style="margin-top:0.5rem">
           <button class="cat-btn" data-value="-10" onclick="selectTarget(this)" style="color:#e74c3c">-10</button>
-          <button class="cat-btn" data-value="10" onclick="selectTarget(this)" style="color:#27ae60">+10</button>
+          <button class="cat-btn active" data-value="10" onclick="selectTarget(this)" style="color:#27ae60">+10</button>
         </div>
       </div>
 
@@ -208,7 +208,7 @@
 <script src="utils.js"></script>
 <script>
 // ─── State ────────────────────────────────────────────────
-let chosenTarget = null;       // +10 or -10
+let chosenTarget = 10;         // +10 or -10, default +10
 let durationSeconds = 60;
 let pointerValue = 0;
 let moveInterval = null;
