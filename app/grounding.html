@@ -97,6 +97,23 @@
   }
   .progress-dot.done { background: var(--success); }
   .progress-dot.current { background: var(--warn); }
+
+  .step-instruction {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    margin: 0.5rem 0 0.25rem;
+    line-height: 1.4;
+  }
+
+  .step-desc {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin: 0;
+    line-height: 1.5;
+  }
 </style>
 </head>
 <body>
@@ -163,7 +180,8 @@
 
     <div class="card">
       <h2 data-i18n="tech-54321">5-4-3-2-1 Sensory Grounding</h2>
-      <p id="senses-instruction" data-i18n="senses-step-see">Notice 5 things you can SEE around you</p>
+      <p id="senses-instruction" class="step-instruction">Notice 5 things you can SEE around you</p>
+      <p id="senses-instruction-desc" class="step-desc">Look around and identify 5 distinct visual details.</p>
     </div>
 
     <div class="field">
@@ -191,7 +209,8 @@
 
     <div class="card">
       <h2 data-i18n="tech-rooting">Rooting Visualization</h2>
-      <p id="rooting-instruction" data-i18n="rooting-step1">Close your eyes. Feel your feet on the ground.</p>
+      <p id="rooting-instruction" class="step-instruction">Close your eyes. Feel your feet on the ground.</p>
+      <p id="rooting-instruction-desc" class="step-desc">Stand or sit comfortably. Press your feet firmly into the floor.</p>
     </div>
 
     <div class="progress-dots" id="rooting-dots">
@@ -247,7 +266,8 @@
 
     <div class="card">
       <h2 data-i18n="tech-body-scan">Body Scan</h2>
-      <p id="scan-instruction" data-i18n="scan-step-head">Focus on your head. Notice any tension. Breathe into it and release.</p>
+      <p id="scan-instruction" class="step-instruction">Focus on your head. Release tension.</p>
+      <p id="scan-instruction-desc" class="step-desc">Notice any tightness in your scalp, forehead, or jaw.</p>
     </div>
 
     <div class="step-list" id="scan-steps"></div>
@@ -286,11 +306,11 @@
 <script>
 // ─── 5-4-3-2-1 ────────────────────────────────────────────
 const SENSE_STEPS = [
-  { key: 'senses-step-see', count: 5, label: 'senses-label-see' },
-  { key: 'senses-step-feel', count: 4, label: 'senses-label-feel' },
-  { key: 'senses-step-hear', count: 3, label: 'senses-label-hear' },
-  { key: 'senses-step-smell', count: 2, label: 'senses-label-smell' },
-  { key: 'senses-step-taste', count: 1, label: 'senses-label-taste' }
+  { key: 'senses-step-see', desc: 'senses-step-see-desc', count: 5, label: 'senses-label-see' },
+  { key: 'senses-step-feel', desc: 'senses-step-feel-desc', count: 4, label: 'senses-label-feel' },
+  { key: 'senses-step-hear', desc: 'senses-step-hear-desc', count: 3, label: 'senses-label-hear' },
+  { key: 'senses-step-smell', desc: 'senses-step-smell-desc', count: 2, label: 'senses-label-smell' },
+  { key: 'senses-step-taste', desc: 'senses-step-taste-desc', count: 1, label: 'senses-label-taste' }
 ];
 let sensesStep = 0;
 let sensesNotes = [];
@@ -323,6 +343,7 @@ function startTechnique(tech) {
 function updateSenseStep() {
   const step = SENSE_STEPS[sensesStep];
   document.getElementById('senses-instruction').textContent = t(step.key);
+  document.getElementById('senses-instruction-desc').textContent = t(step.desc);
   document.getElementById('senses-progress').style.width = ((sensesStep / 5) * 100) + '%';
   document.getElementById('senses-input').value = '';
 
@@ -346,12 +367,18 @@ function nextSenseStep() {
 
 // ─── Rooting ──────────────────────────────────────────────
 const ROOTING_STEPS = [
-  'rooting-step1', 'rooting-step2', 'rooting-step3', 'rooting-step4', 'rooting-step5'
+  { key: 'rooting-step1', desc: 'rooting-step1-desc' },
+  { key: 'rooting-step2', desc: 'rooting-step2-desc' },
+  { key: 'rooting-step3', desc: 'rooting-step3-desc' },
+  { key: 'rooting-step4', desc: 'rooting-step4-desc' },
+  { key: 'rooting-step5', desc: 'rooting-step5-desc' }
 ];
 let rootingStep = 0;
 
 function updateRootingStep() {
-  document.getElementById('rooting-instruction').textContent = t(ROOTING_STEPS[rootingStep]);
+  const step = ROOTING_STEPS[rootingStep];
+  document.getElementById('rooting-instruction').textContent = t(step.key);
+  document.getElementById('rooting-instruction-desc').textContent = t(step.desc);
   document.getElementById('rooting-progress').style.width = ((rootingStep / 5) * 100) + '%';
 
   const dots = document.getElementById('rooting-dots').querySelectorAll('.progress-dot');
@@ -449,16 +476,28 @@ function stopBreath() {
 }
 
 // ─── Body Scan ────────────────────────────────────────────
-const SCAN_AREAS = ['scan-step-head','scan-step-face','scan-step-neck','scan-step-shoulders','scan-step-arms','scan-step-chest','scan-step-stomach','scan-step-legs','scan-step-feet'];
+const SCAN_AREAS = [
+  { key: 'scan-step-head', desc: 'scan-step-head-desc' },
+  { key: 'scan-step-face', desc: 'scan-step-face-desc' },
+  { key: 'scan-step-neck', desc: 'scan-step-neck-desc' },
+  { key: 'scan-step-shoulders', desc: 'scan-step-shoulders-desc' },
+  { key: 'scan-step-arms', desc: 'scan-step-arms-desc' },
+  { key: 'scan-step-chest', desc: 'scan-step-chest-desc' },
+  { key: 'scan-step-stomach', desc: 'scan-step-stomach-desc' },
+  { key: 'scan-step-legs', desc: 'scan-step-legs-desc' },
+  { key: 'scan-step-feet', desc: 'scan-step-feet-desc' }
+];
 let scanStep = 0;
 
 function updateScanStep() {
-  document.getElementById('scan-instruction').textContent = t(SCAN_AREAS[scanStep]);
+  const step = SCAN_AREAS[scanStep];
+  document.getElementById('scan-instruction').textContent = t(step.key);
+  document.getElementById('scan-instruction-desc').textContent = t(step.desc);
   document.getElementById('scan-progress').style.width = ((scanStep / SCAN_AREAS.length) * 100) + '%';
 
   const stepsEl = document.getElementById('scan-steps');
-  stepsEl.innerHTML = SCAN_AREAS.map((key, i) =>
-    `<div class="step-item ${i < scanStep ? 'completed' : ''} ${i === scanStep ? 'active' : ''}">${t(key)}</div>`
+  stepsEl.innerHTML = SCAN_AREAS.map((s, i) =>
+    `<div class="step-item ${i < scanStep ? 'completed' : ''} ${i === scanStep ? 'active' : ''}">${t(s.key)}</div>`
   ).join('');
 }
 
