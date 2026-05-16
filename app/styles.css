@@ -113,6 +113,12 @@ header h1 span {
 }
 
 /* ─── About Link (lightweight, no box) ─────────────────── */
+.home-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
 .about-link {
   font-size: 0.8rem;
   font-weight: 700;
