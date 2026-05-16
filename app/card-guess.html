@@ -421,7 +421,8 @@ function startRound() {
 
 function revealCard() {
   if (!guessSuit || !guessRank) {
-    alert(t('select-suit-rank'));
+    if (!guessSuit) highlightField('suit-buttons');
+    if (!guessRank) highlightField('rank-buttons');
     return;
   }
 

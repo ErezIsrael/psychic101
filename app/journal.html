@@ -209,7 +209,11 @@ function filterEntries(btn) {
 function saveEntry() {
   const title = document.getElementById('entry-title').value.trim();
   const impression = document.getElementById('entry-impression').value.trim();
-  if (!title || !impression) { alert(t('journal-fill-required')); return; }
+  if (!title || !impression) {
+    if (!title) highlightField('entry-title');
+    if (!impression) highlightField('entry-impression');
+    return;
+  }
 
   const entry = {
     id: Date.now(),

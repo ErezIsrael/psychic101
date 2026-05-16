@@ -250,7 +250,11 @@ function filterDreams(btn) {
 function saveDream() {
   const title = document.getElementById('dream-title').value.trim();
   const desc = document.getElementById('dream-description').value.trim();
-  if (!title || !desc) { alert(t('dream-fill-required')); return; }
+  if (!title || !desc) {
+    if (!title) highlightField('dream-title');
+    if (!desc) highlightField('dream-description');
+    return;
+  }
 
   const dream = {
     id: Date.now(),

@@ -380,7 +380,7 @@ function selectSymbol(btn) {
 
 function submitGuess() {
   if (!guessSymbol) {
-    alert(t('select-symbol'));
+    highlightField('symbol-buttons');
     return;
   }
 

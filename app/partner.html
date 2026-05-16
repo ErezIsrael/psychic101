@@ -345,7 +345,7 @@ function startAsHolder() { showScreen('holder-target'); }
 function generateSessionCode() {
   holderTarget = document.getElementById('holder-target-name').value.trim();
   holderDetails = document.getElementById('holder-target-details').value.trim();
-  if (!holderTarget) { alert(t('holder-target-required')); return; }
+  if (!holderTarget) { highlightField('holder-target-name'); return; }
   sessionCode = generateCode();
   document.getElementById('share-code-display').textContent = sessionCode;
   showScreen('holder-share');
@@ -353,7 +353,7 @@ function generateSessionCode() {
 
 function compareResults() {
   const viewerNotes = document.getElementById('holder-viewer-notes').value.trim();
-  if (!viewerNotes) { alert(t('holder-viewer-required')); return; }
+  if (!viewerNotes) { highlightField('holder-viewer-notes'); return; }
 
   document.getElementById('comp-holder').textContent = holderTarget + (holderDetails ? '\n' + holderDetails : '');
   document.getElementById('comp-viewer').textContent = viewerNotes;
@@ -369,7 +369,7 @@ function startAsViewer() { showScreen('viewer-code'); }
 
 function startViewing() {
   const code = document.getElementById('viewer-code-input').value.trim();
-  if (!code) { alert(t('viewer-code-required')); return; }
+  if (!code) { highlightField('viewer-code-input'); return; }
   sessionCode = code;
   document.getElementById('viewer-code-display').textContent = code;
   document.getElementById('viewer-impressions').value = '';
@@ -409,7 +409,7 @@ function updateMatchBadge() {
 }
 
 function saveSession() {
-  if (!compRating) { alert(t('comp-rating-required')); return; }
+  if (!compRating) { document.getElementById('comp-rating-prompt') && (document.getElementById('comp-rating-prompt').textContent = t('comp-rating-required')); return; }
 
   const entry = {
     id: Date.now(),

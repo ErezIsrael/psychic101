@@ -233,6 +233,8 @@
       <button class="tip-refresh" onclick="refreshTip('clair')">↻</button>
     </div>
 
+    <div id="no-data-msg" style="display:none;text-align:center;padding:1rem;color:var(--text-dim)"></div>
+
     <div class="card">
       <h2 data-i18n="clair-profile">Your Clair Sense Profile</h2>
       <p id="dominant-text"></p>
@@ -454,7 +456,8 @@ function finishAssessment() {
 function showResults() {
   assessmentResults = loadAssessment();
   if (!assessmentResults || !assessmentResults.scores) {
-    alert(t('no-assessment-data'));
+    const msg = document.getElementById('no-data-msg');
+    if (msg) { msg.textContent = t('no-assessment-data'); msg.style.display = 'block'; }
     return;
   }
   renderResults();

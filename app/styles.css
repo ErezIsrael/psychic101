@@ -883,3 +883,9 @@ footer {
   max-width: 30rem;
   line-height: 1.5;
 }
+
+/* ── Validation Highlight ─────────────────────────────── */
+.input-error {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.3) !important;
+}

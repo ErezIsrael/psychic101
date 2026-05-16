@@ -292,7 +292,11 @@ function updateRatingDisplay() {
 }
 
 function saveSession() {
-  if (!currentRating) { alert(t('rv-rate-required')); return; }
+  if (!currentRating) {
+    const label = document.getElementById('rating-label');
+    if (label) label.textContent = t('rv-rate-required');
+    return;
+  }
 
   const entry = {
     id: Date.now(),

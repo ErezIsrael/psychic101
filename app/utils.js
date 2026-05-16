@@ -1652,6 +1652,19 @@ function getRandomTip(app) {
   return tips[idx];
 }
 
+function highlightField(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('input-error');
+    el.focus();
+  }
+}
+
+function clearHighlight(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('input-error');
+}
+
 function showTip(app) {
   const tip = getRandomTip(app);
   // Find the tip element inside the currently active screen

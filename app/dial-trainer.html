@@ -326,7 +326,7 @@ function drawDial(canvasId, currentValue, targetValue) {
 // ─── Session Logic ────────────────────────────────────────
 function startSession() {
   if (chosenTarget === null) {
-    alert(t('dial-choose-target') || 'Please choose a target first!');
+    highlightField('target-buttons');
     return;
   }
 
