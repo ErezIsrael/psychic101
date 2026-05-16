@@ -1123,7 +1123,9 @@ function applyTranslations() {
     const replacements = el.getAttribute('data-i18n-replacements')
       ? JSON.parse(el.getAttribute('data-i18n-replacements'))
       : null;
-    el.textContent = t(key, replacements);
+    const translated = t(key, replacements);
+    // Use innerHTML so <strong>, <a>, etc. render correctly
+    el.innerHTML = translated;
   });
   // Also handle placeholders
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
