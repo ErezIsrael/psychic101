@@ -1371,8 +1371,8 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
   });
-  // RTL support — apply to :root (html), header overrides with direction: ltr
-  document.documentElement.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+  // RTL support — apply to body only (not html) to avoid Chromium mobile rendering bugs
+  document.body.dir = currentLang === 'he' ? 'rtl' : 'ltr';
   document.documentElement.lang = currentLang;
 }
 
