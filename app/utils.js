@@ -28,7 +28,12 @@ function getStoredLang() {
   if (st === 'session') { try { const v = sessionStorage.getItem('p101_lang'); if (v) return v; } catch(e) {} }
   if (st === 'cookie') { const m = document.cookie.match(/p101_lang=([^;]+)/); if (m) return m[1]; }
   const params = new URLSearchParams(window.location.search);
-  return params.get('lang');
+  const urlLang = params.get('lang');
+  if (urlLang && TRANSLATIONS[urlLang]) return urlLang;
+  // Auto-detect from browser language (he → Hebrew, otherwise English)
+  const browser = navigator.language.slice(0, 2);
+  if (browser === 'he') return 'he';
+  return 'en';
 }
 function setStoredLang(lang) {
   const st = detectStorage();
@@ -1371,9 +1376,13 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
   });
-  // RTL support — apply to body only (not html) to avoid Chromium mobile rendering bugs
-  document.body.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+  // RTL support — apply dir to body only (not html) to avoid Chromium mobile flex+RTL bug
+  document.body.dir = getLangDirection();
   document.documentElement.lang = currentLang;
+}
+
+function getLangDirection() {
+  return currentLang === 'he' ? 'rtl' : 'ltr';
 }
 
 // Language switcher
