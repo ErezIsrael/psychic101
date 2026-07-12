@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.5.0';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
@@ -809,6 +809,7 @@ const TRANSLATIONS = {
     'legal-disclaimer': 'Psychic101 is provided for educational and entertainment purposes only. No medical, scientific, or psychological claims are made.',
     'legal-bug-link': '🐛 Report a Bug',
     'legal-game-link': '🚀 Hidden Game',
+    'legal-profile-link': '🔮 Profile',
     'version-tag': 'v{v}',
     'legal-privacy-link': 'Privacy Policy',
     'legal-terms-link': 'Terms of Service',
@@ -818,6 +819,23 @@ const TRANSLATIONS = {
     'streak-days': 'day streak',
     'challenge-title': "Today's Challenge",
     'fact-title': 'Did you know?',
+    // Phase 3 — Profile & Retention
+    'badges-title': '🏆 Badges',
+    'profile-title': '🔮 Your Psychic Profile',
+    'profile-total-sessions': 'Total Sessions',
+    'profile-week-sessions': 'This Week',
+    'profile-streak': 'Current Streak',
+    'profile-level': 'Level',
+    'profile-xp': 'Total XP',
+    'profile-badges': 'Badges Earned',
+    'onboard-title': '🔮 Welcome to Psychic101',
+    'onboard-desc': 'Your journey into psychic exploration starts here. Here\'s how to get the most out of this experience:',
+    'onboard-step1': 'Start with the apps that interest you most',
+    'onboard-step2': 'Practice a little every day — consistency is key',
+    'onboard-step3': 'Journal your experiences to track your growth',
+    'onboard-step4': 'Earn badges and XP as you explore',
+    'onboard-start': 'Let\'s Begin!',
+    'weekly-report-title': '📊 Weekly Report',
   },
   he: {
     // Shared UI
@@ -1581,6 +1599,7 @@ const TRANSLATIONS = {
     'legal-disclaimer': 'Psychic101 מסופק למטרות חינוכיות ובידור בלבד. לא נעשות טענות רפואיות, מדעיות או פסיכולוגיות.',
     'legal-bug-link': '🐛 דווח על באג',
     'legal-game-link': '🚀 משחק',
+    'legal-profile-link': '🔮 פרופיל',
     'version-tag': 'v{v}',
     'legal-privacy-link': 'מדיניות פרטיות',
     'legal-terms-link': 'תנאי שירות',
@@ -1590,6 +1609,23 @@ const TRANSLATIONS = {
     'streak-days': 'רצף ימים',
     'challenge-title': 'אתגר היום',
     'fact-title': 'הידעת?',
+    // Phase 3 — Profile & Retention
+    'badges-title': '🏆 תגים',
+    'profile-title': '🔮 הפרופיל הפסיכי שלך',
+    'profile-total-sessions': 'סה"כ סשנים',
+    'profile-week-sessions': 'השבוע',
+    'profile-streak': 'רצף נוכחי',
+    'profile-level': 'רמה',
+    'profile-xp': 'סה"כ XP',
+    'profile-badges': 'תגים הושגו',
+    'onboard-title': '🔮 ברוכים הבאים ל-Psychic101',
+    'onboard-desc': 'המסע שלך לגילוי פסיכי מתחיל כאן. הנה איך לקבל את המרב מהחוויה:',
+    'onboard-step1': 'התחל עם האפליקציות שמעניינות אותך ביותר',
+    'onboard-step2': 'תרגל קצת כל יום — עקביות היא המפתח',
+    'onboard-step3': 'תעד את החוויות שלך כדי לעקוב אחר הצמיחה',
+    'onboard-step4': 'זכה בתגים ו-XP כשאתה חוקר',
+    'onboard-start': 'בוא נתחיל!',
+    'weekly-report-title': '📊 דוח שבועי',
   }
 };
 
@@ -2381,4 +2417,249 @@ function langSelectorHTML() {
     <button class="lang-btn ${currentLang === 'en' ? 'active' : ''}" onclick="setLang('en')">EN</button>
     <button class="lang-btn ${currentLang === 'he' ? 'active' : ''}" onclick="setLang('he')">HE</button>
   </div>`;
+}
+
+// ─── XP / Level System ────────────────────────────────────
+// XP is earned through practice. Levels unlock at thresholds.
+const LEVEL_THRESHOLDS = [0, 100, 250, 500, 1000, 2000, 3500, 6000, 10000, 15000, 25000];
+const LEVEL_NAMES = [
+  'Awakening', 'Seeker', 'Explorer', 'Channeler', 'Perceiver',
+  'Seer', 'Visionary', 'Adept', 'Master', 'Sage', 'Enlightened'
+];
+
+function getXp() {
+  try { return JSON.parse(localStorage.getItem('p101_xp') || '{total:0,history:[]}'); } catch { return {total:0,history:[]}; }
+}
+
+function addXp(amount, source) {
+  let xp = getXp();
+  xp.total += amount;
+  if (source) xp.history.push({amount, source, date: Date.now()});
+  // Keep history to last 500 entries
+  if (xp.history.length > 500) xp.history = xp.history.slice(-500);
+  localStorage.setItem('p101_xp', JSON.stringify(xp));
+  return xp;
+}
+
+function getLevel() {
+  const xp = getXp();
+  let level = 0;
+  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (xp.total >= LEVEL_THRESHOLDS[i]) { level = i; break; }
+  }
+  const currentThreshold = LEVEL_THRESHOLDS[level];
+  const nextThreshold = LEVEL_THRESHOLDS[level + 1] || LEVEL_THRESHOLDS[level] * 2;
+  const progress = nextThreshold > currentThreshold
+    ? Math.round(((xp.total - currentThreshold) / (nextThreshold - currentThreshold)) * 100)
+    : 100;
+  return { level, name: LEVEL_NAMES[level] || LEVEL_NAMES[LEVEL_NAMES.length - 1], xp: xp.total, progress, nextThreshold };
+}
+
+// ─── Badge System ─────────────────────────────────────────
+const BADGES = [
+  { id: 'first-session', name: 'First Step', desc: 'Complete your first session', icon: '🌱', xp: 10 },
+  { id: 'streak-3', name: 'Getting Started', desc: '3-day practice streak', icon: '🔥', xp: 25 },
+  { id: 'streak-7', name: 'Week Warrior', desc: '7-day practice streak', icon: '⚡', xp: 50 },
+  { id: 'streak-30', name: 'Monthly Master', desc: '30-day practice streak', icon: '🌟', xp: 150 },
+  { id: 'rv-10', name: 'RV Explorer', desc: 'Complete 10 RV sessions', icon: '👁️', xp: 50 },
+  { id: 'rv-50', name: 'RV Veteran', desc: 'Complete 50 RV sessions', icon: '🔮', xp: 150 },
+  { id: 'zener-10', name: 'Zener Novice', desc: 'Complete 10 Zener rounds', icon: '🃏', xp: 25 },
+  { id: 'zener-50', name: 'Zener Pro', desc: 'Complete 50 Zener rounds', icon: '🎴', xp: 75 },
+  { id: 'journal-5', name: 'Dream Journaler', desc: 'Log 5 journal entries', icon: '📖', xp: 25 },
+  { id: 'dream-5', name: 'Dream Catcher', desc: 'Log 5 dreams', icon: '💤', xp: 25 },
+  { id: 'clair-complete', name: 'Self Aware', desc: 'Complete the Clairvoyance ID assessment', icon: '🧬', xp: 50 },
+  { id: 'grounding-10', name: 'Grounded', desc: 'Complete 10 grounding sessions', icon: '🌍', xp: 50 },
+  { id: 'all-apps', name: 'Explorer', desc: 'Try all apps at least once', icon: '🗺️', xp: 100 },
+  { id: 'dice-10', name: 'Dice Roller', desc: 'Roll the dice 10 times', icon: '🎲', xp: 25 },
+  { id: 'color-10', name: 'Color Seer', desc: 'Complete 10 Color Sense rounds', icon: '🎨', xp: 25 },
+  { id: 'mind-10', name: 'Mind Reader', desc: 'Complete 10 Mind Reader rounds', icon: '🧠', xp: 25 },
+  { id: 'orb-60', name: 'Zen Master', desc: 'Reach 60 seconds of focus in Focus Orb', icon: '🧘', xp: 50 },
+  { id: 'pulse-10', name: 'Energy Sensitive', desc: 'Complete 10 Energy Pulse rounds', icon: '⚡', xp: 25 },
+  { id: 'xp-1000', name: 'Thousand Points', desc: 'Earn 1000 XP', icon: '💎', xp: 0 },
+  { id: 'level-5', name: 'Perceiver', desc: 'Reach level 5', icon: '✨', xp: 0 },
+];
+
+function getBadges() {
+  try { return JSON.parse(localStorage.getItem('p101_badges') || '[]'); } catch { return []; }
+}
+
+function unlockBadge(id) {
+  let badges = getBadges();
+  if (badges.includes(id)) return false;
+  badges.push(id);
+  localStorage.setItem('p101_badges', JSON.stringify(badges));
+  const badge = BADGES.find(b => b.id === id);
+  if (badge && badge.xp > 0) addXp(badge.xp, 'badge-' + id);
+  return true;
+}
+
+function checkBadges() {
+  // Check all badge conditions and unlock any that qualify
+  const streak = getStreak();
+  if (streak.current >= 3) unlockBadge('streak-3');
+  if (streak.current >= 7) unlockBadge('streak-7');
+  if (streak.current >= 30) unlockBadge('streak-30');
+
+  const xp = getXp();
+  if (xp.total >= 1000) unlockBadge('xp-1000');
+  const level = getLevel();
+  if (level.level >= 5) unlockBadge('level-5');
+
+  // App-specific checks (called from individual apps)
+  // These are checked via checkAppBadge() helper
+}
+
+function checkAppBadge(app, count) {
+  switch(app) {
+    case 'rv': if (count >= 10) unlockBadge('rv-10'); if (count >= 50) unlockBadge('rv-50'); break;
+    case 'zener': if (count >= 10) unlockBadge('zener-10'); if (count >= 50) unlockBadge('zener-50'); break;
+    case 'journal': if (count >= 5) unlockBadge('journal-5'); break;
+    case 'dream': if (count >= 5) unlockBadge('dream-5'); break;
+    case 'grounding': if (count >= 10) unlockBadge('grounding-10'); break;
+    case 'dice': if (count >= 10) unlockBadge('dice-10'); break;
+    case 'color': if (count >= 10) unlockBadge('color-10'); break;
+    case 'mind': if (count >= 10) unlockBadge('mind-10'); break;
+    case 'pulse': if (count >= 10) unlockBadge('pulse-10'); break;
+  }
+  // First session check
+  if (!getBadges().includes('first-session')) {
+    unlockBadge('first-session');
+  }
+}
+
+// Track which apps have been tried
+function markAppTried(app) {
+  try {
+    let tried = JSON.parse(localStorage.getItem('p101_apps_tried') || '[]');
+    if (!tried.includes(app)) {
+      tried.push(app);
+      localStorage.setItem('p101_apps_tried', JSON.stringify(tried));
+    }
+    // Check if all apps tried
+    const allApps = ['rv-trainer', 'random-viewer', 'zener', 'card-guess', 'dial-trainer', 'partner', 'journal', 'dream-tracker', 'grounding', 'clair-id', 'intuition-dice', 'color-sense', 'mind-reader', 'focus-orb', 'energy-pulse'];
+    if (tried.filter(a => allApps.includes(a)).length >= allApps.length) {
+      unlockBadge('all-apps');
+    }
+  } catch(e) {}
+}
+
+// ─── Profile / Stats ──────────────────────────────────────
+function getProfile() {
+  try { return JSON.parse(localStorage.getItem('p101_profile') || '{}'); } catch { return {}; }
+}
+
+function updateProfile(app, data) {
+  let profile = getProfile();
+  if (!profile[app]) profile[app] = {sessions: 0, total: 0, hits: 0, lastSession: null};
+  profile[app].sessions++;
+  if (data.total) profile[app].total += data.total;
+  if (data.hits) profile[app].hits += data.hits;
+  profile[app].lastSession = Date.now();
+  localStorage.setItem('p101_profile', JSON.stringify(profile));
+  return profile;
+}
+
+// ─── Weekly Report ────────────────────────────────────────
+function getWeeklyReport() {
+  const now = Date.now();
+  const weekAgo = now - (7 * 24 * 60 * 60 * 1000);
+  const xp = getXp();
+  const weekXp = xp.history.filter(h => h.date >= weekAgo).reduce((s, h) => s + h.amount, 0);
+  const streak = getStreak();
+  const level = getLevel();
+  const badges = getBadges();
+  const profile = getProfile();
+  const totalSessions = Object.values(profile).reduce((s, a) => s + (a.sessions || 0), 0);
+  const weekSessions = Object.values(profile).reduce((s, a) => s + (a.lastSession && a.lastSession >= weekAgo ? 1 : 0), 0);
+
+  return { weekXp, totalSessions, weekSessions, streak, level, badgesCount: badges.length, totalBadges: BADGES.length };
+}
+
+// ─── Onboarding / Welcome Flow ────────────────────────────
+function hasSeenOnboarding() {
+  return localStorage.getItem('p101_onboarded') === 'true';
+}
+
+function completeOnboarding() {
+  localStorage.setItem('p101_onboarded', 'true');
+}
+
+function renderOnboarding() {
+  if (hasSeenOnboarding()) return;
+  const container = document.getElementById('onboarding-overlay');
+  if (!container) return;
+
+  const t = window.t || ((k) => k);
+  container.innerHTML = `
+    <div class="onboarding-modal">
+      <div class="onboarding-content">
+        <h2>${t('onboard-title') || '🔮 Welcome to Psychic101'}</h2>
+        <p>${t('onboard-desc') || 'Your journey into psychic exploration starts here. Here\'s how to get the most out of this experience:'}</p>
+        <div class="onboard-steps">
+          <div class="onboard-step">
+            <span class="step-icon">🎯</span>
+            <span>${t('onboard-step1') || 'Start with the apps that interest you most'}</span>
+          </div>
+          <div class="onboard-step">
+            <span class="step-icon">📅</span>
+            <span>${t('onboard-step2') || 'Practice a little every day — consistency is key'}</span>
+          </div>
+          <div class="onboard-step">
+            <span class="step-icon">📖</span>
+            <span>${t('onboard-step3') || 'Journal your experiences to track your growth'}</span>
+          </div>
+          <div class="onboard-step">
+            <span class="step-icon">🏆</span>
+            <span>${t('onboard-step4') || 'Earn badges and XP as you explore'}</span>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="document.getElementById('onboarding-overlay').remove(); completeOnboarding();">${t('onboard-start') || 'Let\'s Begin!'}</button>
+      </div>
+    </div>`;
+}
+
+// ─── Render Level / XP Bar ────────────────────────────────
+function renderLevelBar(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const level = getLevel();
+  const t = window.t || ((k) => k);
+  el.innerHTML = `
+    <div class="level-bar">
+      <div class="level-info">
+        <span class="level-name">${level.name}</span>
+        <span class="level-num">Lv. ${level.level + 1}</span>
+      </div>
+      <div class="xp-bar">
+        <div class="xp-fill" style="width:${level.progress}%"></div>
+      </div>
+      <div class="xp-text">${level.xp} / ${level.nextThreshold} XP</div>
+    </div>`;
+}
+
+// ─── Render Badges Grid ───────────────────────────────────
+function renderBadges(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const unlocked = getBadges();
+  const t = window.t || ((k) => k);
+  const unlockedCount = unlocked.length;
+  const totalCount = BADGES.length;
+
+  el.innerHTML = `
+    <div class="badges-header">
+      <span>${t('badges-title') || '🏆 Badges'}</span>
+      <span class="badges-count">${unlockedCount} / ${totalCount}</span>
+    </div>
+    <div class="badges-grid">
+      ${BADGES.map(badge => {
+        const isUnlocked = unlocked.includes(badge.id);
+        return `
+          <div class="badge-item ${isUnlocked ? 'unlocked' : 'locked'}" title="${badge.desc}">
+            <span class="badge-icon">${badge.icon}</span>
+            <span class="badge-name">${badge.name}</span>
+            ${isUnlocked ? '' : '<span class="badge-lock">🔒</span>'}
+          </div>`;
+      }).join('')}
+    </div>`;
 }

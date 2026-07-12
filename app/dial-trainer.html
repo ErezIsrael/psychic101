@@ -483,6 +483,9 @@ function saveSession() {
   });
   saveHistory(history);
   updateStreak();
+  addXp(15, 'dial-trainer');
+  checkAppBadge('dial', history.length);
+  markAppTried('dial-trainer');
   showScreen('history');
   renderHistory();
 }

@@ -520,6 +520,9 @@ function saveSession() {
   history.unshift(session);
   saveHistory(history);
   updateStreak();
+  addXp(10, 'zener');
+  checkAppBadge('zener', history.length);
+  markAppTried('zener');
   clearSessionState();
   sessionActive = false;
   showScreen('welcome');

@@ -186,6 +186,9 @@ function tapPulse() {
   history.unshift({timestamp: Date.now(), offset: offsetSec, tapTime: tapTime / 1000});
   saveData('pulse_history', history);
   updateStreak();
+  addXp(5, 'energy-pulse');
+  checkAppBadge('pulse', history.length);
+  markAppTried('energy-pulse');
 
   const absOffset = Math.abs(offsetSec);
   document.getElementById('result-timing').textContent = (offsetSec > 0 ? '+' : '') + offsetSec.toFixed(2) + 's';

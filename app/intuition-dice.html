@@ -234,6 +234,9 @@ function showResult() {
 
   // Update streak
   updateStreak();
+  addXp(5, 'intuition-dice');
+  checkAppBadge('dice', history.length);
+  markAppTried('intuition-dice');
 
   // Show result
   document.getElementById('result-your-num').textContent = currentGuess;

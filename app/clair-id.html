@@ -449,6 +449,9 @@ function finishAssessment() {
   assessmentResults = { scores, dominant, date: new Date().toISOString() };
   saveAssessment(assessmentResults);
   updateStreak();
+  addXp(25, 'clair-id');
+  unlockBadge('clair-complete');
+  markAppTried('clair-id');
 
   renderResults();
   showScreen('results');
@@ -552,6 +555,7 @@ function logExercise(title) {
   log.unshift({ exercise: title, timestamp: Date.now() });
   saveTrainingLog(log);
   updateStreak();
+  addXp(5, 'clair-id-training');
   renderTraining();
 }
 

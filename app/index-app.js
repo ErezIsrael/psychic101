@@ -56,6 +56,10 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDailyChallenge('challenge-container');
   renderTimePrompt('time-prompt-container');
   renderFunFact('fun-fact-container');
+  // Phase 3 — Onboarding
+  renderOnboarding();
+  // Phase 3 — Badge checks
+  checkBadges();
   // Append ?lang=XX to all app links so language persists across pages
   document.querySelectorAll('.app-card').forEach(a => {
     a.addEventListener('click', (e) => {

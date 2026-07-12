@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Psychic101 — Profile</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="utils.js" defer></script>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Psychic101</a>
+      <span data-i18n="profile-title">🔮 Your Psychic Profile</span>
+      <div id="lang-selector"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Level Bar -->
+    <div id="level-bar-container"></div>
+
+    <!-- Profile Stats -->
+    <div class="profile-section">
+      <h3 data-i18n="profile-title">🔮 Your Psychic Profile</h3>
+      <div class="profile-stats" id="profile-stats"></div>
+    </div>
+
+    <!-- Badges -->
+    <div class="profile-section">
+      <div id="badges-container"></div>
+    </div>
+
+    <!-- Weekly Report -->
+    <div class="profile-section">
+      <h3 data-i18n="weekly-report-title">📊 Weekly Report</h3>
+      <div id="weekly-report"></div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <nav>
+        <a href="index.html" data-i18n="footer-home">Home</a>
+        <a href="about.html" data-i18n="footer-about">About</a>
+        <a href="privacy.html" data-i18n="footer-privacy">Privacy</a>
+        <span data-version class="footer-link"></span>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+    applyTranslations();
+    renderVersion();
+
+    // Render level bar
+    renderLevelBar('level-bar-container');
+
+    // Render badges
+    renderBadges('badges-container');
+
+    // Render profile stats
+    const report = getWeeklyReport();
+    const statsEl = document.getElementById('profile-stats');
+    const t = window.t || ((k) => k);
+    statsEl.innerHTML = `
+      <div class="profile-stat">
+        <span class="profile-stat-value">${report.totalSessions}</span>
+        <span class="profile-stat-label">${t('profile-total-sessions') || 'Total Sessions'}</span>
+      </div>
+      <div class="profile-stat">
+        <span class="profile-stat-value">${report.weekSessions}</span>
+        <span class="profile-stat-label">${t('profile-week-sessions') || 'This Week'}</span>
+      </div>
+      <div class="profile-stat">
+        <span class="profile-stat-value">${report.streak.current} 🔥</span>
+        <span class="profile-stat-label">${t('profile-streak') || 'Current Streak'}</span>
+      </div>
+      <div class="profile-stat">
+        <span class="profile-stat-value">${report.level.name}</span>
+        <span class="profile-stat-label">${t('profile-level') || 'Level'}</span>
+      </div>
+      <div class="profile-stat">
+        <span class="profile-stat-value">${report.level.xp}</span>
+        <span class="profile-stat-label">${t('profile-xp') || 'Total XP'}</span>
+      </div>
+      <div class="profile-stat">
+        <span class="profile-stat-value">${report.badgesCount}/${report.totalBadges}</span>
+        <span class="profile-stat-label">${t('profile-badges') || 'Badges Earned'}</span>
+      </div>
+    `;
+
+    // Render weekly report
+    const weeklyEl = document.getElementById('weekly-report');
+    weeklyEl.innerHTML = `
+      <div class="profile-stats">
+        <div class="profile-stat">
+          <span class="profile-stat-value">${report.weekXp}</span>
+          <span class="profile-stat-label">XP This Week</span>
+        </div>
+        <div class="profile-stat">
+          <span class="profile-stat-value">${report.weekSessions}</span>
+          <span class="profile-stat-label">Sessions This Week</span>
+        </div>
+        <div class="profile-stat">
+          <span class="profile-stat-value">${report.streak.best}</span>
+          <span class="profile-stat-label">Best Streak</span>
+        </div>
+      </div>
+    `;
+
+    // Check for new badges
+    checkBadges();
+  });
+  </script>
+</body>
+</html>

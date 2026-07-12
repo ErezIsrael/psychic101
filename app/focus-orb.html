@@ -187,6 +187,10 @@ function endFocus() {
   history.unshift({timestamp: Date.now(), time: currentFocusTime});
   saveData('orb_history', history);
   updateStreak();
+  addXp(Math.round(currentFocusTime / 5), 'focus-orb');
+  markAppTried('focus-orb');
+  // Check Zen Master badge (60s focus)
+  if (currentFocusTime >= 60) unlockBadge('orb-60');
 
   document.getElementById('result-time').textContent = formatTime(currentFocusTime);
 

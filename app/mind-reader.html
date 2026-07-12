@@ -195,6 +195,9 @@ function pickRead(symbol) {
   history.unshift({timestamp: Date.now(), sent: targetSymbol, received: symbol, hit: isHit});
   saveData('mind_history', history);
   updateStreak();
+  addXp(5, 'mind-reader');
+  checkAppBadge('mind', history.length);
+  markAppTried('mind-reader');
 
   document.getElementById('result-sent').textContent = targetSymbol;
   document.getElementById('result-received').textContent = symbol;

@@ -437,6 +437,9 @@ function saveSession() {
   sessions.unshift(currentSession);
   saveSessions(sessions);
   updateStreak();
+  addXp(20, 'rv-trainer');
+  checkAppBadge('rv', sessions.length);
+  markAppTried('rv-trainer');
   currentSession = null;
   showScreen('welcome');
 }

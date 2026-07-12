@@ -230,6 +230,9 @@ function saveEntry() {
   entries.unshift(entry);
   saveEntries(entries);
   updateStreak();
+  addXp(5, 'journal');
+  checkAppBadge('journal', entries.length);
+  markAppTried('journal');
 
   // Clear form
   document.getElementById('entry-title').value = '';

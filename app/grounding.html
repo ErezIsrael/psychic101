@@ -520,6 +520,9 @@ function logSession(technique, notes) {
   history.unshift({ id: Date.now(), technique, notes });
   saveGH(history);
   updateStreak();
+  addXp(5, 'grounding');
+  checkAppBadge('grounding', history.length);
+  markAppTried('grounding');
 }
 
 function renderGH() {

@@ -272,6 +272,9 @@ function saveDream() {
   dreams.unshift(dream);
   saveDreams(dreams);
   updateStreak();
+  addXp(5, 'dream-tracker');
+  checkAppBadge('dream', dreams.length);
+  markAppTried('dream-tracker');
 
   // Clear form
   document.getElementById('dream-title').value = '';

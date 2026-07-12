@@ -201,6 +201,9 @@ function pickColor(hex) {
   history.unshift({timestamp: Date.now(), actual: targetColor.name, guessed: COLORS.find(c=>c.hex===hex)?.name||'Unknown', hit: isHit});
   saveData('color_history', history);
   updateStreak();
+  addXp(5, 'color-sense');
+  checkAppBadge('color', history.length);
+  markAppTried('color-sense');
 
   document.getElementById('result-actual').style.background = targetColor.hex;
   document.getElementById('result-sensed').style.background = hex;

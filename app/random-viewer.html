@@ -314,6 +314,9 @@ function saveSession() {
   history.unshift(entry);
   saveHistory(history);
   updateStreak();
+  addXp(20, 'random-viewer');
+  checkAppBadge('rv', history.length);
+  markAppTried('random-viewer');
   if (currentRating >= 4) {
     spawnConfetti(25);
   }

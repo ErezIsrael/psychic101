@@ -484,6 +484,9 @@ function saveRound() {
   history.unshift(entry);
   saveHistory(history);
   updateStreak();
+  addXp(10, 'card-guess');
+  checkAppBadge('card-guess', history.length);
+  markAppTried('card-guess');
   currentResult = null;
   showScreen('welcome');
 }

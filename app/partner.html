@@ -434,6 +434,9 @@ function saveSession() {
   history.unshift(entry);
   saveHistory(history);
   updateStreak();
+  addXp(15, 'partner');
+  checkAppBadge('partner', history.length);
+  markAppTried('partner');
   compRating = 0;
   showScreen('welcome');
 }
