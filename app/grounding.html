@@ -519,6 +519,7 @@ function logSession(technique, notes) {
   const history = loadGH();
   history.unshift({ id: Date.now(), technique, notes });
   saveGH(history);
+  updateStreak();
 }
 
 function renderGH() {

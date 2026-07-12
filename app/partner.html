@@ -402,10 +402,17 @@ function setCompRating(r) {
 function updateMatchBadge() {
   const badge = document.getElementById('match-badge');
   if (!compRating) { badge.textContent = t('comp-rate-prompt'); badge.className = 'match-badge'; return; }
-  const labels = ['', t('comp-rate-1'), t('comp-rate-2'), t('comp-rate-3'), t('comp-rate-4'), t('comp-rate-5')];
-  const cls = compRating <= 2 ? 'match-low' : compRating <= 3 ? 'match-med' : 'match-high';
-  badge.textContent = labels[compRating];
-  badge.className = 'match-badge ' + cls;
+  if (compRating >= 4) {
+    badge.textContent = getHitMessage();
+    badge.className = 'match-badge match-high';
+    spawnConfetti(30);
+  } else if (compRating === 3) {
+    badge.textContent = getNearMessage();
+    badge.className = 'match-badge match-med';
+  } else {
+    badge.textContent = getMissMessage();
+    badge.className = 'match-badge match-low';
+  }
 }
 
 function saveSession() {
@@ -426,6 +433,7 @@ function saveSession() {
   const history = loadHistory();
   history.unshift(entry);
   saveHistory(history);
+  updateStreak();
   compRating = 0;
   showScreen('welcome');
 }

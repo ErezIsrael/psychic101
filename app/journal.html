@@ -229,6 +229,7 @@ function saveEntry() {
   const entries = loadEntries();
   entries.unshift(entry);
   saveEntries(entries);
+  updateStreak();
 
   // Clear form
   document.getElementById('entry-title').value = '';

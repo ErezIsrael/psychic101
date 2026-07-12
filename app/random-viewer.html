@@ -313,6 +313,10 @@ function saveSession() {
   const history = loadHistory();
   history.unshift(entry);
   saveHistory(history);
+  updateStreak();
+  if (currentRating >= 4) {
+    spawnConfetti(25);
+  }
   currentRating = 0;
   showScreen('welcome');
 }

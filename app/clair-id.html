@@ -448,6 +448,7 @@ function finishAssessment() {
 
   assessmentResults = { scores, dominant, date: new Date().toISOString() };
   saveAssessment(assessmentResults);
+  updateStreak();
 
   renderResults();
   showScreen('results');
@@ -550,6 +551,7 @@ function logExercise(title) {
   const log = loadTrainingLog();
   log.unshift({ exercise: title, timestamp: Date.now() });
   saveTrainingLog(log);
+  updateStreak();
   renderTraining();
 }
 

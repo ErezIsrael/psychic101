@@ -425,6 +425,9 @@ function rateAccuracy(btn) {
   document.querySelectorAll('[data-rating]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   selectedRating = parseInt(btn.dataset.rating);
+  if (selectedRating >= 4) {
+    spawnConfetti(25);
+  }
 }
 
 function saveSession() {
@@ -433,6 +436,7 @@ function saveSession() {
   const sessions = loadSessions();
   sessions.unshift(currentSession);
   saveSessions(sessions);
+  updateStreak();
   currentSession = null;
   showScreen('welcome');
 }

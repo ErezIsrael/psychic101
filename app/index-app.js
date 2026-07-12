@@ -50,6 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
   renderVersion();
   renderActivity();
+  // Phase 1 — Gamification
+  updateStreak();
+  renderStreak('streak-display');
+  renderDailyChallenge('challenge-container');
+  renderTimePrompt('time-prompt-container');
+  renderFunFact('fun-fact-container');
   // Append ?lang=XX to all app links so language persists across pages
   document.querySelectorAll('.app-card').forEach(a => {
     a.addEventListener('click', (e) => {

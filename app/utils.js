@@ -699,6 +699,11 @@ const TRANSLATIONS = {
     'legal-privacy-link': 'Privacy Policy',
     'legal-terms-link': 'Terms of Service',
     'legal-access-link': 'Accessibility',
+    // Phase 1 — Gamification
+    'streak-start': 'Start practicing to build a streak!',
+    'streak-days': 'day streak',
+    'challenge-title': "Today's Challenge",
+    'fact-title': 'Did you know?',
   },
   he: {
     // Shared UI
@@ -1352,6 +1357,11 @@ const TRANSLATIONS = {
     'legal-privacy-link': 'מדיניות פרטיות',
     'legal-terms-link': 'תנאי שירות',
     'legal-access-link': 'נגישות',
+    // Phase 1 — Gamification
+    'streak-start': 'התחל להתאמן כדי לבנות רצף!',
+    'streak-days': 'רצף ימים',
+    'challenge-title': 'אתגר היום',
+    'fact-title': 'הידעת?',
   }
 };
 
@@ -1876,6 +1886,262 @@ function calcStreak(dates) {
     else break;
   }
   return streak;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Phase 1 — Gamification & Engagement Utilities
+// ═══════════════════════════════════════════════════════════
+
+// ─── Confetti ─────────────────────────────────────────────
+function spawnConfetti(count = 40) {
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+  const colors = ['#7b68ee','#9d8df1','#4ade80','#fbbf24','#f87171','#60a5fa','#f472b6','#fb923c'];
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.setProperty('--dur', (1 + Math.random() * 1) + 's');
+    piece.style.setProperty('--rot', (360 + Math.random() * 720) + 'deg');
+    piece.style.animationDelay = (Math.random() * 0.4) + 's';
+    container.appendChild(piece);
+  }
+  setTimeout(() => container.remove(), 2500);
+}
+
+// ─── Encouraging Miss Messages ───────────────────────────
+const MISS_MESSAGES = {
+  en: [
+    'Interesting! Your intuition pointed elsewhere. Every attempt strengthens your signal. 🔮',
+    'Not this time — but your psychic muscles are getting stronger! 💪',
+    'Close! Your inner sense is developing. Keep going! ✨',
+    'The signal was subtle this time. Trust the process — it grows with practice. 🌱',
+    'Your intuition said something different. That\'s valuable data! Keep tracking. 📊',
+    'No match this round, but your awareness is expanding. That\'s progress! 🌟',
+  ],
+  he: [
+    'מעניין! האינטואיציה שלך הובילה לכיוון אחר. כל ניסיון מחזק את האות שלך. 🔮',
+    'לא הפעם — אבל השרירים הפסיכיים שלך מתחזקים! 💪',
+    'קרוב! החוש הפנימי שלך מתפתח. המשך! ✨',
+    'האות היה עדין הפעם. אמין בתהליך — הוא גדל עם תרגול. 🌱',
+    'האינטואיציה שלך אמרה משהו אחר. זו נתונים חשובים! המשך לעקוב. 📊',
+    'אין התאמה בסיבוב הזה, אבל המודעות שלך מתרחבת. זו התקדמות! 🌟',
+  ]
+};
+
+function getMissMessage() {
+  const msgs = MISS_MESSAGES[currentLang] || MISS_MESSAGES.en;
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function getHitMessage() {
+  const msgs = currentLang === 'he'
+    ? ['🎯 פגיעה! החוש הפנימי שלך עובד!', '🌟 מצוין! האות חזק!', '🔮 קשר פסיכי! המשך כך!']
+    : ['🎯 Hit! Your inner sense is working!', '🌟 Excellent! Strong signal!', '🔮 Psychic connection! Keep it up!'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+function getNearMessage() {
+  const msgs = currentLang === 'he'
+    ? ['👀 קרוב! החוש שלך מתפתח', '✨ כמעט! המשך להתאמן', '🔮 כמעט פגיעה! האות מתחזק']
+    : ['👀 Close! Your sense is developing', '✨ Almost! Keep training', '🔮 Near miss! Signal strengthening'];
+  return msgs[Math.floor(Math.random() * msgs.length)];
+}
+
+// ─── Streak System ────────────────────────────────────────
+function getStreak() {
+  const data = loadData('p101_streak');
+  if (!data) return { current: 0, best: 0, lastDate: null };
+  return data;
+}
+
+function updateStreak() {
+  const today = new Date().toISOString().slice(0, 10);
+  let data = loadData('p101_streak') || { current: 0, best: 0, lastDate: null };
+
+  if (data.lastDate === today) return data; // already practiced today
+
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+
+  if (data.lastDate === yesterday) {
+    data.current++;
+  } else if (data.lastDate !== today) {
+    data.current = 1; // reset or start new
+  }
+
+  data.lastDate = today;
+  data.best = Math.max(data.best, data.current);
+  saveData('p101_streak', data);
+  return data;
+}
+
+function renderStreak(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const data = getStreak();
+  if (data.current < 1) {
+    el.innerHTML = `<span style="font-size:0.8rem;color:var(--text-dim)">${t('streak-start') || 'Start practicing to build a streak!'}</span>`;
+    return;
+  }
+  const flames = '🔥'.repeat(Math.min(data.current, 5));
+  el.innerHTML = `
+    <div class="streak-display">
+      <span class="streak-flame">${flames}</span>
+      <span class="streak-count">${data.current}</span>
+      <span class="streak-label">${t('streak-days') || 'day streak'}</span>
+    </div>`;
+}
+
+// ─── Daily Challenge ──────────────────────────────────────
+const DAILY_CHALLENGES = {
+  en: [
+    { icon: '🎯', text: 'Roll the Intuition Dice 5 times', app: 'dial-trainer.html', key: 'challenge-mon' },
+    { icon: '📓', text: 'Log a dream or synchronicity', app: 'journal.html', key: 'challenge-tue' },
+    { icon: '🃏', text: 'Try the Card Guessing test', app: 'card-guess.html', key: 'challenge-wed' },
+    { icon: '🌳', text: 'Complete a grounding session', app: 'grounding.html', key: 'challenge-thu' },
+    { icon: '🧠', text: 'Try the Zener Symbol test — 10 rounds', app: 'zener.html', key: 'challenge-fri' },
+    { icon: '🔮', text: 'Do a Remote Viewing session', app: 'rv-trainer.html', key: 'challenge-sat' },
+    { icon: '📊', text: 'Review your Signal Line Analyzer', app: 'analyzer.html', key: 'challenge-sun' },
+  ],
+  he: [
+    { icon: '🎯', text: 'התחל סשן במאמן המחוג', app: 'dial-trainer.html', key: 'challenge-mon' },
+    { icon: '📓', text: 'רשום חלום או סינכרוניות', app: 'journal.html', key: 'challenge-tue' },
+    { icon: '🃏', text: 'נסה את ניחוש הקלפים', app: 'card-guess.html', key: 'challenge-wed' },
+    { icon: '🌳', text: 'השלם סשן עיגון', app: 'grounding.html', key: 'challenge-thu' },
+    { icon: '🧠', text: 'נסה את סמלי זנר — 10 סיבובים', app: 'zener.html', key: 'challenge-fri' },
+    { icon: '🔮', text: 'עשה סשן ראייה מרחוק', app: 'rv-trainer.html', key: 'challenge-sat' },
+    { icon: '📊', text: 'סקור את מנתח קו האות', app: 'analyzer.html', key: 'challenge-sun' },
+  ]
+};
+
+function getDailyChallenge() {
+  const day = new Date().getDay(); // 0=Sun ... 6=Sat
+  const challenges = DAILY_CHALLENGES[currentLang] || DAILY_CHALLENGES.en;
+  return challenges[day];
+}
+
+function isChallengeDismissed() {
+  const dismissed = loadData('p101_challenge_dismissed') || {};
+  const today = new Date().toISOString().slice(0, 10);
+  return dismissed.date === today;
+}
+
+function dismissChallenge() {
+  saveData('p101_challenge_dismissed', { date: new Date().toISOString().slice(0, 10) });
+}
+
+function renderDailyChallenge(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (isChallengeDismissed()) { el.innerHTML = ''; return; }
+  const challenge = getDailyChallenge();
+  el.innerHTML = `
+    <div class="challenge-banner">
+      <span class="challenge-icon">${challenge.icon}</span>
+      <span class="challenge-text"><strong>${t('challenge-title') || 'Today\'s Challenge'}:</strong> ${challenge.text}</span>
+      <button class="challenge-dismiss" onclick="dismissChallengeBanner(this)">✕</button>
+    </div>`;
+}
+
+function dismissChallengeBanner(btn) {
+  dismissChallenge();
+  const banner = btn.closest('.challenge-banner') || btn.parentElement;
+  if (banner) banner.parentElement.innerHTML = '';
+}
+
+// ─── Time-of-Day Prompts ─────────────────────────────────
+const TIME_PROMPTS = {
+  en: [
+    { min: 5, max: 10, icon: '🌅', text: 'Good morning! Did you dream last night? ', link: 'dream-tracker.html', linkText: 'Log it →' },
+    { min: 10, max: 14, icon: '☀️', text: 'Morning intuition check! ', link: 'zener.html', linkText: 'Try the Zener test →' },
+    { min: 14, max: 18, icon: '😴', text: 'Afternoon slump? ', link: 'grounding.html', linkText: 'Try a grounding session →' },
+    { min: 18, max: 22, icon: '🌙', text: 'Peak psychic hours! ', link: 'rv-trainer.html', linkText: 'Try Remote Viewing →' },
+    { min: 22, max: 5, icon: '📓', text: 'Evening reflection. ', link: 'journal.html', linkText: 'Journal your impressions →' },
+  ],
+  he: [
+    { min: 5, max: 10, icon: '🌅', text: 'בוקר טוב! חלמת הלילה? ', link: 'dream-tracker.html', linkText: 'רשום את זה →' },
+    { min: 10, max: 14, icon: '☀️', text: 'בדיקת אינטואיציה בוקר! ', link: 'zener.html', linkText: 'נסה את מבחן זנר →' },
+    { min: 14, max: 18, icon: '😴', text: 'נפילה אחר הצהריים? ', link: 'grounding.html', linkText: 'נסה סשן עיגון →' },
+    { min: 18, max: 22, icon: '🌙', text: 'שעות שיא פסיכיות! ', link: 'rv-trainer.html', linkText: 'נסה ראייה מרחוק →' },
+    { min: 22, max: 5, icon: '📓', text: 'הרהור ערב. ', link: 'journal.html', linkText: 'רשום את הרושמים שלך →' },
+  ]
+};
+
+function getTimePrompt() {
+  const hour = new Date().getHours();
+  const prompts = TIME_PROMPTS[currentLang] || TIME_PROMPTS.en;
+  for (const p of prompts) {
+    if (p.min < p.max) {
+      if (hour >= p.min && hour < p.max) return p;
+    } else {
+      // wraps midnight (22-5)
+      if (hour >= p.min || hour < p.max) return p;
+    }
+  }
+  return prompts[0];
+}
+
+function renderTimePrompt(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const prompt = getTimePrompt();
+  el.innerHTML = `
+    <div class="time-prompt">
+      <span class="time-prompt-icon">${prompt.icon}</span>
+      <span class="time-prompt-text">${prompt.text}<a href="${prompt.link}">${prompt.linkText}</a></span>
+    </div>`;
+}
+
+// ─── "Did You Know?" Facts ───────────────────────────────
+const FUN_FACTS = {
+  en: [
+    'The US government ran a remote viewing program called Stargate from 1970-1995.',
+    'Stanford researcher Robert Thorwald documented hundreds of verified RV sessions.',
+    'AI cannot remote view — tested in 2026, all 5 major AIs failed completely.',
+    'Emotional intelligence correlates with RV accuracy (PMC10275521).',
+    'The 12 Principles of Remote Viewing were signed by Puthoff, Targ, Atwater, and others.',
+    'Princeton\'s PEAR Lab ran 80,000+ ESP experiments over 25 years.',
+    'Nobel laureate William Fowler called remote viewing "a real phenomenon".',
+    'The Monroe Institute uses Hemi-Sync to alter brainwave states for exploration.',
+    'Ancient Vedic texts describe "divya drishti" — divine sight — as a trainable ability.',
+    'The IRVA now operates a formal research unit with CRVREG certification.',
+    'Some RVers report "bilocating" — feeling present in two places at once.',
+    'UAP investigators are re-examining Pat Price\'s 1973 RV papers on extraterrestrials.',
+  ],
+  he: [
+    'ממשלת ארה"ב הפעילה תוכנית ראייה מרחוק בשם סטרגייט מ-1970 עד 1995.',
+    'חוקר סטנפורד רוברט תורוולד תיעד מאות סשני RV מאומתים.',
+    'בינה מלאכותית לא יכולה לראות מרחוק — נבדק ב-2026, כל 5 הבינות המובילות נכשלו.',
+    'אינטליגנציה רגשית מתואמת עם דיוק RV (PMC10275521).',
+    '12 העקרונות של ראייה מרחוק חוממו על ידי פוטוף, טארג, אטווור ואחרים.',
+    'מעבדת PEAR של פרינסטון ביצעה יותר מ-80,000 ניסויי ESP לאורך 25 שנים.',
+    'זוכה פרס נובל ויליאם פאולר כינה ראייה מרחוק "תופעה אמיתית".',
+    'מכון מונרו משתמש ב-Hemi-Sync לשנות מצבי גלי מוח לחקר תודעה.',
+    'מסמכים ודיים עתיקים מתארים "divya drishti" — ראייה אלוהית — כיכולת ניתנת לאימון.',
+    'ה-IRVA מפעיל כעת יחידת מחקר רשמית עם תעודת CRVREG.',
+    'חלק מצופי המרחוק מדווחים על "בילוקציה" — תחושת נוכחות בשני מקומות בו זמנית.',
+    'חוקרי UAP סוקרים מחדש את מאמרי 1973 של פט פרייס על חייזרים.',
+  ]
+};
+
+function getDailyFact() {
+  const facts = FUN_FACTS[currentLang] || FUN_FACTS.en;
+  // Rotate based on day of year so it changes daily but is consistent
+  const start = new Date(new Date().getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((Date.now() - start) / 86400000);
+  return facts[dayOfYear % facts.length];
+}
+
+function renderFunFact(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `
+    <div class="fact-banner">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text">${t('fact-title') || 'Did you know?'} ${getDailyFact()}</span>
+    </div>`;
 }
 
 // ─── Language Selector HTML ───────────────────────────────

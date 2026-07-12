@@ -424,16 +424,17 @@ function stopSession() {
   // Verdict
   const verdict = document.getElementById('result-verdict');
   if (towardRatio >= 60) {
-    verdict.textContent = t('dial-strong');
+    verdict.textContent = getHitMessage();
     verdict.style.color = '#27ae60';
+    spawnConfetti(30);
   } else if (towardRatio >= 55) {
-    verdict.textContent = t('dial-promising');
+    verdict.textContent = getNearMessage();
     verdict.style.color = '#2ecc71';
   } else if (towardRatio >= 50) {
-    verdict.textContent = t('dial-slight');
+    verdict.textContent = getNearMessage();
     verdict.style.color = '#f39c12';
   } else {
-    verdict.textContent = t('dial-weak');
+    verdict.textContent = getMissMessage();
     verdict.style.color = '#e74c3c';
   }
 
@@ -481,6 +482,7 @@ function saveSession() {
     duration: durationSeconds
   });
   saveHistory(history);
+  updateStreak();
   showScreen('history');
   renderHistory();
 }

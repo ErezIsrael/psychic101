@@ -271,6 +271,7 @@ function saveDream() {
   const dreams = loadDreams();
   dreams.unshift(dream);
   saveDreams(dreams);
+  updateStreak();
 
   // Clear form
   document.getElementById('dream-title').value = '';

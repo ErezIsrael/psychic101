@@ -402,10 +402,11 @@ function submitGuess() {
   const badge = document.getElementById('result-badge');
   if (correct) {
     badge.className = 'result-badge result-exact';
-    badge.textContent = '🎯 ' + t('correct');
+    badge.textContent = getHitMessage();
+    spawnConfetti(30);
   } else {
     badge.className = 'result-badge result-miss';
-    badge.textContent = '❌ ' + t('incorrect-target') + ' ' + SYM_ICONS[currentTarget];
+    badge.textContent = getMissMessage();
   }
 
   // Show guess vs target
@@ -518,6 +519,7 @@ function saveSession() {
   };
   history.unshift(session);
   saveHistory(history);
+  updateStreak();
   clearSessionState();
   sessionActive = false;
   showScreen('welcome');

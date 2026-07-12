@@ -440,9 +440,20 @@ function revealCard() {
 
   // Badge
   const badge = document.getElementById('result-badge');
-  const labels = { exact: '🎯 ' + t('exact-match'), 'same-suit': '👍 ' + t('same-suit'), 'same-color': '👁 ' + t('same-color'), miss: '❌ ' + t('miss') };
-  badge.className = 'result-badge result-' + result;
-  badge.textContent = labels[result];
+  if (result === 'exact') {
+    badge.className = 'result-badge result-exact';
+    badge.textContent = getHitMessage();
+    spawnConfetti(35);
+  } else if (result === 'same-suit') {
+    badge.className = 'result-badge result-suit';
+    badge.textContent = getNearMessage();
+  } else if (result === 'same-color') {
+    badge.className = 'result-badge result-color';
+    badge.textContent = getNearMessage();
+  } else {
+    badge.className = 'result-badge result-miss';
+    badge.textContent = getMissMessage();
+  }
 
   // Live stats
   updateLiveStats();
@@ -472,6 +483,7 @@ function saveRound() {
   const history = loadHistory();
   history.unshift(entry);
   saveHistory(history);
+  updateStreak();
   currentResult = null;
   showScreen('welcome');
 }
