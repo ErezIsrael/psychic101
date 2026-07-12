@@ -1,6 +1,6 @@
 # Psychic Abilities & Remote Viewing — Research Summary
 
-> Compiled: 2026-05-15
+> Compiled: 2026-05-15, Updated: 2026-07-12
 > Purpose: A practical reference for learning and developing psychic abilities, with a deep dive into remote viewing.
 
 ---
@@ -744,6 +744,106 @@ Multiple methodologies exist for remote viewing. Understanding the differences h
 - **"Experts' Remote Viewing Guidelines"** — Journal of Scientific Exploration (2026)
 - **"Associative Remote Viewing Projects: Assessing Rater Reliability"** — Koestler Parapsychology Unit, Edinburgh
 - **CIA declassified documents** — cia.gov/readingroom (search "remote viewing" for full archive)
+
+---
+
+## 17. Recent Developments & New Insights (2024–2026)
+
+### 17.1 AI Cannot Remote View
+**Source:** Daz Smith experiment, April 2026 (remoteviewed.com)
+
+A blind RV experiment tested five major AI models (ChatGPT, Copilot, Grok, Claude, Perplexity) on a single blind target. **All five failed completely.** The AIs produced generic, template-style descriptions that bore no resemblance to the actual target.
+
+**Why this matters:** AI can simulate the *language* of remote viewing, but cannot access the signal line. This confirms that RV depends on human consciousness — specifically the ability to enter a non-local perceptual state that AI cannot replicate. The human brain's unique capacity for non-local perception appears to be biological, not computational.
+
+**Implication for Psychic101:** The training exercises on this site develop a genuinely human capability that cannot be automated or replaced by AI.
+
+### 17.2 The 12 Principles of Remote Viewing
+**Source:** Center Lane Project, signed by Puthoff, Targ, Atwater, McNear, Smith, Ray, Buchanan, Mishlove (centerlane-rv.org)
+
+A formal document defining what distinguishes true RV from other psychic practices. The 12 principles:
+
+1. **RV is a trainable skill** — based on an innate human ability
+2. **RV is always intentional** — deliberate, not spontaneous
+3. **Control belongs to the viewer** — the viewer directs the process
+4. **Bilocation is essential** — balanced perception of both physical and non-local reality
+5. **Blind targeting** — viewer is protected from target awareness
+6. **Mental noise management** — viewers are aware of and manage interference
+7. **RV is description, not naming** — describe data, don't label the target
+8. **Defined protocols** — specific procedures must be followed
+9. **Real-time recording** — results must be "objectified" and accessible to others
+10. **Procedural tracking** — administrative details are recorded
+11. **Post-session feedback** — essential for improvement
+12. **Multiple viewers & consensus** — essential for real-world applications
+
+**New insight:** The concept of **bilocation** (Principle 4) is not widely discussed in standard RV training but is fundamental. It means the viewer maintains awareness of both the physical world AND the non-local signal simultaneously. This dual awareness is what separates skilled viewers from those who "lose themselves" in sessions.
+
+### 17.3 UAP Remote Viewing — Pat Price Papers (1973)
+**Source:** Daz Smith analysis, November 2024; remoteviewed.com
+
+Pat Price's 1973 remote viewing sessions on UAP phenomena are being re-examined in light of recent UAP disclosures. Price described:
+- **"The Hitchhiker Effect"** — entities that appear to "hitch" onto objects in transit
+- Detailed descriptions of interior UAP structures that predate public knowledge
+- Warnings about potential risks associated with certain UAP encounters
+
+**New insight:** RV may have captured accurate UAP data decades before conventional intelligence could. This raises questions about whether RV could be applied to current UAP phenomena for information gathering.
+
+### 17.4 Mystery Drones Remote Viewing (2024–2026)
+**Source:** Daz Smith interview on New Thinking Allowed, April 2026
+
+Daz Smith conducted RV sessions on the "mystery drones" reported across the US and Europe. Key impressions:
+- **Advanced organic technology** — drones may be partially biological/organic
+- **Shape-shifting capability** — ability to change form and structure
+- **Symbiotic relationship** — potential relationship between humans and non-human intelligences
+- **Predictive accuracy** — Smith had predicted drone activity in 2024 before it became public
+
+**New insight:** RV is being applied to current, real-world phenomena with verifiable outcomes. This represents a shift from theoretical research to operational application.
+
+### 17.5 Neural Entrainment & Hemi-Sync®
+**Source:** Monroe Institute (monroeinstitute.org)
+
+The Monroe Institute's current approach:
+- **Monroe Sound Science** — proprietary neural entrainment using binaural/multi-layered frequencies
+- **50+ years of research**, 50,000+ program attendees, 100+ countries
+- **Distant Energy Communication (DEC)** — structured group healing experiments
+- **Consciousness Research Program** — open to academic researchers
+
+**New insight:** Monroe's approach is complementary to RV — Hemi-Sync helps achieve the focused awareness states that make RV easier. Many experienced RVers use Monroe audio tracks as a pre-session tool to enter the optimal brainwave state.
+
+### 17.6 IRVA Research Unit (IRU)
+**Source:** IRVA (irva.org)
+
+IRVA now operates a formal **Research Unit (IRU)** conducting:
+- **CRVREG Study** — ongoing CRV research with standardized protocols
+- **Applied Precognition Project** — testing ARV for future-event prediction
+- **IRVA-iRis Research Grants** — funding for independent RV research proposals
+
+**New insight:** The RV community is moving toward formalized, peer-reviewed research. IRVA's 501(c)(3) status allows it to accept research funding and collaborate with academic institutions.
+
+### 17.7 Emotional Intelligence Correlation
+**Source:** PMC10275521 — "Follow-up on the CIA's Remote Viewing Program"
+
+Recent research found that viewers with higher emotional intelligence scored significantly better on RV tasks. The mechanism may be:
+- **Emotional regulation** — ability to distinguish personal emotions from target emotional signatures
+- **Empathy** — capacity to receive and process emotional data from the signal line
+- **Self-awareness** — recognizing when personal bias contaminates the data
+
+**New insight for training:** Emotional intelligence development should be integrated into RV training programs. Meditation, mindfulness, and emotional awareness exercises directly support RV accuracy.
+
+### 17.8 Community & Practice Resources (Updated)
+
+**New/Updated resources since last compilation:**
+
+| Resource | Type | Notes |
+|---|---|---|
+| **Eight Martinis Magazine** | Publication | Free RV magazine by Daz Smith — sessions, research, interviews |
+| **IRVA Conference 2026** | Event | Upcoming international RV conference |
+| **IRVA-Konferenz Deutschland 2026** | Event | German-language RV conference |
+| **Futures Forecasters** | Group | ARV team examining future trends and global events |
+| **Hellfire RV Club** | Community | Daz Smith's UK-based RV practice group |
+| **New Thinking Allowed** | Podcast | Jeffrey Mishlove's podcast — RV interviews and discussions |
+| **Dolphin Energy Club** | Healing | Monroe Institute's distant healing network |
+| **Community Groups** | Local | 400+ Monroe Institute community groups worldwide |
 
 ---
 
