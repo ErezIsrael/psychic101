@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Intuition Dice</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <h1 style="margin:0"><a class="home-link" href="index.html"><span data-i18n="hub-title">🔮 Psychic101</span></a></h1>
+    <div id="lang-selector"></div>
+  </div>
+</header>
+
+<main id="main-content">
+
+  <!-- Welcome Screen -->
+  <div class="screen active" id="screen-welcome">
+    <div class="hero">
+      <div class="welcome-icon">🎲</div>
+      <h2 data-i18n="dice-title">Intuition Dice</h2>
+      <p data-i18n="dice-desc">A quick psychic check-in. Focus on a number, roll the dice, and see if your intuition can influence the outcome.</p>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="dice-how-title">How It Works</h3>
+      <ol class="steps">
+        <li data-i18n="dice-step1">Pick a number from 1 to 6 in your mind</li>
+        <li data-i18n="dice-step2">Tap the dice to roll — focus on your number</li>
+        <li data-i18n="dice-step3">See if your intuition influenced the result</li>
+        <li data-i18n="dice-step4">Track your streak and accuracy over time</li>
+      </ol>
+    </div>
+
+    <div class="tip-banner" id="tip-banner">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" data-i18n="dice-tip1">Relax and let your intuition guide you. Don't force it — just feel.</span>
+      <button class="tip-refresh" onclick="refreshTip()" title="New tip">↻</button>
+    </div>
+
+    <div class="stats-grid" id="dice-stats">
+      <div class="stat-card"><div class="value" id="stat-rolls">0</div><div class="label" data-i18n="dice-total-rolls">Total Rolls</div></div>
+      <div class="stat-card"><div class="value" id="stat-hits">0</div><div class="label" data-i18n="dice-hits">Hits</div></div>
+      <div class="stat-card"><div class="value" id="stat-accuracy">—</div><div class="label" data-i18n="dice-accuracy">Accuracy</div></div>
+      <div class="stat-card"><div class="value" id="stat-streak">0</div><div class="label" data-i18n="dice-best-streak">Best Streak</div></div>
+    </div>
+
+    <div style="margin-top:1rem">
+      <button class="btn btn-primary" onclick="startRoll()" data-i18n="dice-roll-btn">🎲 Roll the Dice</button>
+    </div>
+  </div>
+
+  <!-- Roll Screen -->
+  <div class="screen" id="screen-roll">
+    <div class="hero">
+      <h2 data-i18n="dice-focus-title">Focus on Your Number</h2>
+      <p data-i18n="dice-focus-desc">Think of a number from 1 to 6. Then tap the dice to roll.</p>
+    </div>
+
+    <div style="text-align:center;margin:2rem 0">
+      <div id="dice-display" style="font-size:6rem;cursor:pointer;transition:transform 0.3s;user-select:none" onclick="rollDice()">🎲</div>
+      <p style="color:var(--text-dim);margin-top:1rem" data-i18n="dice-tap-roll">Tap the dice to roll</p>
+    </div>
+
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div class="screen" id="screen-result">
+    <div class="hero">
+      <h2 id="result-heading">Result</h2>
+    </div>
+
+    <div style="text-align:center;margin:1.5rem 0">
+      <div id="result-dice" style="font-size:5rem"></div>
+      <div id="result-message" class="result-message" style="margin-top:1rem"></div>
+    </div>
+
+    <div class="card" style="text-align:center">
+      <p data-i18n="dice-your-number">Your number was:</p>
+      <div id="result-your-num" style="font-size:2rem;font-weight:700;color:var(--accent)"></div>
+      <p style="margin-top:0.5rem" data-i18n="dice-dice-showed">The dice showed:</p>
+      <div id="result-dice-num" style="font-size:2rem;font-weight:700;color:var(--accent2)"></div>
+    </div>
+
+    <div style="margin-top:1.5rem;display:flex;flex-direction:column;gap:0.75rem">
+      <button class="btn btn-primary" onclick="startRoll()" data-i18n="dice-roll-again">🎲 Roll Again</button>
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back-home">← Back to Home</button>
+    </div>
+  </div>
+
+  <!-- History Screen -->
+  <div class="screen" id="screen-history">
+    <h2 data-i18n="dice-history-title">📊 Roll History</h2>
+    <div id="dice-history-list" style="margin-top:1rem"></div>
+    <div style="margin-top:1.5rem">
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-inner">
+    <p class="copyright">© 2026 Psychic101</p>
+    <nav class="footer-nav">
+      <a href="privacy.html" data-i18n="legal-privacy-link">Privacy</a>
+      <a href="terms.html" data-i18n="legal-terms-link">Terms</a>
+      <a href="accessibility.html" data-i18n="legal-access-link">Accessibility</a>
+      <span class="footer-link" data-version></span>
+    </nav>
+    <p class="disclaimer" data-i18n="legal-disclaimer">For educational and entertainment purposes only.</p>
+  </div>
+</footer>
+
+<script src="utils.js" defer></script>
+<script>
+// ─── State ────────────────────────────────────────────────
+let currentGuess = 0;
+let currentRoll = 0;
+let sessionStreak = 0;
+let bestSessionStreak = 0;
+
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+const DICE_NUMBERS = [1,2,3,4,5,6];
+
+const DICE_TIPS = {
+  en: [
+    'Relax and let your intuition guide you. Don\'t force it — just feel.',
+    'The Princeton PEAR Lab found that relaxed states produce better PK results.',
+    'Try this at different times of day — your intuition may be stronger at certain hours.',
+    'Micro-PK (influencing small random events) is the most studied form of psychokinesis.',
+    'Focus on the feeling of the number, not the visual shape of it.',
+    'Some people find it easier to "push" the dice toward their number with their mind.',
+    'Consistency matters more than any single result. Track your long-term accuracy.',
+    'If you feel frustrated, take a break. Stress blocks intuitive signals.',
+  ],
+  he: [
+    'הירגע ותן לאינטואיציה שלך להוביל. אל תכריח — פשוט תרגיש.',
+    'מעבדת PEAR של פרינסטון גילתה שמצבים רגועים מייצרים תוצאות PK טובות יותר.',
+    'נסה בשעות שונות ביום — האינטואיציה שלך עשויה להיות חזקה יותר בשעות מסוימות.',
+    'מיקרו-PK (השפעה על אירועים אקראיים קטנים) היא הצורה הנחקרת ביותר של פסיכוקינטיקה.',
+    'התמקד בתחושה של המספר, לא בצורה הוויזואלית שלו.',
+    'חלק מהאנשים מוצאים קל יותר "לדחוף" את הקוביה לכיוון המספר שלהם עם המחשבה.',
+    'עקביות חשובה יותר מתוצאה בודדת. עקוב אחר הדיוק לאורך זמן.',
+    'אם אתה מרגיש מתוסכל, קח הפסקה. מתח חוסם אותות אינטואיטיביים.',
+  ]
+};
+
+let currentTipIndex = 0;
+
+function refreshTip() {
+  const tips = DICE_TIPS[currentLang] || DICE_TIPS.en;
+  currentTipIndex = (currentTipIndex + 1) % tips.length;
+  document.querySelector('.tip-text').textContent = tips[currentTipIndex];
+}
+
+// ─── Storage ──────────────────────────────────────────────
+function loadDiceHistory() { return loadData('dice_history') || []; }
+function saveDiceHistory(data) { saveData('dice_history', data); }
+
+// ─── Screens ──────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (id === 'welcome') renderStats();
+  if (id === 'history') renderHistory();
+}
+
+// ─── Roll Logic ───────────────────────────────────────────
+function startRoll() {
+  // Show number picker
+  const num = prompt(currentLang === 'he' ? 'חשוב על מספר בין 1 ל-6:' : 'Think of a number from 1 to 6:');
+  if (!num) return;
+  currentGuess = parseInt(num);
+  if (isNaN(currentGuess) || currentGuess < 1 || currentGuess > 6) {
+    alert(currentLang === 'he' ? 'אנא בחר מספר בין 1 ל-6' : 'Please pick a number from 1 to 6');
+    return;
+  }
+  showScreen('roll');
+  resetDiceDisplay();
+}
+
+function resetDiceDisplay() {
+  const el = document.getElementById('dice-display');
+  el.textContent = '🎲';
+  el.style.transform = 'rotate(0deg)';
+}
+
+function rollDice() {
+  const el = document.getElementById('dice-display');
+  let spins = 0;
+  const maxSpins = 15;
+  const interval = setInterval(() => {
+    const randomFace = DICE_FACES[Math.floor(Math.random() * 6)];
+    el.textContent = randomFace;
+    el.style.transform = 'rotate(' + (spins * 40) + 'deg) scale(' + (1 + Math.sin(spins) * 0.1) + ')';
+    spins++;
+    if (spins >= maxSpins) {
+      clearInterval(interval);
+      currentRoll = Math.floor(Math.random() * 6) + 1;
+      el.textContent = DICE_FACES[currentRoll - 1];
+      el.style.transform = 'rotate(0deg) scale(1)';
+      setTimeout(() => showResult(), 400);
+    }
+  }, 100);
+}
+
+function showResult() {
+  const isHit = currentGuess === currentRoll;
+
+  // Update session streak
+  if (isHit) {
+    sessionStreak++;
+    if (sessionStreak > bestSessionStreak) bestSessionStreak = sessionStreak;
+  } else {
+    sessionStreak = 0;
+  }
+
+  // Save to history
+  const history = loadDiceHistory();
+  history.unshift({
+    timestamp: Date.now(),
+    guess: currentGuess,
+    roll: currentRoll,
+    hit: isHit
+  });
+  saveDiceHistory(history);
+
+  // Update streak
+  updateStreak();
+
+  // Show result
+  document.getElementById('result-your-num').textContent = currentGuess;
+  document.getElementById('result-dice-num').textContent = currentRoll;
+  document.getElementById('result-dice').textContent = DICE_FACES[currentRoll - 1];
+
+  const msgEl = document.getElementById('result-message');
+  const headingEl = document.getElementById('result-heading');
+
+  if (isHit) {
+    spawnConfetti(30);
+    headingEl.textContent = t('dice-hit-title') || '🎯 Connection!';
+    msgEl.className = 'result-message result-hit';
+    msgEl.textContent = getHitMessage();
+  } else {
+    headingEl.textContent = t('dice-miss-title') || '🎲 No Match';
+    msgEl.className = 'result-message result-miss';
+    msgEl.textContent = getMissMessage();
+  }
+
+  showScreen('result');
+}
+
+// ─── Stats ────────────────────────────────────────────────
+function renderStats() {
+  const history = loadDiceHistory();
+  const total = history.length;
+  const hits = history.filter(h => h.hit).length;
+  const accuracy = total > 0 ? Math.round((hits / total) * 100) + '%' : '—';
+
+  document.getElementById('stat-rolls').textContent = total;
+  document.getElementById('stat-hits').textContent = hits;
+  document.getElementById('stat-accuracy').textContent = accuracy;
+  document.getElementById('stat-streak').textContent = bestSessionStreak;
+}
+
+// ─── History ──────────────────────────────────────────────
+function renderHistory() {
+  const history = loadDiceHistory();
+  const list = document.getElementById('dice-history-list');
+
+  if (!history.length) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-dim)">' + (t('no-data') || 'No data yet.') + '</p>';
+    return;
+  }
+
+  list.innerHTML = history.slice(0, 50).map(h => {
+    const date = new Date(h.timestamp).toLocaleDateString();
+    const icon = h.hit ? '🎯' : '🎲';
+    return `<div class="session-item">
+      <span>${icon}</span>
+      <span style="margin-left:0.5rem">Guessed ${h.guess} → Rolled ${h.roll}</span>
+      <span class="date">${date}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  renderVersion();
+  renderStats();
+  renderStreak('dice-streak-display');
+});
+</script>
+
+</body>
+</html>

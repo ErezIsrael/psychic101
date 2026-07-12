@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Mind Reader</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <h1 style="margin:0"><a class="home-link" href="index.html"><span data-i18n="hub-title">🔮 Psychic101</span></a></h1>
+    <div id="lang-selector"></div>
+  </div>
+</header>
+<main id="main-content">
+  <div class="screen active" id="screen-welcome">
+    <div class="hero">
+      <div class="welcome-icon">🧠</div>
+      <h2 data-i18n="mind-title">Mind Reader</h2>
+      <p data-i18n="mind-desc">A solo telepathy challenge. Think of a symbol, then try to read your own mind a moment later.</p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="mind-how-title">How It Works</h3>
+      <ol class="steps">
+        <li data-i18n="mind-step1">Pick a symbol and focus on it intensely</li>
+        <li data-i18n="mind-step2">The screen clears — send the image to your subconscious</li>
+        <li data-i18n="mind-step3">Try to "read" what symbol you chose</li>
+        <li data-i18n="mind-step4">See if your mind can transmit to itself</li>
+      </ol>
+    </div>
+    <div class="tip-banner" id="tip-banner">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" data-i18n="mind-tip1">Focus on the feeling of the symbol, not its name.</span>
+      <button class="tip-refresh" onclick="refreshTip()">↻</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="stat-rounds">0</div><div class="label" data-i18n="mind-total-rounds">Rounds</div></div>
+      <div class="stat-card"><div class="value" id="stat-hits">0</div><div class="label" data-i18n="mind-hits">Hits</div></div>
+      <div class="stat-card"><div class="value" id="stat-accuracy">—</div><div class="label" data-i18n="mind-accuracy">Accuracy</div></div>
+      <div class="stat-card"><div class="value" id="stat-streak">0</div><div class="label" data-i18n="mind-best-streak">Best Streak</div></div>
+    </div>
+    <div style="margin-top:1rem">
+      <button class="btn btn-primary" onclick="startRound()" data-i18n="mind-start-btn">🧠 Start Round</button>
+      <button class="btn btn-secondary" onclick="showScreen('history')" style="margin-top:0.5rem">📊 History</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-pick">
+    <div class="hero">
+      <h2 data-i18n="mind-pick-title">Choose a Symbol</h2>
+      <p data-i18n="mind-pick-desc">Tap one — then focus on it with all your mind.</p>
+    </div>
+    <div id="symbol-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0"></div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-focus">
+    <div style="text-align:center;margin:3rem 0">
+      <div id="focus-symbol" style="font-size:6rem;animation:pulse-glow 1.5s ease-in-out infinite"></div>
+      <p style="color:var(--text-dim);margin-top:1rem;font-size:1.1rem" data-i18n="mind-focus-text">Focus on this symbol...</p>
+      <p style="color:var(--text-dim);font-size:0.85rem;margin-top:0.5rem" data-i18n="mind-focus-sub">Send it deep into your mind</p>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <button class="btn btn-primary" onclick="showRead()" data-i18n="mind-ready-btn">I'm Ready to Read</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-read">
+    <div class="hero">
+      <h2 data-i18n="mind-read-title">What symbol do you sense?</h2>
+      <p data-i18n="mind-read-desc">Don't think — just tap what comes to mind.</p>
+    </div>
+    <div id="read-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0"></div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-result">
+    <div class="hero"><h2 id="result-heading">Result</h2></div>
+    <div style="text-align:center;margin:1.5rem 0">
+      <div style="display:flex;justify-content:center;gap:2rem;align-items:center;font-size:4rem">
+        <div><p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.5rem" data-i18n="mind-sent">Sent</p><div id="result-sent"></div></div>
+        <div>→</div>
+        <div><p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.5rem" data-i18n="mind-received">Received</p><div id="result-received"></div></div>
+      </div>
+      <div id="result-message" class="result-message" style="margin-top:1.5rem"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem">
+      <button class="btn btn-primary" onclick="startRound()" data-i18n="mind-next-btn">🧠 Next Round</button>
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back-home">← Home</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-history">
+    <h2>📊 History</h2>
+    <div id="mind-history-list" style="margin-top:1rem"></div>
+    <div style="margin-top:1.5rem"><button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button></div>
+  </div>
+</main>
+<footer>
+  <div class="footer-inner">
+    <p class="copyright">© 2026 Psychic101</p>
+    <nav class="footer-nav">
+      <a href="privacy.html" data-i18n="legal-privacy-link">Privacy</a>
+      <a href="terms.html" data-i18n="legal-terms-link">Terms</a>
+      <a href="accessibility.html" data-i18n="legal-access-link">Accessibility</a>
+      <span class="footer-link" data-version></span>
+    </nav>
+    <p class="disclaimer" data-i18n="legal-disclaimer">For educational and entertainment purposes only.</p>
+  </div>
+</footer>
+<script src="utils.js" defer></script>
+<script>
+const SYMBOLS = ['⭐','🌙','☀️','💎','🔥','💧','🌿','🦋','🌊'];
+let targetSymbol = '';
+let sessionStreak = 0;
+let bestStreak = 0;
+
+const MIND_TIPS = {
+  en: [
+    "Focus on the feeling of the symbol, not its name.",
+    "Imagine the symbol glowing in your mind's eye.",
+    "The more vivid your mental image, the easier it is to 'read' later.",
+    "This exercise trains your ability to send and receive mental signals.",
+    "Try breathing slowly while focusing — calm minds transmit better.",
+    "If you sense a different symbol, note it — that's your subconscious speaking.",
+    "Practice makes the signal stronger. Your accuracy should improve over time.",
+    "Some people find it helps to imagine sending the symbol through their third eye.",
+  ],
+  he: [
+    "התמקד בתחושה של הסמל, לא בשמו.",
+    "דמיין את הסמל מואר בעיני הרוח שלך.",
+    "ככל שהתמונה הנפשית שלך חדה יותר, קל יותר 'לקרוא' אותה אחר כך.",
+    "תרגול זה מאמן את היכולת לשלוח ולקבל אותות נפשיים.",
+    "נסה לנשום לאט בעודך מתמקד — מוח רגוע שולח טוב יותר.",
+    "אם אתה מרגיש סמל אחר, רשום אותו — זו תת-המודעות שלך מדברת.",
+    "תרגול מחזק את האות. הדיוק שלך צריך להשתפר עם הזמן.",
+    "חלק מהאנשים מוצאים שזה עוזר לדמיין שליחת הסמל דרך העין השלישית.",
+  ]
+};
+let currentTipIndex = 0;
+
+function refreshTip() {
+  const tips = MIND_TIPS[currentLang] || MIND_TIPS.en;
+  currentTipIndex = (currentTipIndex + 1) % tips.length;
+  document.querySelector('.tip-text').textContent = tips[currentTipIndex];
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (id === 'welcome') renderStats();
+  if (id === 'history') renderHistory();
+}
+
+function renderStats() {
+  const history = loadData('mind_history') || [];
+  const total = history.length;
+  const hits = history.filter(h => h.hit).length;
+  const accuracy = total > 0 ? Math.round((hits / total) * 100) + '%' : '—';
+  document.getElementById('stat-rounds').textContent = total;
+  document.getElementById('stat-hits').textContent = hits;
+  document.getElementById('stat-accuracy').textContent = accuracy;
+  document.getElementById('stat-streak').textContent = bestStreak;
+}
+
+function startRound() {
+  const grid = document.getElementById('symbol-grid');
+  grid.innerHTML = SYMBOLS.map(s =>
+    `<button onclick="pickSymbol('${s}')" style="font-size:3rem;background:var(--surface2);border:2px solid var(--surface2);border-radius:var(--radius);padding:1rem;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--surface2)'">${s}</button>`
+  ).join('');
+  showScreen('pick');
+}
+
+function pickSymbol(symbol) {
+  targetSymbol = symbol;
+  document.getElementById('focus-symbol').textContent = symbol;
+  showScreen('focus');
+}
+
+function showRead() {
+  const grid = document.getElementById('read-grid');
+  grid.innerHTML = SYMBOLS.map(s =>
+    `<button onclick="pickRead('${s}')" style="font-size:3rem;background:var(--surface2);border:2px solid var(--surface2);border-radius:var(--radius);padding:1rem;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--surface2)'">${s}</button>`
+  ).join('');
+  showScreen('read');
+}
+
+function pickRead(symbol) {
+  const isHit = symbol === targetSymbol;
+  if (isHit) { sessionStreak++; if (sessionStreak > bestStreak) bestStreak = sessionStreak; }
+  else { sessionStreak = 0; }
+
+  const history = loadData('mind_history') || [];
+  history.unshift({timestamp: Date.now(), sent: targetSymbol, received: symbol, hit: isHit});
+  saveData('mind_history', history);
+  updateStreak();
+
+  document.getElementById('result-sent').textContent = targetSymbol;
+  document.getElementById('result-received').textContent = symbol;
+
+  const msgEl = document.getElementById('result-message');
+  const headingEl = document.getElementById('result-heading');
+
+  if (isHit) {
+    spawnConfetti(30);
+    headingEl.textContent = t('mind-hit-title') || '🧠 Mind Connected!';
+    msgEl.className = 'result-message result-hit';
+    msgEl.textContent = getHitMessage();
+  } else {
+    headingEl.textContent = t('mind-miss-title') || '🧠 Signal Faded';
+    msgEl.className = 'result-message result-miss';
+    msgEl.textContent = getMissMessage();
+  }
+  showScreen('result');
+}
+
+function renderHistory() {
+  const history = loadData('mind_history') || [];
+  const list = document.getElementById('mind-history-list');
+  if (!history.length) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-dim)">' + (t('no-data') || 'No data yet.') + '</p>';
+    return;
+  }
+  list.innerHTML = history.slice(0, 30).map(h => {
+    const date = new Date(h.timestamp).toLocaleDateString();
+    const icon = h.hit ? '🧠' : '📡';
+    return `<div class="session-item"><span>${icon}</span><span style="margin-left:0.5rem">${h.sent} → ${h.received}</span><span class="date">${date}</span></div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  renderVersion();
+  renderStats();
+  renderStreak('mind-streak-display');
+});
+</script>
+</body>
+</html>

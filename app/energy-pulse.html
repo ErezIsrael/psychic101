@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Energy Pulse</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <h1 style="margin:0"><a class="home-link" href="index.html"><span data-i18n="hub-title">🔮 Psychic101</span></a></h1>
+    <div id="lang-selector"></div>
+  </div>
+</header>
+<main id="main-content">
+  <div class="screen active" id="screen-welcome">
+    <div class="hero">
+      <div class="welcome-icon">⚡</div>
+      <h2 data-i18n="pulse-title">Energy Pulse</h2>
+      <p data-i18n="pulse-desc">Can you sense the rhythm? A subtle energy pulses — try to feel when it peaks.</p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="pulse-how-title">How It Works</h3>
+      <ol class="steps">
+        <li data-i18n="pulse-step1">A visual pulse begins — close your eyes and sense it</li>
+        <li data-i18n="pulse-step2">When you feel the energy peak, tap the screen</li>
+        <li data-i18n="pulse-step3">See how close your sense was to the actual peak</li>
+        <li data-i18n="pulse-step4">Train your sensitivity to subtle energy shifts</li>
+      </ol>
+    </div>
+    <div class="tip-banner" id="tip-banner">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" data-i18n="pulse-tip1">Don't watch for the pulse — feel it in your body.</span>
+      <button class="tip-refresh" onclick="refreshTip()">↻</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="stat-rounds">0</div><div class="label" data-i18n="pulse-rounds">Rounds</div></div>
+      <div class="stat-card"><div class="value" id="stat-perfect">0</div><div class="label" data-i18n="pulse-perfect">Perfect</div></div>
+      <div class="stat-card"><div class="value" id="stat-avg">—</div><div class="label" data-i18n="pulse-avg-offset">Avg Offset</div></div>
+      <div class="stat-card"><div class="value" id="stat-level">1</div><div class="label" data-i18n="pulse-level">Level</div></div>
+    </div>
+    <div style="margin-top:1rem">
+      <button class="btn btn-primary" onclick="startPulse()" data-i18n="pulse-start-btn">⚡ Start Pulse</button>
+      <button class="btn btn-secondary" onclick="showScreen('history')" style="margin-top:0.5rem">📊 History</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-pulse">
+    <div style="text-align:center;margin:2rem 0">
+      <p style="color:var(--text-dim);margin-bottom:2rem" data-i18n="pulse-instruction">Close your eyes. Feel the pulse. Tap when it peaks.</p>
+      <div id="pulse-visual" style="width:150px;height:150px;border-radius:50%;margin:0 auto;position:relative">
+        <div id="pulse-ring" style="position:absolute;inset:0;border-radius:50%;border:3px solid var(--accent);opacity:0.3"></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <button class="btn btn-primary" onclick="tapPulse()" data-i18n="pulse-tap-btn" style="min-width:200px">⚡ I Feel It!</button>
+    </div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-result">
+    <div class="hero"><h2 id="result-heading">Result</h2></div>
+    <div style="text-align:center;margin:2rem 0">
+      <div id="result-timing" style="font-size:2rem;font-weight:700;color:var(--accent)"></div>
+      <p style="color:var(--text-dim);margin-top:0.5rem" data-i18n="pulse-offset">Offset from peak</p>
+      <div id="result-message" class="result-message" style="margin-top:1.5rem"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem">
+      <button class="btn btn-primary" onclick="startPulse()" data-i18n="pulse-next-btn">⚡ Next Pulse</button>
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back-home">← Home</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-history">
+    <h2>📊 History</h2>
+    <div id="pulse-history-list" style="margin-top:1rem"></div>
+    <div style="margin-top:1.5rem"><button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button></div>
+  </div>
+</main>
+<footer>
+  <div class="footer-inner">
+    <p class="copyright">© 2026 Psychic101</p>
+    <nav class="footer-nav">
+      <a href="privacy.html" data-i18n="legal-privacy-link">Privacy</a>
+      <a href="terms.html" data-i18n="legal-terms-link">Terms</a>
+      <a href="accessibility.html" data-i18n="legal-access-link">Accessibility</a>
+      <span class="footer-link" data-version></span>
+    </nav>
+    <p class="disclaimer" data-i18n="legal-disclaimer">For educational and entertainment purposes only.</p>
+  </div>
+</footer>
+<script src="utils.js" defer></script>
+<script>
+let peakTime = 0;
+let pulseStartTime = 0;
+let pulseAnimFrame = null;
+let pulsePhase = 0;
+
+const PULSE_TIPS = {
+  en: [
+    "Don't watch for the pulse — feel it in your body.",
+    "Energy sensitivity is a skill that develops with practice.",
+    "Some people feel energy in their hands, others in their chest.",
+    "The pulse is subtle — trust your first impression.",
+    "Try this after a grounding exercise for sharper sensitivity.",
+    "Your body may tingle, warm, or feel a 'push' at the peak.",
+    "Consistency matters more than any single result.",
+    "Some cultures call this 'chi sensing' or 'prana awareness'.",
+  ],
+  he: [
+    "אל תחכה לפולס — הרגש אותו בגוף שלך.",
+    "רגישות לאנרגיה היא מיומנות שמתפתחת עם תרגול.",
+    "חלק מהאנשים מרגשים אנרגיה בידיים, אחרים בחזה.",
+    "הפולס עדין — סמוך על הרושם הראשון שלך.",
+    "נסה אחרי תרגול עיגון לרגישות חדה יותר.",
+    "הגוף שלך עשוי לצרוב, להתחמם, או להרגיש 'דחיפה' בשיא.",
+    "עקביות חשובה יותר מתוצאה בודדת.",
+    "חלק מהתרבויות קוראות לזה 'תחושת צ'י' או 'מודעות פראנה'.",
+  ]
+};
+let currentTipIndex = 0;
+
+function refreshTip() {
+  const tips = PULSE_TIPS[currentLang] || PULSE_TIPS.en;
+  currentTipIndex = (currentTipIndex + 1) % tips.length;
+  document.querySelector('.tip-text').textContent = tips[currentTipIndex];
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (id === 'welcome') renderStats();
+  if (id === 'history') renderHistory();
+}
+
+function renderStats() {
+  const history = loadData('pulse_history') || [];
+  const total = history.length;
+  const perfect = history.filter(h => Math.abs(h.offset) < 0.3).length;
+  const avgOffset = total > 0 ? (history.reduce((a,h) => a + Math.abs(h.offset), 0) / total).toFixed(2) + 's' : '—';
+  const level = Math.floor(total / 5) + 1;
+
+  document.getElementById('stat-rounds').textContent = total;
+  document.getElementById('stat-perfect').textContent = perfect;
+  document.getElementById('stat-avg').textContent = avgOffset;
+  document.getElementById('stat-level').textContent = level;
+}
+
+function startPulse() {
+  showScreen('pulse');
+  pulseStartTime = Date.now();
+  pulsePhase = 0;
+
+  // Peak will happen between 3-8 seconds
+  peakTime = 3000 + Math.random() * 5000;
+
+  const ring = document.getElementById('pulse-ring');
+  ring.style.opacity = '0.3';
+  ring.style.transform = 'scale(0.5)';
+
+  function animatePulse() {
+    const elapsed = Date.now() - pulseStartTime;
+    const progress = elapsed / peakTime;
+    const intensity = Math.sin(progress * Math.PI);
+
+    ring.style.opacity = (0.3 + intensity * 0.7).toString();
+    ring.style.transform = 'scale(' + (0.5 + intensity * 0.5) + ')';
+    ring.style.boxShadow = '0 0 ' + (intensity * 30) + 'px var(--accent)';
+
+    if (elapsed < peakTime + 2000) {
+      pulseAnimFrame = requestAnimationFrame(animatePulse);
+    }
+  }
+  pulseAnimFrame = requestAnimationFrame(animatePulse);
+}
+
+function tapPulse() {
+  cancelAnimationFrame(pulseAnimFrame);
+  const tapTime = Date.now() - pulseStartTime;
+  const peakMs = peakTime;
+  const offsetMs = tapTime - peakMs;
+  const offsetSec = offsetMs / 1000;
+
+  const history = loadData('pulse_history') || [];
+  history.unshift({timestamp: Date.now(), offset: offsetSec, tapTime: tapTime / 1000});
+  saveData('pulse_history', history);
+  updateStreak();
+
+  const absOffset = Math.abs(offsetSec);
+  document.getElementById('result-timing').textContent = (offsetSec > 0 ? '+' : '') + offsetSec.toFixed(2) + 's';
+
+  const msgEl = document.getElementById('result-message');
+  const headingEl = document.getElementById('result-heading');
+
+  if (absOffset < 0.3) {
+    spawnConfetti(30);
+    headingEl.textContent = '⚡ Perfect Sensitivity!';
+    msgEl.className = 'result-message result-hit';
+    msgEl.textContent = getHitMessage();
+  } else if (absOffset < 1.0) {
+    headingEl.textContent = '👁️ Very Close!';
+    msgEl.className = 'result-message result-near';
+    msgEl.textContent = getNearMessage();
+  } else {
+    headingEl.textContent = '🌱 Keep Sensing';
+    msgEl.className = 'result-message result-miss';
+    msgEl.textContent = getMissMessage();
+  }
+  showScreen('result');
+}
+
+function renderHistory() {
+  const history = loadData('pulse_history') || [];
+  const list = document.getElementById('pulse-history-list');
+  if (!history.length) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-dim)">' + (t('no-data') || 'No data yet.') + '</p>';
+    return;
+  }
+  list.innerHTML = history.slice(0, 30).map(h => {
+    const date = new Date(h.timestamp).toLocaleDateString();
+    const abs = Math.abs(h.offset);
+    const icon = abs < 0.3 ? '⚡' : abs < 1.0 ? '👁️' : '🌱';
+    return `<div class="session-item"><span>${icon}</span><span style="margin-left:0.5rem">${h.offset > 0 ? '+' : ''}${h.offset.toFixed(2)}s</span><span class="date">${date}</span></div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  renderVersion();
+  renderStats();
+  renderStreak('pulse-streak-display');
+});
+</script>
+</body>
+</html>

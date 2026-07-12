@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Focus Orb</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <h1 style="margin:0"><a class="home-link" href="index.html"><span data-i18n="hub-title">🔮 Psychic101</span></a></h1>
+    <div id="lang-selector"></div>
+  </div>
+</header>
+<main id="main-content">
+  <div class="screen active" id="screen-welcome">
+    <div class="hero">
+      <div class="welcome-icon">🔮</div>
+      <h2 data-i18n="orb-title">Focus Orb</h2>
+      <p data-i18n="orb-desc">A concentration exercise. Keep your focus on the orb — how long can you maintain it?</p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="orb-how-title">How It Works</h3>
+      <ol class="steps">
+        <li data-i18n="orb-step1">Stare at the glowing orb without blinking</li>
+        <li data-i18n="orb-step2">The orb will drift — follow it with your eyes</li>
+        <li data-i18n="orb-step3">When you lose focus, tap to reset</li>
+        <li data-i18n="orb-step4">Beat your best focus time</li>
+      </ol>
+    </div>
+    <div class="tip-banner" id="tip-banner">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" data-i18n="orb-tip1">Sustained focus is the foundation of all psychic abilities.</span>
+      <button class="tip-refresh" onclick="refreshTip()">↻</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="stat-sessions">0</div><div class="label" data-i18n="orb-sessions">Sessions</div></div>
+      <div class="stat-card"><div class="value" id="stat-best">0s</div><div class="label" data-i18n="orb-best">Best Time</div></div>
+      <div class="stat-card"><div class="value" id="stat-avg">0s</div><div class="label" data-i18n="orb-avg">Average</div></div>
+      <div class="stat-card"><div class="value" id="stat-total">0s</div><div class="label" data-i18n="orb-total">Total Focus</div></div>
+    </div>
+    <div style="margin-top:1rem">
+      <button class="btn btn-primary" onclick="startFocus()" data-i18n="orb-start-btn">🔮 Begin Focus</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-focus">
+    <div style="text-align:center;margin:1rem 0">
+      <p style="color:var(--text-dim);margin-bottom:0.5rem" data-i18n="orb-focus-label">Focus Time</p>
+      <div id="focus-timer" class="timer" style="font-size:2.5rem">0.0s</div>
+    </div>
+    <div id="orb-area" style="width:100%;height:50vh;position:relative;overflow:hidden;border-radius:var(--radius);background:var(--surface2);cursor:pointer;margin:1rem 0" onclick="loseFocus()">
+      <div id="orb" style="position:absolute;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,var(--accent),transparent);filter:blur(2px);animation:orb-float 4s ease-in-out infinite;transition:left 2s ease,top 2s ease"></div>
+    </div>
+    <p style="text-align:center;color:var(--text-dim);font-size:0.85rem" data-i18n="orb-tap-lose">Tap if you lose focus</p>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="endFocus()" data-i18n="orb-end-btn">End Session</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-result">
+    <div class="hero">
+      <h2 id="result-heading">Session Complete</h2>
+    </div>
+    <div style="text-align:center;margin:2rem 0">
+      <div id="result-time" style="font-size:3rem;font-weight:700;color:var(--accent)">0.0s</div>
+      <p style="color:var(--text-dim);margin-top:0.5rem" data-i18n="orb-focus-duration">Focus Duration</p>
+      <div id="result-message" class="result-message" style="margin-top:1rem"></div>
+    </div>
+    <div id="orb-milestone" style="text-align:center;margin:1rem 0"></div>
+    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem">
+      <button class="btn btn-primary" onclick="startFocus()" data-i18n="orb-again-btn">🔮 Try Again</button>
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back-home">← Home</button>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="footer-inner">
+    <p class="copyright">© 2026 Psychic101</p>
+    <nav class="footer-nav">
+      <a href="privacy.html" data-i18n="legal-privacy-link">Privacy</a>
+      <a href="terms.html" data-i18n="legal-terms-link">Terms</a>
+      <a href="accessibility.html" data-i18n="legal-access-link">Accessibility</a>
+      <span class="footer-link" data-version></span>
+    </nav>
+    <p class="disclaimer" data-i18n="legal-disclaimer">For educational and entertainment purposes only.</p>
+  </div>
+</footer>
+<script src="utils.js" defer></script>
+<script>
+let focusStartTime = 0;
+let focusTimer = null;
+let orbInterval = null;
+let currentFocusTime = 0;
+
+const ORB_TIPS = {
+  en: [
+    "Sustained focus is the foundation of all psychic abilities.",
+    "Remote viewers use focused attention to maintain contact with targets.",
+    "The longer you can focus, the clearer your psychic signals become.",
+    "If your mind wanders, gently bring it back — that's the practice.",
+    "Try this exercise before other psychic training for best results.",
+    "Some people find that focusing on breath while watching the orb helps.",
+    "Aim for 30 seconds of pure focus — that's a great baseline.",
+    "The orb represents your attention. Keep it centered and steady.",
+  ],
+  he: [
+    "ריכוז מתמשך הוא הבסיס לכל היכולות הפסיכיות.",
+    "צופים מרחוקים משתמשים בריכוז כדי לשמור על קשר עם המטרות.",
+    "ככל שתתמקד יותר, האותות הפסיכיים שלך יהיו ברורים יותר.",
+    "אם המחשבות שלך מתפנות, החזר אותן בעדינות — זה התרגול.",
+    "נסה תרגול זה לפני אימון פסיכי אחר לתוצאות הטובות ביותר.",
+    "חלק מהאנשים מוצאים שריכוז על הנשימה בעודך צופה בכדור עוזר.",
+    "שאף ל-30 שניות של ריכוז טהור — זו נקודת פתיחה מצוינת.",
+    "הכדור מייצג את תשומת הלב שלך. שמור אותו ממוקד ויציב.",
+  ]
+};
+let currentTipIndex = 0;
+
+function refreshTip() {
+  const tips = ORB_TIPS[currentLang] || ORB_TIPS.en;
+  currentTipIndex = (currentTipIndex + 1) % tips.length;
+  document.querySelector('.tip-text').textContent = tips[currentTipIndex];
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (id === 'welcome') renderStats();
+}
+
+function renderStats() {
+  const history = loadData('orb_history') || [];
+  const total = history.length;
+  const times = history.map(h => h.time);
+  const best = times.length ? Math.max(...times) : 0;
+  const avg = times.length ? (times.reduce((a,b) => a+b, 0) / times.length) : 0;
+  const totalSec = times.reduce((a,b) => a+b, 0);
+
+  document.getElementById('stat-sessions').textContent = total;
+  document.getElementById('stat-best').textContent = formatTime(best);
+  document.getElementById('stat-avg').textContent = formatTime(avg);
+  document.getElementById('stat-total').textContent = formatTime(totalSec);
+}
+
+function formatTime(sec) {
+  if (sec >= 60) return Math.floor(sec/60) + 'm ' + Math.round(sec%60) + 's';
+  return sec.toFixed(1) + 's';
+}
+
+function startFocus() {
+  showScreen('focus');
+  focusStartTime = Date.now();
+  currentFocusTime = 0;
+  document.getElementById('focus-timer').textContent = '0.0s';
+
+  // Position orb randomly
+  moveOrb();
+
+  focusTimer = setInterval(() => {
+    currentFocusTime = (Date.now() - focusStartTime) / 1000;
+    document.getElementById('focus-timer').textContent = currentFocusTime.toFixed(1) + 's';
+  }, 100);
+
+  // Move orb periodically
+  orbInterval = setInterval(moveOrb, 3000);
+}
+
+function moveOrb() {
+  const orb = document.getElementById('orb');
+  const area = document.getElementById('orb-area');
+  const maxX = area.clientWidth - 80;
+  const maxY = area.clientHeight - 80;
+  orb.style.left = Math.random() * maxX + 'px';
+  orb.style.top = Math.random() * maxY + 'px';
+}
+
+function loseFocus() {
+  endFocus();
+}
+
+function endFocus() {
+  clearInterval(focusTimer);
+  clearInterval(orbInterval);
+
+  const history = loadData('orb_history') || [];
+  history.unshift({timestamp: Date.now(), time: currentFocusTime});
+  saveData('orb_history', history);
+  updateStreak();
+
+  document.getElementById('result-time').textContent = formatTime(currentFocusTime);
+
+  const msgEl = document.getElementById('result-message');
+  const headingEl = document.getElementById('result-heading');
+  const milestoneEl = document.getElementById('orb-milestone');
+  milestoneEl.innerHTML = '';
+
+  if (currentFocusTime >= 30) {
+    spawnConfetti(25);
+    headingEl.textContent = '🔮 Excellent Focus!';
+    msgEl.className = 'result-message result-hit';
+    msgEl.textContent = getHitMessage();
+    if (currentFocusTime >= 60) {
+      milestoneEl.innerHTML = '<div class="tag tag-green">⭐ 60s Master</div>';
+    } else {
+      milestoneEl.innerHTML = '<div class="tag tag-green">🔮 30s Focused</div>';
+    }
+  } else if (currentFocusTime >= 15) {
+    headingEl.textContent = '👁️ Good Focus';
+    msgEl.className = 'result-message result-near';
+    msgEl.textContent = getNearMessage();
+    milestoneEl.innerHTML = '<div class="tag tag-yellow">👁️ 15s Aware</div>';
+  } else {
+    headingEl.textContent = '🌱 Keep Practicing';
+    msgEl.className = 'result-message result-miss';
+    msgEl.textContent = getMissMessage();
+  }
+
+  showScreen('result');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  renderVersion();
+  renderStats();
+  renderStreak('orb-streak-display');
+});
+</script>
+</body>
+</html>

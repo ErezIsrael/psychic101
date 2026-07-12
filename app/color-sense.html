@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Psychic101 — Color Sense</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<header>
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
+    <h1 style="margin:0"><a class="home-link" href="index.html"><span data-i18n="hub-title">🔮 Psychic101</span></a></h1>
+    <div id="lang-selector"></div>
+  </div>
+</header>
+<main id="main-content">
+  <div class="screen active" id="screen-welcome">
+    <div class="hero">
+      <div class="welcome-icon">🎨</div>
+      <h2 data-i18n="color-title">Color Sense</h2>
+      <p data-i18n="color-desc">A color flashes briefly — can your inner eye see it?</p>
+    </div>
+    <div class="card">
+      <h3 data-i18n="color-how-title">How It Works</h3>
+      <ol class="steps">
+        <li data-i18n="color-step1">A color fills the screen briefly</li>
+        <li data-i18n="color-step2">It disappears — close your eyes and sense it</li>
+        <li data-i18n="color-step3">Pick the color you sensed from the palette</li>
+        <li data-i18n="color-step4">Track your clairvoyance accuracy</li>
+      </ol>
+    </div>
+    <div class="tip-banner" id="tip-banner">
+      <span class="tip-icon">💡</span>
+      <span class="tip-text" data-i18n="color-tip1">Don't try to remember — try to sense it from within.</span>
+      <button class="tip-refresh" onclick="refreshTip()">↻</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="value" id="stat-rounds">0</div><div class="label" data-i18n="color-total-rounds">Rounds</div></div>
+      <div class="stat-card"><div class="value" id="stat-hits">0</div><div class="label" data-i18n="color-hits">Hits</div></div>
+      <div class="stat-card"><div class="value" id="stat-accuracy">—</div><div class="label" data-i18n="color-accuracy">Accuracy</div></div>
+      <div class="stat-card"><div class="value" id="stat-level">1</div><div class="label" data-i18n="color-level">Level</div></div>
+    </div>
+    <div style="margin-top:1rem">
+      <button class="btn btn-primary" onclick="startRound()" data-i18n="color-start-btn">🎨 Start</button>
+      <button class="btn btn-secondary" onclick="showScreen('history')" style="margin-top:0.5rem" data-i18n="dice-history-title">📊 History</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-flash">
+    <div id="color-flash-area" style="width:100%;height:60vh;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;transition:background 0.3s">
+      <p style="color:var(--text-dim);font-size:1.2rem" data-i18n="color-waiting">Getting ready...</p>
+    </div>
+    <div style="text-align:center;margin-top:1.5rem">
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-guess">
+    <div class="hero">
+      <h2 data-i18n="color-guess-title">What color did you sense?</h2>
+      <p data-i18n="color-guess-desc">Close your eyes, sense it, then tap your answer.</p>
+    </div>
+    <div id="color-palette" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:1.5rem 0"></div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-secondary btn-sm" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-result">
+    <div class="hero"><h2 id="result-heading">Result</h2></div>
+    <div style="text-align:center;margin:1.5rem 0">
+      <div style="display:flex;justify-content:center;gap:2rem;align-items:center">
+        <div><p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.5rem" data-i18n="color-actual">Actual</p><div id="result-actual" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--surface2)"></div></div>
+        <div style="font-size:2rem">→</div>
+        <div><p style="font-size:0.8rem;color:var(--text-dim);margin-bottom:0.5rem" data-i18n="color-sensed">You Sensed</p><div id="result-sensed" style="width:80px;height:80px;border-radius:50%;border:3px solid var(--surface2)"></div></div>
+      </div>
+      <div id="result-message" class="result-message" style="margin-top:1.5rem"></div>
+    </div>
+    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem">
+      <button class="btn btn-primary" onclick="startRound()" data-i18n="color-next-btn">🎨 Next Round</button>
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back-home">← Home</button>
+    </div>
+  </div>
+  <div class="screen" id="screen-history">
+    <h2 data-i18n="dice-history-title">📊 History</h2>
+    <div id="color-history-list" style="margin-top:1rem"></div>
+    <div style="margin-top:1.5rem"><button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button></div>
+  </div>
+</main>
+<footer>
+  <div class="footer-inner">
+    <p class="copyright">© 2026 Psychic101</p>
+    <nav class="footer-nav">
+      <a href="privacy.html" data-i18n="legal-privacy-link">Privacy</a>
+      <a href="terms.html" data-i18n="legal-terms-link">Terms</a>
+      <a href="accessibility.html" data-i18n="legal-access-link">Accessibility</a>
+      <span class="footer-link" data-version></span>
+    </nav>
+    <p class="disclaimer" data-i18n="legal-disclaimer">For educational and entertainment purposes only.</p>
+  </div>
+</footer>
+<script src="utils.js" defer></script>
+<script>
+const COLORS = [
+  {name:'Crimson',hex:'#DC143C'},{name:'Ocean',hex:'#1E90FF'},{name:'Emerald',hex:'#50C878'},
+  {name:'Amethyst',hex:'#9966CC'},{name:'Sunset',hex:'#FF6347'},{name:'Teal',hex:'#008080'},
+  {name:'Gold',hex:'#FFD700'},{name:'Rose',hex:'#FF007F'},{name:'Sage',hex:'#9DC183'},
+  {name:'Indigo',hex:'#4B0082'},{name:'Coral',hex:'#FF7F50'},{name:'Mint',hex:'#98FF98'}
+];
+let targetColor = null;
+let colorHistory = [];
+
+const COLOR_TIPS = {
+  en: [
+    "Don't try to remember — try to sense it from within.",
+    "Colors carry emotional energy. Notice how the color feels, not just how it looks.",
+    "In synesthesia, colors are associated with numbers and letters. Your brain may already be wired for this.",
+    "Some remote viewers report seeing colors around objects before their shapes.",
+    "Practice in a dim room for best results — less visual noise means clearer signals.",
+    "If you sense a color that isn't in the palette, trust it — your inner eye may be more precise than the options.",
+    "The longer you practice, the more vivid your color impressions become.",
+    "Some people see complementary colors — if you sensed blue but the answer was orange, that's still a connection.",
+  ],
+  he: [
+    "אל תנסה לזכור — נסה להרגיש את זה מבפנים.",
+    "צבעים נושאים אנרגיה רגשית. שים לב איך הצבע מרגיש, לא רק איך הוא נראה.",
+    "בסינסתזיה, צבעים קשורים למספרים ואותיות. המוח שלך אולי כבר מחוטב לכך.",
+    "חלק מהצופים המרחוקים מדווחים על ראיית צבעים סביב חפצים לפני הצורות שלהם.",
+    "תרגל בחדר חשוך לתוצאות הטובות ביותר.",
+    "אם אתה מרגיש צבע שלא נמצא בפלטת הצבעים, סמוך על עצמך.",
+    "ככל שתתרגל יותר, הרושמים שלך יהיו חדים יותר.",
+    "חלק מהאנשים רואים צבעים משלימים — זו עדיין חיבור.",
+  ]
+};
+let currentTipIndex = 0;
+
+function refreshTip() {
+  const tips = COLOR_TIPS[currentLang] || COLOR_TIPS.en;
+  currentTipIndex = (currentTipIndex + 1) % tips.length;
+  document.querySelector('.tip-text').textContent = tips[currentTipIndex];
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (id === 'welcome') renderStats();
+  if (id === 'history') renderHistory();
+}
+
+function renderStats() {
+  const history = loadData('color_history') || [];
+  const total = history.length;
+  const hits = history.filter(h => h.hit).length;
+  const accuracy = total > 0 ? Math.round((hits / total) * 100) + '%' : '—';
+  const level = Math.floor(total / 10) + 1;
+  document.getElementById('stat-rounds').textContent = total;
+  document.getElementById('stat-hits').textContent = hits;
+  document.getElementById('stat-accuracy').textContent = accuracy;
+  document.getElementById('stat-level').textContent = level;
+}
+
+function startRound() {
+  targetColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+  showScreen('flash');
+  const area = document.getElementById('color-flash-area');
+  area.style.background = 'var(--surface2)';
+  area.innerHTML = '<p style="color:var(--text-dim);font-size:1.2rem">...</p>';
+
+  setTimeout(() => {
+    area.style.background = targetColor.hex;
+    area.innerHTML = '';
+  }, 500);
+
+  const flashDuration = Math.max(400, 1200 - (Math.floor(((loadData('color_history')||[]).length / 10)) * 100));
+  setTimeout(() => {
+    area.style.background = 'var(--surface2)';
+    area.innerHTML = '<p style="color:var(--text-dim);font-size:1.2rem">👁️</p>';
+    setTimeout(() => showGuess(), 800);
+  }, flashDuration);
+}
+
+function showGuess() {
+  const palette = document.getElementById('color-palette');
+  const options = [targetColor];
+  while (options.length < 6) {
+    const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+    if (!options.includes(c)) options.push(c);
+  }
+  // Shuffle
+  for (let i = options.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [options[i], options[j]] = [options[j], options[i]];
+  }
+  palette.innerHTML = options.map(c =>
+    `<button onclick="pickColor('${c.hex}')" style="width:100%;height:80px;border-radius:var(--radius);background:${c.hex};border:3px solid var(--surface2);cursor:pointer;transition:transform 0.2s" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'"></button>`
+  ).join('');
+  showScreen('guess');
+}
+
+function pickColor(hex) {
+  const isHit = hex === targetColor.hex;
+  const history = loadData('color_history') || [];
+  history.unshift({timestamp: Date.now(), actual: targetColor.name, guessed: COLORS.find(c=>c.hex===hex)?.name||'Unknown', hit: isHit});
+  saveData('color_history', history);
+  updateStreak();
+
+  document.getElementById('result-actual').style.background = targetColor.hex;
+  document.getElementById('result-sensed').style.background = hex;
+
+  const msgEl = document.getElementById('result-message');
+  const headingEl = document.getElementById('result-heading');
+
+  if (isHit) {
+    spawnConfetti(30);
+    headingEl.textContent = t('color-hit-title') || '🎯 Perfect Vision!';
+    msgEl.className = 'result-message result-hit';
+    msgEl.textContent = getHitMessage();
+  } else {
+    headingEl.textContent = t('color-miss-title') || '🎨 Close, Keep Going!';
+    msgEl.className = 'result-message result-miss';
+    msgEl.textContent = getMissMessage();
+  }
+  showScreen('result');
+}
+
+function renderHistory() {
+  const history = loadData('color_history') || [];
+  const list = document.getElementById('color-history-list');
+  if (!history.length) {
+    list.innerHTML = '<p style="text-align:center;color:var(--text-dim)">' + (t('no-data') || 'No data yet.') + '</p>';
+    return;
+  }
+  list.innerHTML = history.slice(0, 30).map(h => {
+    const date = new Date(h.timestamp).toLocaleDateString();
+    const icon = h.hit ? '🎯' : '🎨';
+    return `<div class="session-item"><span>${icon}</span><span style="margin-left:0.5rem">${h.actual} → ${h.guessed}</span><span class="date">${date}</span></div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+  applyTranslations();
+  renderVersion();
+  renderStats();
+  renderStreak('color-streak-display');
+});
+</script>
+</body>
+</html>
