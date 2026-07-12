@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
