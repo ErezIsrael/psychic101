@@ -1,5 +1,8 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
+// ─── Version (update here on each release) ────────────────
+const APP_VERSION = '1.2.0';
+
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
 let _storageType = null; // 'local' | 'session' | 'cookie'
@@ -692,6 +695,7 @@ const TRANSLATIONS = {
     'legal-disclaimer': 'Psychic101 is provided for educational and entertainment purposes only. No medical, scientific, or psychological claims are made.',
     'legal-bug-link': '🐛 Report a Bug',
     'legal-game-link': '🚀 Hidden Game',
+    'version-tag': 'v{v}',
     'legal-privacy-link': 'Privacy Policy',
     'legal-terms-link': 'Terms of Service',
     'legal-access-link': 'Accessibility',
@@ -1344,6 +1348,7 @@ const TRANSLATIONS = {
     'legal-disclaimer': 'Psychic101 מסופק למטרות חינוכיות ובידור בלבד. לא נעשות טענות רפואיות, מדעיות או פסיכולוגיות.',
     'legal-bug-link': '🐛 דווח על באג',
     'legal-game-link': '🚀 משחק',
+    'version-tag': 'v{v}',
     'legal-privacy-link': 'מדיניות פרטיות',
     'legal-terms-link': 'תנאי שירות',
     'legal-access-link': 'נגישות',
@@ -1393,8 +1398,15 @@ function setLang(lang) {
   const ls = document.getElementById('lang-selector');
   if (ls) ls.innerHTML = langSelectorHTML();
   applyTranslations();
+  renderVersion();
 }
 
+// ─── Version Tag ──────────────────────────────────────────
+function renderVersion() {
+  document.querySelectorAll('[data-version]').forEach(el => {
+    el.textContent = t('version-tag', { v: APP_VERSION });
+  });
+}
 // ─── Tips Database ────────────────────────────────────────
 const TIPS = {
   rv: {

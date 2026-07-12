@@ -892,6 +892,12 @@ footer {
   line-height: 1.5;
 }
 
+.footer-link {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
 /* ── Validation Highlight ─────────────────────────────── */
 .input-error {
   border-color: #e74c3c !important;

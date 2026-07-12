@@ -48,6 +48,7 @@ function renderActivity() {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('lang-selector').innerHTML = langSelectorHTML();
   applyTranslations();
+  renderVersion();
   renderActivity();
   // Append ?lang=XX to all app links so language persists across pages
   document.querySelectorAll('.app-card').forEach(a => {
