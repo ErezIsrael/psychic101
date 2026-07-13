@@ -74,6 +74,25 @@
   .mini-stat { background: var(--surface2); border-radius: 8px; padding: 0.75rem; text-align: center; }
   .mini-stat .val { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
   .mini-stat .lbl { font-size: 0.7rem; color: var(--text-dim); }
+
+  .emoji-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  .emoji-btn {
+    font-size: 2rem;
+    padding: 0.75rem;
+    background: var(--surface2);
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .emoji-btn:hover { border-color: var(--accent); transform: scale(1.1); }
+  .emoji-btn.emoji-selected { border-color: var(--accent); background: rgba(123,104,238,0.15); }
 </style>
 </head>
 <body>
@@ -111,6 +130,16 @@
     </div>
 
     <h2 class="section-title" data-i18n="partner-choose-role">Choose Your Role</h2>
+
+    <div style="text-align:center;margin-bottom:1rem">
+      <label style="display:inline-flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.9rem">
+        <input type="checkbox" id="emoji-mode-toggle" onchange="toggleEmojiMode()">
+        <span data-i18n="partner-emoji-mode">🎭 Emoji Mode (pick from 8 emojis)</span>
+      </label>
+    </div>
+
+    <div id="emoji-target-grid" class="emoji-grid hidden" style="margin-bottom:1rem"></div>
+
     <div class="role-card" onclick="startAsHolder()">
       <div class="role-icon">🎯</div>
       <div class="role-title" data-i18n="role-holder">Holder</div>
@@ -335,6 +364,30 @@ let viewerImpressions = '';
 let viewerSensory = '';
 let viewerEmotions = '';
 let compRating = 0;
+let emojiMode = false;
+let emojiTarget = '';
+const EMOJI_TARGETS = ['🌍', '🏔️', '🌊', '🌸', '🦁', '🏠', '🚀', '🎸'];
+let selectedEmoji = '';
+
+function toggleEmojiMode() {
+  emojiMode = document.getElementById('emoji-mode-toggle').checked;
+  const grid = document.getElementById('emoji-target-grid');
+  if (emojiMode) {
+    grid.classList.remove('hidden');
+    grid.innerHTML = EMOJI_TARGETS.map(e =>
+      `<button class="emoji-btn" onclick="selectEmojiTarget('${e}')">${e}</button>`
+    ).join('');
+  } else {
+    grid.classList.add('hidden');
+    selectedEmoji = '';
+  }
+}
+
+function selectEmojiTarget(emoji) {
+  selectedEmoji = emoji;
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('emoji-selected'));
+  document.querySelector(`.emoji-btn[onclick*="${emoji}"]`).classList.add('emoji-selected');
+}
 
 function loadHistory() { return loadData('partner_history') || []; }
 function saveHistory(data) { saveData('partner_history', data); }
@@ -343,9 +396,15 @@ function saveHistory(data) { saveData('partner_history', data); }
 function startAsHolder() { showScreen('holder-target'); }
 
 function generateSessionCode() {
-  holderTarget = document.getElementById('holder-target-name').value.trim();
-  holderDetails = document.getElementById('holder-target-details').value.trim();
-  if (!holderTarget) { highlightField('holder-target-name'); return; }
+  if (emojiMode) {
+    if (!selectedEmoji) { alert(t('partner-select-emoji') || 'Please select an emoji target'); return; }
+    holderTarget = selectedEmoji;
+    holderDetails = 'Emoji mode target';
+  } else {
+    holderTarget = document.getElementById('holder-target-name').value.trim();
+    holderDetails = document.getElementById('holder-target-details').value.trim();
+    if (!holderTarget) { highlightField('holder-target-name'); return; }
+  }
   sessionCode = generateCode();
   document.getElementById('share-code-display').textContent = sessionCode;
   showScreen('holder-share');
@@ -406,6 +465,7 @@ function updateMatchBadge() {
     badge.textContent = getHitMessage();
     badge.className = 'match-badge match-high';
     spawnConfetti(30);
+    playSound('hit');
   } else if (compRating === 3) {
     badge.textContent = getNearMessage();
     badge.className = 'match-badge match-med';

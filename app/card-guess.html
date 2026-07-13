@@ -444,6 +444,7 @@ function revealCard() {
     badge.className = 'result-badge result-exact';
     badge.textContent = getHitMessage();
     spawnConfetti(35);
+    playSound('hit');
   } else if (result === 'same-suit') {
     badge.className = 'result-badge result-suit';
     badge.textContent = getNearMessage();
@@ -453,6 +454,7 @@ function revealCard() {
   } else {
     badge.className = 'result-badge result-miss';
     badge.textContent = getMissMessage();
+    playSound('miss');
   }
 
   // Live stats

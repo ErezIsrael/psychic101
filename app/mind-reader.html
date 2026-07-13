@@ -207,6 +207,7 @@ function pickRead(symbol) {
 
   if (isHit) {
     spawnConfetti(30);
+    playSound('hit');
     headingEl.textContent = t('mind-hit-title') || '🧠 Mind Connected!';
     msgEl.className = 'result-message result-hit';
     msgEl.textContent = getHitMessage();
@@ -214,6 +215,7 @@ function pickRead(symbol) {
     headingEl.textContent = t('mind-miss-title') || '🧠 Signal Faded';
     msgEl.className = 'result-message result-miss';
     msgEl.textContent = getMissMessage();
+    playSound('miss');
   }
   showScreen('result');
 }

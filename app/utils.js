@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.5.0';
+const APP_VERSION = '1.6.0';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
@@ -187,6 +187,8 @@ const TRANSLATIONS = {
     'rv-tip3': 'Record everything — even if it seems silly',
     'rv-tip4': 'Don\'t force or guess — let impressions come naturally',
     'rv-tip5': 'Watch for AOL (analytical overlays) — label them and move on',
+    'rv-walk-back': '← Back',
+    'rv-walk-next': 'Next →',
     'step1-ideogram': 'Step 1 — Ideogram',
     'ideogram-desc': 'Iterate the target code silently. Let your hand move freely on the canvas below. The resulting mark is your <strong>ideogram</strong> — the gestalt of the target.',
     'ideogram-category': 'Ideogram Category',
@@ -360,6 +362,8 @@ const TRANSLATIONS = {
     'pulse-title': 'Energy Pulse',
     'pulse-desc': 'Can you sense the rhythm? A subtle energy pulses — try to feel when it peaks.',
     'pulse-desc-hub': 'Can you sense the rhythm? Feel when the energy peaks.',
+    'catcher-desc-hub': 'Capture your dreams with tags, voice input, and mood tracking.',
+    'tele-desc-hub': 'Two players, same room. Can you sense your partner\'s emoji?',
     'pulse-how-title': 'How It Works',
     'pulse-step1': 'A visual pulse begins — close your eyes and sense it',
     'pulse-step2': 'When you feel the energy peak, tap the screen',
@@ -637,6 +641,8 @@ const TRANSLATIONS = {
     'partner-step3': 'Viewer enters code and records impressions',
     'partner-step4': 'Compare results and rate accuracy',
     'partner-choose-role': 'Choose Your Role',
+    'partner-emoji-mode': '🎭 Emoji Mode (pick from 8 emojis)',
+    'partner-select-emoji': 'Please select an emoji target',
     'role-holder': '🎯 Holder',
     'role-holder-desc': 'You set the target and compare results',
     'role-viewer': '👁 Viewer',
@@ -836,6 +842,40 @@ const TRANSLATIONS = {
     'onboard-step4': 'Earn badges and XP as you explore',
     'onboard-start': 'Let\'s Begin!',
     'weekly-report-title': '📊 Weekly Report',
+    // Phase 4 — New Apps
+    'catcher-title': '🌙 Dream Catcher',
+    'catcher-greeting': 'Did you dream last night?',
+    'catcher-desc': 'Capture your dreams while they\'re fresh. Tag them, describe them, and look for patterns over time.',
+    'catcher-log': '🌟 Quick Dream Log',
+    'catcher-tags': 'What was your dream about?',
+    'catcher-note-placeholder': 'Describe your dream... (optional)',
+    'catcher-voice': 'Tap to speak your dream',
+    'catcher-mood': 'How did it feel?',
+    'catcher-save': '💫 Save Dream',
+    'tele-title': '📡 Telepathy Game',
+    'tele-rounds': 'Rounds',
+    'tele-connections': 'Connections',
+    'tele-rate': 'Rate',
+    'tele-sender': '🧠 Player A — Sender',
+    'tele-sender-instr': 'Pick an emoji and focus on it. Don\'t let Player B see!',
+    'tele-sender-done': 'I\'m Focused — Pass to Player B',
+    'tele-receiver': '👁 Player B — Receiver',
+    'tele-receiver-instr': 'Sense which emoji Player A is thinking of...',
+    'tele-hit': 'You both sensed the same emoji!',
+    'tele-miss': 'Not this time...',
+    'tele-miss-msg': 'Keep trying — the connection grows with practice!',
+    'tele-next': 'Next Round →',
+    'tele-reset': 'Reset Score',
+    // Phase 4 — Shareable Results
+    'share-title': '📋 Share Your Results',
+    'share-copy': 'Copy to Clipboard',
+    'share-copied': '✅ Copied!',
+    // Phase 4 — Sound Effects
+    'sound-toggle': '🔊 Sound Effects',
+    // Phase 4 — Visual Enhancements
+    'visual-card-flip': 'Card Flip',
+    'visual-progress': 'Progress',
+    'visual-streak-flame': '🔥 Streak',
   },
   he: {
     // Shared UI
@@ -977,6 +1017,8 @@ const TRANSLATIONS = {
     'rv-tip3': 'רשום הכל — גם אם זה נראה טיפש',
     'rv-tip4': 'אל תכריח או תנחש — תן לרושמים לבוא באופן טבעי',
     'rv-tip5': 'שים לב ל-AOL (כיסויים אנליטיים) — תגוב אותם והמשך',
+    'rv-walk-back': '← אחורה',
+    'rv-walk-next': 'הבא →',
     'step1-ideogram': 'שלב 1 — איידיוגרמה',
     'ideogram-desc': 'חזור על קוד היעד בשקט. תן לידיך לזוז בחופשיות על הקנבס למטה. הסימן המתקבל הוא <strong>האיידיוגרמה</strong> שלך — הגסטלט של היעד.',
     'ideogram-category': 'קטגוריית איידיוגרמה',
@@ -1150,6 +1192,8 @@ const TRANSLATIONS = {
     'pulse-title': 'פולס אנרגיה',
     'pulse-desc': 'האם אתה יכול להרגיש את הקצב? אנרגיה עדינה פועמת — נסה להרגיש מתי היא מגיעה לשיא.',
     'pulse-desc-hub': 'האם אתה יכול להרגיש את הקצב? הרגש מתי האנרגיה מגיעה לשיא.',
+    'catcher-desc-hub': 'תפוס חלומות עם תגים, קלט קולי, ומעקב מצב רוח.',
+    'tele-desc-hub': 'שני שחקנים, אותו חדר. האם אתה יכול לתסס את האימוג\'י של בן הזוג?',
     'pulse-how-title': 'איך זה עובד',
     'pulse-step1': 'פולס ויזואלי מתחיל — סגור עיניים והרגש',
     'pulse-step2': 'כשאתה מרגיש את שיא האנרגיה, גע במסך',
@@ -1427,6 +1471,8 @@ const TRANSLATIONS = {
     'partner-step3': 'הצופה מזין קוד ורשם רושמים',
     'partner-step4': 'השווה תוצאות ודרג דיוק',
     'partner-choose-role': 'בחר תפקיד',
+    'partner-emoji-mode': '🎭 מצב אימוג׳י (בחר מ-8 אימוג׳י)',
+    'partner-select-emoji': 'אנא בחר מטרת אימוג׳י',
     'role-holder': '🎯 מחזיק',
     'role-holder-desc': 'אתה מגדיר את היעד ומשווה תוצאות',
     'role-viewer': '👁 צופה',
@@ -1626,6 +1672,40 @@ const TRANSLATIONS = {
     'onboard-step4': 'זכה בתגים ו-XP כשאתה חוקר',
     'onboard-start': 'בוא נתחיל!',
     'weekly-report-title': '📊 דוח שבועי',
+    // Phase 4 — New Apps
+    'catcher-title': '🌙 תופס חלומות',
+    'catcher-greeting': 'האם חלמת הלילה?',
+    'catcher-desc': 'תפוס את החלומות שלך כשהם טריים. תג, תאר, וחפש דפוסים לאורך זמן.',
+    'catcher-log': '🌟 רישום חלום מהיר',
+    'catcher-tags': 'על מה היה החלום?',
+    'catcher-note-placeholder': 'תאר את החלום... (אופציונלי)',
+    'catcher-voice': 'לחץ לדבר על החלום שלך',
+    'catcher-mood': 'איך זה הרגיש?',
+    'catcher-save': '💫 שמור חלום',
+    'tele-title': '📡 משחק טלפאתיה',
+    'tele-rounds': 'סיבובים',
+    'tele-connections': 'חיבורים',
+    'tele-rate': 'שיעור',
+    'tele-sender': '🧠 שחקן א — שולח',
+    'tele-sender-instr': 'בחר אימוג'י והתמקד בו. אל תתן לשחקן ב לראות!',
+    'tele-sender-done': 'התמקדתי — העבר לשחקן ב',
+    'tele-receiver': '👁 שחקן ב — מקבל',
+    'tele-receiver-instr': 'תסס איזה אימוג'י שחקן א חושב עליו...',
+    'tele-hit': 'שניכם תססתם את אותו אימוג\'י!',
+    'tele-miss': 'לא הפעם...',
+    'tele-miss-msg': 'המשיכו לנסות — החיבור גדל עם תרגול!',
+    'tele-next': 'סיבוב הבא →',
+    'tele-reset': 'אפס ניקוד',
+    // Phase 4 — Shareable Results
+    'share-title': '📋 שתף את התוצאות שלך',
+    'share-copy': 'העתק ללוח',
+    'share-copied': '✅ הועתק!',
+    // Phase 4 — Sound Effects
+    'sound-toggle': '🔊 אפקטים קוליים',
+    // Phase 4 — Visual Enhancements
+    'visual-card-flip': 'הפוך קלף',
+    'visual-progress': 'התקדמות',
+    'visual-streak-flame': '🔥 רצף',
   }
 };
 
@@ -2662,4 +2742,130 @@ function renderBadges(containerId) {
           </div>`;
       }).join('')}
     </div>`;
+}
+
+// ─── Phase 4: Sound Effects ───────────────────────────────
+let soundEnabled = localStorage.getItem('p101_sound') !== 'off';
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem('p101_sound', soundEnabled ? 'on' : 'off');
+}
+
+function playSound(type) {
+  if (!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.value = 0.08;
+    if (type === 'hit') {
+      osc.frequency.value = 523;
+      osc.type = 'sine';
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.3);
+      // Second tone for chord
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.connect(gain2); gain2.connect(ctx.destination);
+      gain2.gain.value = 0.06;
+      osc2.frequency.value = 659;
+      osc2.type = 'sine';
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+      osc2.start(ctx.currentTime + 0.05);
+      osc2.stop(ctx.currentTime + 0.4);
+    } else if (type === 'miss') {
+      osc.frequency.value = 220;
+      osc.type = 'sine';
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } else if (type === 'near') {
+      osc.frequency.value = 330;
+      osc.type = 'triangle';
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.25);
+    } else if (type === 'badge') {
+      osc.frequency.value = 440;
+      osc.type = 'sine';
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.6);
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.connect(gain2); gain2.connect(ctx.destination);
+      gain2.gain.value = 0.05;
+      osc2.frequency.value = 554;
+      osc2.type = 'sine';
+      gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+      osc2.start(ctx.currentTime + 0.15);
+      osc2.stop(ctx.currentTime + 0.85);
+    } else if (type === 'click') {
+      osc.frequency.value = 800;
+      osc.type = 'sine';
+      gain.gain.value = 0.03;
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.05);
+    }
+  } catch(e) { /* Audio not supported */ }
+}
+
+// ─── Phase 4: Shareable Results ───────────────────────────
+function shareResult(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.querySelector('[data-share-btn]');
+      if (btn) {
+        const t = window.t || ((k) => k);
+        btn.textContent = t('share-copied') || '✅ Copied!';
+        setTimeout(() => { btn.textContent = t('share-copy') || 'Copy to Clipboard'; }, 2000);
+      }
+    });
+  }
+}
+
+function generateShareText(app, result) {
+  const base = 'psychic101.app';
+  return `${result}\n\n🔮 Psychic101 — ${app}\n${base}`;
+}
+
+// ─── Phase 4: Card Flip Animation ─────────────────────────
+function flipCard(element, revealContent) {
+  element.style.transition = 'transform 0.6s';
+  element.style.transform = 'rotateY(90deg)';
+  setTimeout(() => {
+    element.innerHTML = revealContent;
+    element.style.transform = 'rotateY(0deg)';
+  }, 300);
+}
+
+// ─── Phase 4: Progress Ring ───────────────────────────────
+function renderProgressRing(containerId, progress, size = 60) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const r = (size - 8) / 2;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (progress / 100) * circ;
+  el.innerHTML = `
+    <svg width="${size}" height="${size}" style="display:block;margin:0 auto">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--surface2)" stroke-width="4"/>
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--accent)" stroke-width="4"
+        stroke-dasharray="${circ}" stroke-dashoffset="${offset}"
+        stroke-linecap="round" transform="rotate(-90 ${size/2} ${size/2})"/>
+    </svg>`;
+}
+
+// ─── Phase 4: Streak Flame Animation ──────────────────────
+function renderStreakFlame(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const streak = getStreak();
+  const s = getStreak();
+  const flames = s.current >= 30 ? '🔥🔥🔥' : s.current >= 7 ? '🔥🔥' : s.current >= 1 ? '🔥' : '';
+  el.innerHTML = flames ? `<span class="streak-flame">${flames}</span> <span class="streak-count">${s.current}</span>` : '';
 }

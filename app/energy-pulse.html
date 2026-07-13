@@ -198,6 +198,7 @@ function tapPulse() {
 
   if (absOffset < 0.3) {
     spawnConfetti(30);
+    playSound('hit');
     headingEl.textContent = '⚡ Perfect Sensitivity!';
     msgEl.className = 'result-message result-hit';
     msgEl.textContent = getHitMessage();
@@ -209,6 +210,7 @@ function tapPulse() {
     headingEl.textContent = '🌱 Keep Sensing';
     msgEl.className = 'result-message result-miss';
     msgEl.textContent = getMissMessage();
+    playSound('miss');
   }
   showScreen('result');
 }

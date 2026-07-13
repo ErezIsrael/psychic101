@@ -319,6 +319,7 @@ function saveSession() {
   markAppTried('random-viewer');
   if (currentRating >= 4) {
     spawnConfetti(25);
+    playSound('hit');
   }
   currentRating = 0;
   showScreen('welcome');

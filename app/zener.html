@@ -404,9 +404,11 @@ function submitGuess() {
     badge.className = 'result-badge result-exact';
     badge.textContent = getHitMessage();
     spawnConfetti(30);
+    playSound('hit');
   } else {
     badge.className = 'result-badge result-miss';
     badge.textContent = getMissMessage();
+    playSound('miss');
   }
 
   // Show guess vs target

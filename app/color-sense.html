@@ -213,6 +213,7 @@ function pickColor(hex) {
 
   if (isHit) {
     spawnConfetti(30);
+    playSound('hit');
     headingEl.textContent = t('color-hit-title') || '🎯 Perfect Vision!';
     msgEl.className = 'result-message result-hit';
     msgEl.textContent = getHitMessage();
@@ -220,6 +221,7 @@ function pickColor(hex) {
     headingEl.textContent = t('color-miss-title') || '🎨 Close, Keep Going!';
     msgEl.className = 'result-message result-miss';
     msgEl.textContent = getMissMessage();
+    playSound('miss');
   }
   showScreen('result');
 }

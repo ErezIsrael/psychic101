@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Psychic101 — Dream Catcher</title>
+<link rel="stylesheet" href="styles.css">
+<script src="utils.js" defer></script>
+<style>
+  .dream-catcher-hero {
+    text-align: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(180deg, rgba(30,27,75,0.4) 0%, transparent 100%);
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem;
+  }
+  .stars { position: relative; height: 120px; margin-bottom: 1rem; overflow: hidden; }
+  .star { position: absolute; width: 3px; height: 3px; background: #fff; border-radius: 50%; animation: twinkle 2s ease-in-out infinite alternate; }
+  @keyframes twinkle { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+  .moon { font-size: 3rem; animation: moon-glow 3s ease-in-out infinite alternate; }
+  @keyframes moon-glow { 0% { filter: drop-shadow(0 0 8px rgba(251,191,36,0.4)); } 100% { filter: drop-shadow(0 0 20px rgba(251,191,36,0.8)); } }
+
+  .tag-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin: 1rem 0; }
+  .tag-btn { padding: 0.5rem 0.75rem; border-radius: 20px; border: 1px solid var(--surface2); background: var(--surface2); color: var(--text); font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+  .tag-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tag-btn:hover { border-color: var(--accent); }
+
+  .dream-textarea { width: 100%; min-height: 120px; background: var(--surface1); border: 1px solid var(--surface2); border-radius: var(--radius); padding: 0.75rem; color: var(--text); font-size: 0.9rem; resize: vertical; margin: 0.75rem 0; }
+  .dream-textarea:focus { outline: none; border-color: var(--accent); }
+
+  .voice-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.75rem; background: var(--surface2); border: 1px solid var(--surface2); border-radius: var(--radius); color: var(--text); font-size: 0.9rem; cursor: pointer; margin-bottom: 0.75rem; }
+  .voice-btn:hover { border-color: var(--accent); }
+  .voice-btn.recording { background: rgba(248,113,113,0.2); border-color: var(--danger); color: var(--danger); animation: pulse-glow 1s infinite; }
+
+  .dream-list { margin-top: 1.5rem; }
+  .dream-entry { background: var(--surface2); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; }
+  .dream-entry-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
+  .dream-entry-tag { font-size: 0.7rem; padding: 0.15rem 0.5rem; background: var(--surface1); border-radius: 12px; color: var(--text-dim); }
+  .dream-entry-text { font-size: 0.85rem; color: var(--text); line-height: 1.5; margin-bottom: 0.5rem; }
+  .dream-entry-date { font-size: 0.75rem; color: var(--text-dim); }
+  .dream-entry-mood { font-size: 0.85rem; margin-left: 0.5rem; }
+
+  .dream-float { animation: float-up 0.6s ease-out; }
+  @keyframes float-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="logo">Psychic101</a>
+      <span data-i18n="catcher-title">🌙 Dream Catcher</span>
+      <div id="lang-selector"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="dream-catcher-hero">
+      <div class="stars" id="stars-container"></div>
+      <div class="moon">🌙</div>
+      <h2 data-i18n="catcher-greeting">Did you dream last night?</h2>
+      <p style="color:var(--text-dim);font-size:0.9rem" data-i18n="catcher-desc">Capture your dreams while they're fresh. Tag them, describe them, and look for patterns over time.</p>
+    </div>
+
+    <!-- Quick Log -->
+    <div class="card" id="log-form">
+      <h3 data-i18n="catcher-log">🌟 Quick Dream Log</h3>
+
+      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem" data-i18n="catcher-tags">What was your dream about?</p>
+      <div class="tag-grid" id="tag-grid">
+        <button class="tag-btn" data-tag="🕊️ Flying">🕊️ Flying</button>
+        <button class="tag-btn" data-tag="🏠 Home">🏠 Home</button>
+        <button class="tag-btn" data-tag="🌊 Water">🌊 Water</button>
+        <button class="tag-btn" data-tag="👥 People">👥 People</button>
+        <button class="tag-btn" data-tag="🐾 Animals">🐾 Animals</button>
+        <button class="tag-btn" data-tag="🔮 Mystic">🔮 Mystic</button>
+        <button class="tag-btn" data-tag="😱 Nightmare">😱 Nightmare</button>
+        <button class="tag-btn" data-tag="😌 Peaceful">😌 Peaceful</button>
+        <button class="tag-btn" data-tag="🏃 Chasing">🏃 Chasing</button>
+        <button class="tag-btn" data-tag="💕 Love">💕 Love</button>
+        <button class="tag-btn" data-tag="🌍 Nature">🌍 Nature</button>
+        <button class="tag-btn" data-tag="🔮 Precog">🔮 Precog</button>
+      </div>
+
+      <textarea class="dream-textarea" id="dream-note" data-i18n-placeholder="catcher-note-placeholder" placeholder="Describe your dream... (optional)"></textarea>
+
+      <button class="voice-btn" id="voice-btn" onclick="toggleVoice()">
+        <span id="voice-icon">🎤</span>
+        <span id="voice-text" data-i18n="catcher-voice">Tap to speak your dream</span>
+      </button>
+
+      <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem" data-i18n="catcher-mood">How did it feel?</p>
+      <div class="tag-grid" id="mood-grid">
+        <button class="tag-btn" data-mood="😊 Positive">😊</button>
+        <button class="tag-btn" data-mood="😐 Neutral">😐</button>
+        <button class="tag-btn" data-mood="😰 Scary">😰</button>
+        <button class="tag-btn" data-mood="🤔 Confusing">🤔</button>
+        <button class="tag-btn" data-mood="✨ Vivid">✨</button>
+      </div>
+
+      <button class="btn-primary" style="width:100%;margin-top:0.75rem" onclick="saveDream()" data-i18n="catcher-save">💫 Save Dream</button>
+    </div>
+
+    <!-- Dream Collection -->
+    <div class="dream-list" id="dream-list"></div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <nav>
+        <a href="index.html" data-i18n="footer-home">Home</a>
+        <a href="profile.html" data-i18n="legal-profile-link">🔮 Profile</a>
+        <span data-version class="footer-link"></span>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+  const DREAM_TAGS = ['🕊️ Flying','🏠 Home','🌊 Water','👥 People','🐾 Animals','🔮 Mystic','😱 Nightmare','😌 Peaceful','🏃 Chasing','💕 Love','🌍 Nature','🔮 Precog'];
+  let selectedTags = [];
+  let selectedMood = '';
+  let isRecording = false;
+  let recognition = null;
+
+  // Stars background
+  function initStars() {
+    const c = document.getElementById('stars-container');
+    for (let i = 0; i < 30; i++) {
+      const s = document.createElement('span');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDelay = Math.random() * 2 + 's';
+      s.style.width = s.style.height = (Math.random() * 3 + 1) + 'px';
+      c.appendChild(s);
+    }
+  }
+
+  // Tag selection
+  document.getElementById('tag-grid').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tag-btn');
+    if (!btn) return;
+    const tag = btn.dataset.tag;
+    btn.classList.toggle('active');
+    if (selectedTags.includes(tag)) selectedTags = selectedTags.filter(t => t !== tag);
+    else selectedTags.push(tag);
+  });
+
+  document.getElementById('mood-grid').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tag-btn');
+    if (!btn) return;
+    document.querySelectorAll('#mood-grid .tag-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedMood = btn.dataset.mood;
+  });
+
+  // Voice input
+  function toggleVoice() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Voice input not supported in this browser');
+      return;
+    }
+    if (isRecording) {
+      recognition.stop();
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'en-US';
+    recognition.interimResults = true;
+    recognition.onresult = (e) => {
+      let transcript = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) transcript += e.results[i][0].transcript;
+      document.getElementById('dream-note').value = transcript;
+    };
+    recognition.onend = () => { isRecording = false; updateVoiceUI(); };
+    recognition.onerror = () => { isRecording = false; updateVoiceUI(); };
+    recognition.start();
+    isRecording = true;
+    updateVoiceUI();
+  }
+
+  function updateVoiceUI() {
+    const btn = document.getElementById('voice-btn');
+    const icon = document.getElementById('voice-icon');
+    const text = document.getElementById('voice-text');
+    if (isRecording) {
+      btn.classList.add('recording');
+      icon.textContent = '⏹️';
+      text.textContent = 'Listening... tap to stop';
+    } else {
+      btn.classList.remove('recording');
+      icon.textContent = '🎤';
+      const t = window.t || ((k) => k);
+      text.textContent = t('catcher-voice') || 'Tap to speak your dream';
+    }
+  }
+
+  // Save dream
+  function saveDream() {
+    const note = document.getElementById('dream-note').value.trim();
+    if (selectedTags.length === 0 && !note) return;
+
+    const dreams = JSON.parse(localStorage.getItem('p101_dreams') || '[]');
+    dreams.unshift({
+      timestamp: Date.now(),
+      tags: selectedTags,
+      mood: selectedMood,
+      note: note
+    });
+    localStorage.setItem('p101_dreams', JSON.stringify(dreams));
+
+    updateStreak();
+    addXp(10, 'dream-catcher');
+    checkAppBadge('dream', dreams.length);
+    markAppTried('dream-catcher');
+
+    if (selectedTags.some(t => t.includes('🔮'))) spawnConfetti(15);
+
+    // Clear form
+    document.getElementById('dream-note').value = '';
+    document.querySelectorAll('.tag-btn').forEach(b => b.classList.remove('active'));
+    selectedTags = [];
+    selectedMood = '';
+
+    renderDreams();
+  }
+
+  // Render dreams
+  function renderDreams() {
+    const dreams = JSON.parse(localStorage.getItem('p101_dreams') || '[]');
+    const list = document.getElementById('dream-list');
+    if (!dreams.length) {
+      list.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:2rem">No dreams logged yet. Sweet dreams! 🌙</p>';
+      return;
+    }
+    list.innerHTML = '<h3 style="margin-bottom:1rem">🌙 Your Dream Collection</h3>' +
+      dreams.slice(0, 50).map(d => {
+        const date = new Date(d.timestamp).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return `<div class="dream-entry dream-float">
+          ${d.tags.length ? '<div class="dream-entry-tags">' + d.tags.map(t => '<span class="dream-entry-tag">' + t + '</span>').join('') + '</div>' : ''}
+          ${d.note ? '<div class="dream-entry-text">' + escapeHtml(d.note) + '</div>' : ''}
+          <div class="dream-entry-date">${date} ${d.mood ? '<span class="dream-entry-mood">' + d.mood + '</span>' : ''}</div>
+        </div>`;
+      }).join('');
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('lang-selector').innerHTML = langSelectorHTML();
+    applyTranslations();
+    renderVersion();
+    initStars();
+    renderDreams();
+    renderStreak('catcher-streak');
+  });
+  </script>
+</body>
+</html>

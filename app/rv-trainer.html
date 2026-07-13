@@ -69,6 +69,18 @@
     </button>
   </div>
 
+  <!-- RV Walkthrough Overlay (first-time only) -->
+  <div id="rv-walkthrough" class="rv-walkthrough hidden">
+    <div class="rv-walkthrough-content">
+      <div id="rv-walk-step" class="rv-walkthrough-step active"></div>
+      <div style="margin-top:1rem">
+        <span id="rv-walk-dots" style="color:var(--text-dim);margin-right:0.5rem"></span>
+        <button class="btn btn-secondary btn-sm" onclick="rvWalkPrev()" id="rv-walk-prev" style="margin-right:0.5rem" data-i18n="rv-walk-back">← Back</button>
+        <button class="btn btn-primary btn-sm" onclick="rvWalkNext()" id="rv-walk-next" data-i18n="rv-walk-next">Next →</button>
+      </div>
+    </div>
+  </div>
+
   <!-- IDEOGRAM SCREEN -->
   <div id="screen-ideogram" class="screen">
     <div class="progress-bar"><div class="fill" style="width: 20%"></div></div>
@@ -427,6 +439,7 @@ function rateAccuracy(btn) {
   selectedRating = parseInt(btn.dataset.rating);
   if (selectedRating >= 4) {
     spawnConfetti(25);
+    playSound('hit');
   }
 }
 
@@ -570,7 +583,55 @@ document.addEventListener('DOMContentLoaded', () => {
   initCanvas();
   renderHistory();
   showTip('rv');
+  // Show walkthrough for first-time users
+  if (!localStorage.getItem('p101_rv_walkthrough')) {
+    rvWalkStep = 0;
+    renderRvWalkStep();
+    document.getElementById('rv-walkthrough').classList.remove('hidden');
+  }
 });
+
+// ─── RV Walkthrough ───────────────────────────────────────
+const RV_WALK_STEPS = [
+  { icon: '🔮', title: 'Welcome to Remote Viewing!', text: 'Remote Viewing is a structured way to explore perception beyond the five senses. Let\'s walk through how it works.' },
+  { icon: '🎯', title: 'Step 1: Get a Target', text: 'You\'ll receive a random code linked to a hidden image. Your job is to sense what it looks like.' },
+  { icon: '✏️', title: 'Step 2: Draw Your First Impression', text: 'Let your hand move freely on the canvas. Don\'t think — just draw. This captures your initial "gestalt".' },
+  { icon: '👁️', title: 'Step 3: Record Impressions', text: 'Note colors, textures, shapes, emotions, and anything else you sense. Every detail counts.' },
+  { icon: '📐', title: 'Step 4: Dimensions & Emotions', text: 'Describe the size, distance, and emotional quality of what you sense.' },
+  { icon: '🖼️', title: 'Step 5: Reveal & Compare', text: 'The target image appears. Rate how accurate your impressions were. Be honest — it\'s how you improve.' },
+  { icon: '📈', title: 'Track Your Progress', text: 'Your sessions are saved. Over time, you\'ll see patterns and improvements in your ability.' },
+  { icon: '✨', title: 'Ready to Begin!', text: 'Remember: there\'s no wrong answer. Trust your first impressions and have fun exploring!' }
+];
+let rvWalkStep = 0;
+
+function renderRvWalkStep() {
+  const step = RV_WALK_STEPS[rvWalkStep];
+  const t = window.t || ((k) => k);
+  document.getElementById('rv-walk-step').innerHTML = `
+    <div class="rv-walkthrough-illustration">${step.icon}</div>
+    <h3>${step.title}</h3>
+    <p style="color:var(--text-dim)">${step.text}</p>`;
+  document.getElementById('rv-walk-dots').textContent = (rvWalkStep + 1) + ' / ' + RV_WALK_STEPS.length;
+  document.getElementById('rv-walk-prev').style.display = rvWalkStep === 0 ? 'none' : 'inline-block';
+  document.getElementById('rv-walk-next').textContent = rvWalkStep === RV_WALK_STEPS.length - 1 ? (t('onboard-start') || 'Let\'s Begin!') : (t('rv-walk-next') || 'Next →');
+}
+
+function rvWalkNext() {
+  if (rvWalkStep < RV_WALK_STEPS.length - 1) {
+    rvWalkStep++;
+    renderRvWalkStep();
+  } else {
+    document.getElementById('rv-walkthrough').classList.add('hidden');
+    localStorage.setItem('p101_rv_walkthrough', '1');
+  }
+}
+
+function rvWalkPrev() {
+  if (rvWalkStep > 0) {
+    rvWalkStep--;
+    renderRvWalkStep();
+  }
+}
 
 const _showScreen = showScreen;
 showScreen = function(name) {

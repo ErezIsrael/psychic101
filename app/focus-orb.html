@@ -201,6 +201,7 @@ function endFocus() {
 
   if (currentFocusTime >= 30) {
     spawnConfetti(25);
+    playSound('hit');
     headingEl.textContent = '🔮 Excellent Focus!';
     msgEl.className = 'result-message result-hit';
     msgEl.textContent = getHitMessage();

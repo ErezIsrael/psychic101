@@ -248,6 +248,7 @@ function showResult() {
 
   if (isHit) {
     spawnConfetti(30);
+    playSound('hit');
     headingEl.textContent = t('dice-hit-title') || '🎯 Connection!';
     msgEl.className = 'result-message result-hit';
     msgEl.textContent = getHitMessage();
@@ -255,6 +256,7 @@ function showResult() {
     headingEl.textContent = t('dice-miss-title') || '🎲 No Match';
     msgEl.className = 'result-message result-miss';
     msgEl.textContent = getMissMessage();
+    playSound('miss');
   }
 
   showScreen('result');

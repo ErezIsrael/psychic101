@@ -286,9 +286,16 @@ function drawDial(canvasId, currentValue, targetValue) {
   ctx.arc(cx, cy, 4, 0, Math.PI * 2);
   ctx.fill();
 
-  // Target marker (dashed line)
+  // Target glow zone
   if (targetValue !== undefined && targetValue !== null) {
     const tx = cx + (targetValue / 10) * halfLen;
+    const glowGrad = ctx.createRadialGradient(tx, cy, 0, tx, cy, 30);
+    glowGrad.addColorStop(0, 'rgba(123,104,238,0.15)');
+    glowGrad.addColorStop(1, 'rgba(123,104,238,0)');
+    ctx.fillStyle = glowGrad;
+    ctx.fillRect(tx - 30, cy - 30, 60, 60);
+
+    // Target marker (dashed line)
     ctx.strokeStyle = '#e74c3c';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
@@ -304,9 +311,16 @@ function drawDial(canvasId, currentValue, targetValue) {
     ctx.fillText((targetValue > 0 ? '+' : '') + targetValue, tx, cy - 44);
   }
 
-  // Current pointer (blue arrow)
+  // Current pointer glow
   if (currentValue !== undefined && currentValue !== null) {
     const gx = cx + (currentValue / 10) * halfLen;
+    const ptrGlow = ctx.createRadialGradient(gx, cy + 20, 0, gx, cy + 20, 15);
+    ptrGlow.addColorStop(0, 'rgba(52,152,219,0.3)');
+    ptrGlow.addColorStop(1, 'rgba(52,152,219,0)');
+    ctx.fillStyle = ptrGlow;
+    ctx.fillRect(gx - 15, cy + 5, 30, 30);
+
+    // Current pointer (blue arrow)
     ctx.fillStyle = '#3498db';
     ctx.beginPath();
     ctx.moveTo(gx, cy + 30);
@@ -427,6 +441,7 @@ function stopSession() {
     verdict.textContent = getHitMessage();
     verdict.style.color = '#27ae60';
     spawnConfetti(30);
+    playSound('hit');
   } else if (towardRatio >= 55) {
     verdict.textContent = getNearMessage();
     verdict.style.color = '#2ecc71';
