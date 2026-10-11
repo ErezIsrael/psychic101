@@ -6,6 +6,11 @@
 <title>Psychic101 — Grounding Coach</title>
 <link rel="stylesheet" href="styles.css">
 <style>
+  /* App accent palette */
+  :root { --accent: #16a34a; --accent2: #22c55e; --accent-light: rgba(22, 163, 74, 0.10); }
+</style>
+
+<style>
   .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 600px) { .nav-row { flex-direction: row; } }
 
@@ -302,7 +307,7 @@
   <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<script src="utils.js" defer></script>
+<script src="utils.js?v=1.7.1" defer></script>
 <script>
 // ─── 5-4-3-2-1 ────────────────────────────────────────────
 const SENSE_STEPS = [

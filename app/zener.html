@@ -6,6 +6,11 @@
 <title>Psychic101 — Zener Symbol Trainer</title>
 <link rel="stylesheet" href="styles.css">
 <style>
+  /* App accent palette */
+  :root { --accent: #0d9488; --accent2: #14b8a6; --accent-light: rgba(13, 148, 136, 0.10); }
+</style>
+
+<style>
   .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 600px) { .nav-row { flex-direction: row; } }
 
@@ -265,6 +270,7 @@
       <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="quit">← Quit</button>
       <button class="btn btn-primary" id="next-trial-btn" onclick="nextTrial()" data-i18n="next-trial">▶ Next Trial</button>
       <button class="btn btn-primary" id="save-session-btn" onclick="saveSession()" style="display:none" data-i18n="save-session">💾 Save Session</button>
+      <button class="btn btn-secondary" id="share-btn" data-share-btn onclick="shareZenerScore()" style="display:none" data-i18n="share-score">📣 Share Score</button>
     </div>
   </div>
 
@@ -304,7 +310,7 @@
   <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<script src="utils.js" defer></script>
+<script src="utils.js?v=1.7.1" defer></script>
 <script>
 // ─── Zener Symbol App Logic ───────────────────────────────
 const SYMBOLS = ['circle','cross','waves','square','star'];
@@ -408,6 +414,7 @@ function submitGuess() {
   } else {
     badge.className = 'result-badge result-miss';
     badge.textContent = getMissMessage();
+    retriggerAnimation(badge);
     playSound('miss');
   }
 
@@ -432,13 +439,22 @@ function submitGuess() {
   // Show/hide buttons based on session progress
   const nextBtn = document.getElementById('next-trial-btn');
   const saveBtn = document.getElementById('save-session-btn');
+  const shareBtn = document.getElementById('share-btn');
   if (sessionIndex < sessionSize) {
     nextBtn.style.display = 'block';
     saveBtn.style.display = 'none';
+    shareBtn.style.display = 'none';
   } else {
     nextBtn.style.display = 'none';
     saveBtn.style.display = 'block';
+    shareBtn.style.display = 'block';
   }
+}
+
+function shareZenerScore() {
+  const correct = sessionTrials.filter(x => x.correct).length;
+  const text = t('share-zener-text').replace('{score}', correct).replace('{total}', sessionTrials.length);
+  shareResult(text, buildChallengeUrl(correct, sessionTrials.length));
 }
 
 function showSessionResult() {
@@ -463,9 +479,10 @@ function showSessionResult() {
   document.getElementById('result-symbol').className = 'symbol-display';
   document.getElementById('guess-label').textContent = '';
 
-  // Show save button, hide next trial
+  // Show save + share buttons, hide next trial
   document.getElementById('next-trial-btn').style.display = 'none';
   document.getElementById('save-session-btn').style.display = 'block';
+  document.getElementById('share-btn').style.display = 'block';
 
   showScreen('result');
 }

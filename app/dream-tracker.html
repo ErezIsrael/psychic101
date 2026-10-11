@@ -6,6 +6,11 @@
 <title>Psychic101 — Dream Tracker</title>
 <link rel="stylesheet" href="styles.css">
 <style>
+  /* App accent palette */
+  :root { --accent: #6d28d9; --accent2: #7c3aed; --accent-light: rgba(109, 40, 217, 0.10); }
+</style>
+
+<style>
   .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 600px) { .nav-row { flex-direction: row; } }
 
@@ -204,7 +209,7 @@
   <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<script src="utils.js" defer></script>
+<script src="utils.js?v=1.7.1" defer></script>
 <script>
 let selectedMood = null;
 let selectedSymbols = [];

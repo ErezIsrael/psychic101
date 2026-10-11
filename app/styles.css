@@ -5,19 +5,25 @@
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --bg: #0f0f1a;
-  --surface: #1a1a2e;
-  --surface2: #22223a;
-  --accent: #7b68ee;
-  --accent2: #9d8df1;
-  --text: #e0e0e0;
-  --text-dim: #8888aa;
-  --success: #4ade80;
-  --warn: #fbbf24;
-  --danger: #f87171;
+  --bg: #f0eef6;
+  --surface: #ffffff;
+  --surface2: #f5f3fa;
+  --surface1: #faf9fc;
+  --accent: #6c47e8;
+  --accent2: #8b6cf0;
+  --accent-light: rgba(108, 71, 232, 0.08);
+  --text: #1e1b3a;
+  --text-dim: #6b6890;
+  --success: #22c55e;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --border: #e5e2f0;
   --radius: 12px;
   --content-max: 100%;
   --pad-inline: 1rem;
+  --shadow-sm: 0 1px 3px rgba(108, 71, 232, 0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(108, 71, 232, 0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 24px rgba(108, 71, 232, 0.12), 0 4px 8px rgba(0,0,0,0.04);
 }
 
 /* ─── Skip Link ────────────────────────────────────────── */
@@ -54,7 +60,7 @@ html {
 
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
+  background: linear-gradient(180deg, #eae8f5 0%, var(--bg) 30%);
   color: var(--text);
   min-height: 100vh;
   min-height: -webkit-fill-available;
@@ -71,12 +77,14 @@ img, video, canvas { max-width: 100%; height: auto; }
 /* ─── Header ───────────────────────────────────────────── */
 header {
   width: 100%;
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 0.75rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--surface2);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -85,8 +93,8 @@ header {
 
 header h1 {
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--accent2);
+  font-weight: 700;
+  color: var(--accent);
   letter-spacing: 0.5px;
 }
 
@@ -99,8 +107,8 @@ header h1 span {
 /* ─── Navigation Button (≥48×48px tap target) ─────────── */
 .nav-btn {
   background: var(--surface2);
-  border: 1px solid var(--accent);
-  color: var(--accent2);
+  border: 1px solid var(--border);
+  color: var(--accent);
   padding: 0.5rem 1rem;
   min-height: 3rem;
   min-width: 3rem;
@@ -108,10 +116,11 @@ header h1 span {
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
 }
 
 @media (hover: hover) {
-  .nav-btn:hover { background: var(--accent); color: #fff; }
+  .nav-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 }
 
 /* ─── About Link (lightweight, no box) ─────────────────── */
@@ -149,7 +158,7 @@ header h1 span {
 
 .lang-btn {
   background: var(--surface2);
-  border: 1px solid var(--surface2);
+  border: 1px solid var(--border);
   color: var(--text-dim);
   padding: 0.25rem 0.5rem;
   min-height: 2rem;
@@ -167,7 +176,7 @@ header h1 span {
 }
 
 @media (hover: hover) {
-  .lang-btn:hover { background: var(--accent2); color: #fff; }
+  .lang-btn:hover { background: var(--accent-light); color: var(--accent); }
 }
 
 /* RTL adjustments */
@@ -215,22 +224,23 @@ main {
 /* ─── Cards ────────────────────────────────────────────── */
 .card {
   background: var(--surface);
-  border: 1px solid var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
   margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .card h2 {
   font-size: 1.1rem;
   margin-bottom: 0.75rem;
-  color: var(--accent2);
+  color: var(--accent);
 }
 
 .card p, .card li {
   font-size: 0.9rem;
   line-height: 1.6;
-  color: var(--text-dim);
+  color: var(--text);
 }
 
 .card ul { padding-left: 1.25rem; }
@@ -245,7 +255,8 @@ main {
   letter-spacing: 6px;
   color: var(--accent);
   font-family: 'Courier New', monospace;
-  background: var(--surface2);
+  background: linear-gradient(135deg, var(--accent-light), rgba(139, 108, 240, 0.06));
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 1rem;
   word-break: break-all;
@@ -269,36 +280,43 @@ main {
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  box-shadow: var(--shadow-md);
+}
 .btn-secondary {
-  background: var(--surface2);
-  color: var(--text);
-  border: 1px solid var(--accent);
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
 }
 .btn-sm { padding: 0.5rem 1rem; font-size: 0.85rem; width: auto; min-height: 2.5rem; }
 
 @media (hover: hover) {
-  .btn-primary:hover { background: var(--accent2); }
-  .btn-secondary:hover { background: var(--accent); color: #fff; }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+  .btn-secondary:hover { background: var(--accent-light); border-color: var(--accent); }
 }
 
 /* ─── Forms ────────────────────────────────────────────── */
 textarea, input[type="text"], input[type="number"], input[type="search"] {
   width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   color: var(--text);
   padding: 0.75rem;
   border-radius: 8px;
   font-size: 1rem; /* prevents iOS zoom on focus */
   font-family: inherit;
   resize: vertical;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
 }
 
 textarea:focus, input:focus {
   outline: none;
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(108, 71, 232, 0.12), var(--shadow-sm);
 }
 
 textarea { min-height: 3rem; }
@@ -320,7 +338,8 @@ label {
   font-family: 'Courier New', monospace;
   color: var(--accent);
   padding: 1rem;
-  background: var(--surface2);
+  background: linear-gradient(135deg, var(--accent-light), rgba(139, 108, 240, 0.04));
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-bottom: 1rem;
 }
@@ -337,7 +356,8 @@ label {
   max-width: 100%;
   border-radius: var(--radius);
   margin-bottom: 1rem;
-  border: 2px solid var(--surface2);
+  border: 2px solid var(--border);
+  box-shadow: var(--shadow-md);
 }
 
 /* ─── Feedback Grid (stacked on mobile) ────────────────── */
@@ -370,17 +390,18 @@ label {
 
 .session-item {
   background: var(--surface);
-  border: 1px solid var(--surface2);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem 1rem;
   margin-bottom: 0.5rem;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
   min-height: 3rem;
+  box-shadow: var(--shadow-sm);
 }
 
 @media (hover: hover) {
-  .session-item:hover { border-color: var(--accent); }
+  .session-item:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-1px); }
 }
 
 .session-item .code {
@@ -419,7 +440,7 @@ label {
   counter-increment: step;
   padding: 0.75rem 0 0.75rem 2.5rem;
   position: relative;
-  border-bottom: 1px solid var(--surface2);
+  border-bottom: 1px solid var(--border);
 }
 
 .steps li::before {
@@ -445,8 +466,8 @@ label {
 .ideogram-area {
   width: 100%;
   height: 180px;
-  background: var(--surface2);
-  border: 1px solid var(--surface2);
+  background: var(--surface);
+  border: 2px dashed var(--border);
   border-radius: var(--radius);
   cursor: crosshair;
   touch-action: none;
@@ -463,7 +484,7 @@ label {
   top: 0.5rem;
   right: 0.5rem;
   background: var(--surface);
-  border: 1px solid var(--surface2);
+  border: 1px solid var(--border);
   color: var(--text-dim);
   padding: 0.375rem 0.625rem;
   min-height: 2.5rem;
@@ -471,6 +492,7 @@ label {
   border-radius: 6px;
   font-size: 0.75rem;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
 }
 
 .ideogram-wrap {
@@ -490,8 +512,8 @@ label {
   padding: 0.5rem 0.875rem;
   min-height: 2.5rem;
   border-radius: 20px;
-  border: 1px solid var(--surface2);
-  background: var(--surface2);
+  border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--text-dim);
   font-size: 0.8rem;
   cursor: pointer;
@@ -502,16 +524,17 @@ label {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
+  box-shadow: var(--shadow-sm);
 }
 
 @media (hover: hover) {
-  .cat-btn:hover { border-color: var(--accent); }
+  .cat-btn:hover { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
 }
 
 /* ─── Progress Bar ─────────────────────────────────────── */
 .progress-bar {
   height: 4px;
-  background: var(--surface2);
+  background: var(--border);
   border-radius: 2px;
   margin-bottom: 1.5rem;
   overflow: hidden;
@@ -532,10 +555,12 @@ label {
 }
 
 .stat-card {
-  background: var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1rem;
   text-align: center;
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-card .value {
@@ -555,7 +580,9 @@ label {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(30, 27, 58, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   z-index: 200;
   align-items: flex-end; /* bottom sheet on mobile */
   justify-content: center;
@@ -566,30 +593,31 @@ label {
 
 .modal {
   background: var(--surface);
-  border: 1px solid var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--radius) var(--radius) 0 0;
   padding: 1.5rem;
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
+  box-shadow: var(--shadow-lg);
 }
 
 .modal h3 {
-  color: var(--accent2);
+  color: var(--accent);
   margin-bottom: 0.75rem;
 }
 
 .modal p {
   font-size: 0.9rem;
-  color: var(--text-dim);
+  color: var(--text);
   line-height: 1.6;
   margin-bottom: 0.75rem;
 }
 
 /* ─── Tip Banner ───────────────────────────────────────── */
 .tip-banner {
-  background: linear-gradient(135deg, rgba(123,104,238,0.12), rgba(157,141,241,0.06));
-  border: 1px solid rgba(123,104,238,0.25);
+  background: linear-gradient(135deg, rgba(108,71,232,0.08), rgba(139,108,240,0.04));
+  border: 1px solid rgba(108,71,232,0.18);
   border-radius: var(--radius);
   padding: 0.875rem 1rem;
   margin-bottom: 1rem;
@@ -612,8 +640,8 @@ label {
 
 .tip-banner .tip-refresh {
   flex-shrink: 0;
-  background: var(--surface2);
-  border: 1px solid var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   color: var(--text-dim);
   padding: 0.375rem 0.625rem;
   min-height: 2rem;
@@ -642,21 +670,23 @@ label {
 
 .app-card {
   background: var(--surface);
-  border: 1px solid var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
-  transition: border-color 0.2s;
+  transition: all 0.25s;
   text-decoration: none;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   min-height: 3rem;
+  box-shadow: var(--shadow-sm);
 }
 
 @media (hover: hover) {
   .app-card:hover {
     border-color: var(--accent);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
   }
 }
 
@@ -668,7 +698,7 @@ label {
 .app-card .app-title {
   font-size: 1rem;
   font-weight: 600;
-  color: var(--accent2);
+  color: var(--text);
 }
 
 .app-card .app-desc {
@@ -692,8 +722,9 @@ label {
 
 .hero h2 {
   font-size: 1.35rem;
-  color: var(--accent2);
+  color: var(--accent);
   margin-bottom: 0.5rem;
+  font-weight: 800;
 }
 
 .hero p {
@@ -706,10 +737,11 @@ label {
 
 .section-title {
   font-size: 1rem;
-  color: var(--accent2);
+  color: var(--text);
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--surface2);
+  border-bottom: 2px solid var(--accent);
+  font-weight: 700;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -808,6 +840,7 @@ input[type="range"] {
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
+  box-shadow: var(--shadow-sm);
 }
 .activity-icon {
   font-size: 1.5rem;
@@ -844,10 +877,11 @@ input[type="range"] {
 footer {
   width: 100%;
   background: var(--surface);
-  border-top: 1px solid var(--surface2);
+  border-top: 1px solid var(--border);
   padding: 1.5rem 1rem;
   text-align: center;
   margin-top: auto;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
 }
 
 .footer-inner {
@@ -1090,10 +1124,12 @@ footer {
 
 /* ─── Level / XP Bar ───────────────────────────────────── */
 .level-bar {
-  background: var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.75rem 1rem;
   margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
 }
 .level-info {
   display: flex;
@@ -1109,13 +1145,13 @@ footer {
 .level-num {
   font-size: 0.8rem;
   color: var(--text-dim);
-  background: var(--surface1);
+  background: var(--accent-light);
   padding: 0.15rem 0.5rem;
   border-radius: 12px;
 }
 .xp-bar {
   height: 8px;
-  background: var(--surface1);
+  background: var(--border);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.35rem;
@@ -1156,14 +1192,16 @@ footer {
   align-items: center;
   padding: 0.75rem 0.5rem;
   border-radius: var(--radius);
-  background: var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   text-align: center;
   position: relative;
   transition: all 0.3s;
 }
 .badge-item.unlocked {
-  background: linear-gradient(135deg, rgba(123,104,238,0.15), rgba(157,141,241,0.08));
-  border: 1px solid rgba(123,104,238,0.3);
+  background: linear-gradient(135deg, rgba(108,71,232,0.1), rgba(139,108,240,0.06));
+  border: 1px solid rgba(108,71,232,0.25);
+  box-shadow: var(--shadow-sm);
 }
 .badge-item.locked {
   opacity: 0.4;
@@ -1197,12 +1235,14 @@ footer {
   padding: 1rem;
 }
 .onboarding-content {
-  background: var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 2rem;
   max-width: 480px;
   width: 100%;
   text-align: center;
+  box-shadow: var(--shadow-lg);
 }
 .onboarding-content h2 {
   margin-bottom: 1rem;
@@ -1232,14 +1272,17 @@ footer {
 
 /* ─── Profile Dashboard ────────────────────────────────── */
 .profile-section {
-  background: var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 .profile-section h3 {
   margin-bottom: 1rem;
   font-size: 1.1rem;
+  color: var(--accent);
 }
 .profile-stats {
   display: grid;
@@ -1249,7 +1292,8 @@ footer {
 .profile-stat {
   text-align: center;
   padding: 1rem;
-  background: var(--surface1);
+  background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 .profile-stat-value {
@@ -1302,6 +1346,7 @@ footer {
   background: var(--surface);
   border: 2px solid var(--accent);
   transform: rotateY(180deg);
+  box-shadow: var(--shadow-md);
 }
 
 /* Streak Flame */
@@ -1320,8 +1365,8 @@ footer {
   bottom: 1rem;
   right: 1rem;
   z-index: 100;
-  background: var(--surface2);
-  border: 1px solid var(--surface2);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 50%;
   width: 44px; height: 44px;
   display: flex;
@@ -1330,9 +1375,11 @@ footer {
   cursor: pointer;
   font-size: 1.2rem;
   transition: all 0.2s;
+  box-shadow: var(--shadow-md);
 }
 .sound-toggle:hover {
   border-color: var(--accent);
+  box-shadow: var(--shadow-lg);
 }
 [dir="rtl"] .sound-toggle {
   right: auto;
@@ -1358,7 +1405,8 @@ footer {
   text-align: center;
 }
 .share-text {
-  background: var(--surface1);
+  background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.75rem;
   margin: 1rem 0;
@@ -1401,11 +1449,13 @@ footer {
 }
 .rv-walkthrough-content {
   background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 2rem;
   max-width: 400px;
   width: 90%;
   text-align: center;
+  box-shadow: var(--shadow-lg);
 }
 .rv-walkthrough-step {
   display: none;
@@ -1417,3 +1467,101 @@ footer {
   font-size: 3rem;
   margin-bottom: 1rem;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Dark Theme (Mystic)
+   Toggled via data-theme="dark" on <html> (see utils.js)
+   ═══════════════════════════════════════════════════════════ */
+:root[data-theme="dark"] {
+  --bg: #14111f;
+  --surface: #1d1930;
+  --surface2: #282242;
+  --surface1: #181528;
+  --accent-light: rgba(155, 123, 255, 0.16);
+  --text: #ece9f8;
+  --text-dim: #a49dc6;
+  --border: #3a3358;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+:root[data-theme="dark"] body {
+  background: linear-gradient(180deg, #1e1a33 0%, var(--bg) 30%);
+}
+:root[data-theme="dark"] header {
+  background: rgba(29, 25, 48, 0.85);
+}
+:root[data-theme="dark"] .tip-banner {
+  background: linear-gradient(135deg, rgba(155, 123, 255, 0.14), rgba(155, 123, 255, 0.05));
+  border-color: rgba(155, 123, 255, 0.28);
+}
+
+/* ─── Challenge Banner (shared score links) ──────────────── */
+.challenge-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(251,191,36,0.16), rgba(251,191,36,0.05));
+  border: 1px solid rgba(251,191,36,0.45);
+  color: var(--text);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.challenge-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: auto;
+  padding: 0.25rem 0.5rem;
+  flex-shrink: 0;
+}
+:root[data-theme="dark"] .challenge-close { color: var(--text-dim); }
+
+/* ═══════════════════════════════════════════════════════════
+   Widescreen Enhancements (≥1100px)
+   ═══════════════════════════════════════════════════════════ */
+@media (min-width: 1100px) {
+  main { max-width: 62rem; }
+  .hero h2 { font-size: 2.25rem; }
+  .hero p { font-size: 1rem; max-width: 38rem; }
+  .app-grid { grid-template-columns: repeat(4, 1fr); }
+  .app-card { padding: 1.5rem; }
+  .app-card .app-icon { font-size: 2.5rem; }
+  .section-title { font-size: 1.35rem; }
+  .card { padding: 1.75rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Playful Micro-Interactions
+   ═══════════════════════════════════════════════════════════ */
+@keyframes p101-wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-12deg) scale(1.15); }
+  75% { transform: rotate(12deg) scale(1.15); }
+}
+@media (hover: hover) {
+  .app-card:hover .app-icon { animation: p101-wiggle 0.5s ease-in-out; }
+}
+
+@keyframes p101-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.progress-bar .fill {
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent));
+  background-size: 200% 100%;
+  animation: p101-shimmer 2.5s linear infinite;
+}
+
+@keyframes p101-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.result-badge.result-miss { animation: p101-shake 0.45s ease-in-out; }

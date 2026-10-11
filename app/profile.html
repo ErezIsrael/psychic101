@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Psychic101 — Profile</title>
   <link rel="stylesheet" href="styles.css">
-  <script src="utils.js" defer></script>
+  <style>
+    /* App accent palette */
+    :root { --accent: #d97706; --accent2: #f59e0b; --accent-light: rgba(217, 119, 6, 0.10); }
+  </style>
+
+  <script src="utils.js?v=1.7.1" defer></script>
 </head>
 <body>
   <header>
@@ -91,6 +96,16 @@
         <span class="profile-stat-label">${t('profile-badges') || 'Badges Earned'}</span>
       </div>
     `;
+
+    // Share my progress
+    const shareWrap = document.createElement('div');
+    shareWrap.style.marginTop = '1rem';
+    shareWrap.innerHTML = `<button class="btn btn-secondary" data-share-btn>📣 ${t('share-score')}</button>`;
+    statsEl.parentElement.appendChild(shareWrap);
+    shareWrap.querySelector('button').onclick = () => {
+      const text = t('share-profile-text').replace('{level}', report.level.level).replace('{rank}', report.level.name);
+      shareResult(text, window.location.origin + window.location.pathname);
+    };
 
     // Render weekly report
     const weeklyEl = document.getElementById('weekly-report');

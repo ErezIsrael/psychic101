@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.6.0';
+const APP_VERSION = '1.7.0';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
@@ -44,7 +44,8 @@ function setStoredLang(lang) {
   if (st === 'session') { try { sessionStorage.setItem('p101_lang', lang); return; } catch(e) {} }
   document.cookie = 'p101_lang=' + lang + ';path=/;max-age=31536000';
 }
-let currentLang = getStoredLang() || 'en';
+// NOTE: currentLang is initialized AFTER TRANSLATIONS (getStoredLang
+// validates ?lang= against TRANSLATIONS and would hit a TDZ error otherwise)
 
 const TRANSLATIONS = {
   en: {
@@ -399,7 +400,15 @@ const TRANSLATIONS = {
     'card-step2': 'Focus on the card back',
     'card-step3': 'Record your impression',
     'card-step4': 'Reveal the card',
-    'card-step5': 'Rate your accuracy',
+    'card-step5': 'Finish the session and review your score',
+    'card-session-size': 'Guesses per Session',
+    'card-guess-of': 'Guess',
+    'card-next': '⏭ Next Card',
+    'card-session-notes': 'Session Notes',
+    'share-score': '📣 Share Score',
+    'share-card-text': 'I scored {score}/{total} on Card Guessing in Psychic101 — can you beat me? 🔮',
+    'share-zener-text': 'I scored {score}/{total} on Zener Symbols in Psychic101 — can you beat me? 🔮',
+    'share-profile-text': 'I reached level {level} ({rank}) in Psychic101 — can you keep up? 🔮',
     'reveal-card': '🔍 Reveal Card',
     'simplified-deck': 'Simplified Deck',
     'zener-title-hub': 'Zener Symbol Trainer',
@@ -870,6 +879,9 @@ const TRANSLATIONS = {
     'share-title': '📋 Share Your Results',
     'share-copy': 'Copy to Clipboard',
     'share-copied': '✅ Copied!',
+    'beat-challenge': 'Challenge! Someone scored',
+    'beat-them': '— can you beat them?',
+    'theme-toggle': 'Toggle dark mode',
     // Phase 4 — Sound Effects
     'sound-toggle': '🔊 Sound Effects',
     // Phase 4 — Visual Enhancements
@@ -1229,7 +1241,15 @@ const TRANSLATIONS = {
     'card-step2': 'התמקד בגב הקלף',
     'card-step3': 'רשום את הרושם שלך',
     'card-step4': 'חשוף את הקלף',
-    'card-step5': 'דרג את הדיוק שלך',
+    'card-step5': 'סיימו את הסשן וסקרו את הציון',
+    'card-session-size': 'ניחושים לסשן',
+    'card-guess-of': 'ניחוש',
+    'card-next': '⏭ הקלף הבא',
+    'card-session-notes': 'הערות סשן',
+    'share-score': '📣 שתף ציון',
+    'share-card-text': 'קיציץ {score}/{total} בניחוש קלפים ב־Psychic101 — אפשר לנצח אותי? 🔮',
+    'share-zener-text': 'קיציץ {score}/{total} בסמלי זנר ב־Psychic101 — אפשר לנצח אותי? 🔮',
+    'share-profile-text': 'הגעתי לסדרה {level} ({rank}) ב־Psychic101 — אפשר להשיג אותי? 🔮',
     'reveal-card': '🔍 חשוף קלף',
     'simplified-deck': 'חפיסה מופשטת',
     'zener-title-hub': 'מאמן סמלי זנר',
@@ -1700,6 +1720,9 @@ const TRANSLATIONS = {
     'share-title': '📋 שתף את התוצאות שלך',
     'share-copy': 'העתק ללוח',
     'share-copied': '✅ הועתק!',
+    'beat-challenge': 'אתגר! מישהו רשם',
+    'beat-them': '— אפשר לנצח אותו?',
+    'theme-toggle': 'החלפה למצב כהה',
     // Phase 4 — Sound Effects
     'sound-toggle': '🔊 אפקטים קוליים',
     // Phase 4 — Visual Enhancements
@@ -1710,6 +1733,8 @@ const TRANSLATIONS = {
 };
 
 // Translate a key, with optional replacements
+let currentLang = getStoredLang() || 'en';
+
 function t(key, replacements) {
   let str = TRANSLATIONS[currentLang]?.[key] || TRANSLATIONS.en[key] || key;
   if (replacements) {
@@ -1739,6 +1764,8 @@ function applyTranslations() {
   document.body.dir = getLangDirection();
   document.documentElement.lang = currentLang;
 }
+
+function getLang() { return currentLang; }
 
 function getLangDirection() {
   return currentLang === 'he' ? 'rtl' : 'ltr';
@@ -2816,22 +2843,64 @@ function playSound(type) {
 }
 
 // ─── Phase 4: Shareable Results ───────────────────────────
-function shareResult(text) {
+function shareResult(text, url) {
+  const btn = document.querySelector('[data-share-btn]');
+  const flash = (msgKey) => {
+    if (!btn) return;
+    const tf = window.t || ((k) => k);
+    btn.textContent = tf(msgKey);
+    setTimeout(() => { btn.textContent = tf('share-copy') || 'Copy to Clipboard'; }, 2000);
+  };
+  // Native share sheet (mobile) — includes the URL when provided
+  if (navigator.share) {
+    const payload = { title: 'Psychic101', text };
+    if (url) payload.url = url;
+    navigator.share(payload).catch(() => {}); // user cancelled — no feedback needed
+    return;
+  }
+  // Fallback: copy the shareable link (or text) to clipboard
+  const toCopy = url || text;
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.querySelector('[data-share-btn]');
-      if (btn) {
-        const t = window.t || ((k) => k);
-        btn.textContent = t('share-copied') || '✅ Copied!';
-        setTimeout(() => { btn.textContent = t('share-copy') || 'Copy to Clipboard'; }, 2000);
-      }
-    });
+    navigator.clipboard.writeText(toCopy).then(() => flash('share-copied'));
   }
 }
 
 function generateShareText(app, result) {
-  const base = 'psychic101.app';
+  const base = window.location.origin;
   return `${result}\n\n🔮 Psychic101 — ${app}\n${base}`;
+}
+
+// ─── Challenge Links: share a score, friends try to beat it ─
+function buildChallengeUrl(score, total) {
+  const p = new URLSearchParams();
+  p.set('beat', score + '-' + total);
+  p.set('d', new Date().toISOString().slice(0, 10));
+  // Keep the ?lang= preference in the shared link
+  const lang = currentLang;
+  if (lang && lang !== 'en') p.set('lang', lang);
+  return window.location.origin + window.location.pathname + '?' + p.toString();
+}
+
+function showChallengeBanner() {
+  const p = new URLSearchParams(window.location.search);
+  const beat = p.get('beat');
+  if (!beat || document.getElementById('challenge-banner')) return;
+  const [score, total] = beat.split('-');
+  if (!score || !total || isNaN(score) || isNaN(total)) return;
+  const dateStr = p.get('d') ? new Date(p.get('d') + 'T00:00:00').toLocaleDateString() : '';
+  const banner = document.createElement('div');
+  banner.id = 'challenge-banner';
+  banner.innerHTML = `<span class="challenge-text">🏆 <strong>${t('beat-challenge')}</strong> ${score}/${total}${dateStr ? ' · ' + dateStr : ''}</span>` +
+    `<button class="challenge-close" onclick="this.parentElement.remove()" aria-label="${t('close')}">✕</button>`;
+  const main = document.querySelector('main');
+  if (main) main.insertBefore(banner, main.firstChild);
+}
+
+// ─── Animation helper: restart a CSS animation on an element ─
+function retriggerAnimation(el) {
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
 }
 
 // ─── Phase 4: Card Flip Animation ─────────────────────────
@@ -2869,3 +2938,39 @@ function renderStreakFlame(containerId) {
   const flames = s.current >= 30 ? '🔥🔥🔥' : s.current >= 7 ? '🔥🔥' : s.current >= 1 ? '🔥' : '';
   el.innerHTML = flames ? `<span class="streak-flame">${flames}</span> <span class="streak-count">${s.current}</span>` : '';
 }
+
+// ─── Theme (light / mystic dark) ───────────────────────────
+function getTheme() {
+  try { return localStorage.getItem('psychic101_theme') || 'light'; } catch (e) { return 'light'; }
+}
+function setTheme(theme) {
+  if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  else document.documentElement.removeAttribute('data-theme');
+  try { localStorage.setItem('psychic101_theme', theme); } catch (e) {}
+}
+function initThemeToggle() {
+  const header = document.querySelector('header');
+  if (!header || document.getElementById('theme-toggle')) return;
+  const btn = document.createElement('button');
+  btn.className = 'nav-btn';
+  btn.id = 'theme-toggle';
+  btn.setAttribute('aria-label', t('theme-toggle'));
+  btn.textContent = getTheme() === 'dark' ? '☀️' : '🌙';
+  btn.onclick = () => {
+    const next = getTheme() === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    btn.textContent = next === 'dark' ? '☀️' : '🌙';
+  };
+  const langWrap = header.querySelector('#lang-selector');
+  if (langWrap) langWrap.parentElement.insertBefore(btn, langWrap);
+  else header.appendChild(btn);
+}
+
+// Apply saved theme as early as utils.js loads (before first paint in most browsers)
+setTheme(getTheme());
+
+// ─── Challenge Banner (shared score links) ─────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  showChallengeBanner();
+  initThemeToggle();
+});

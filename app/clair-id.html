@@ -6,6 +6,11 @@
 <title>Psychic101 — Clair Sense Identifier</title>
 <link rel="stylesheet" href="styles.css">
 <style>
+  /* App accent palette */
+  :root { --accent: #2563eb; --accent2: #3b82f6; --accent-light: rgba(37, 99, 235, 0.10); }
+</style>
+
+<style>
   .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 600px) { .nav-row { flex-direction: row; } }
 
@@ -288,7 +293,7 @@
   <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<script src="utils.js" defer></script>
+<script src="utils.js?v=1.7.1" defer></script>
 <script>
 // ─── Clair Sense Identifier Logic ─────────────────────────
 const CLAIR_SENSES = [

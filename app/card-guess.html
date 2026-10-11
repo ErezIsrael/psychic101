@@ -6,8 +6,33 @@
 <title>Psychic101 — Card Guessing Trainer</title>
 <link rel="stylesheet" href="styles.css">
 <style>
+  /* App accent palette */
+  :root { --accent: #dc2626; --accent2: #ef4444; --accent-light: rgba(220, 38, 38, 0.10); }
+</style>
+
+<style>
   .nav-row { display: flex; flex-direction: column; gap: 0.75rem; }
   @media (min-width: 600px) { .nav-row { flex-direction: row; } }
+
+  /* ─── Session Progress ───────────────────────────────── */
+  .trial-progress {
+    text-align: center;
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+  .trial-progress strong { color: var(--accent); }
+
+  .chi-indicator {
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .chi-sig { background: rgba(74,222,128,0.12); color: var(--success); border: 1px solid rgba(74,222,128,0.25); }
+  .chi-ns { background: rgba(251,191,36,0.12); color: var(--warn); border: 1px solid rgba(251,191,36,0.25); }
+  .chi-low { background: rgba(248,113,113,0.12); color: var(--danger); border: 1px solid rgba(248,113,113,0.25); }
 
   /* ─── Card Display ─────────────────────────────────── */
   .card-display {
@@ -233,12 +258,23 @@
       </div>
     </div>
 
-    <button class="btn btn-primary" onclick="startRound()" data-i18n="card-start">🃏 Start New Round</button>
+    <div class="field">
+      <label for="session-size" data-i18n="card-session-size">Guesses per Session</label>
+      <select id="session-size" style="width:100%;background:var(--surface2);border:1px solid var(--surface2);color:var(--text);padding:0.75rem;border-radius:8px;font-size:1rem;">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="25">25</option>
+      </select>
+    </div>
+
+    <button class="btn btn-primary" onclick="startSession()" data-i18n="card-start">🃏 Start New Session</button>
+    <button class="btn btn-secondary" id="continue-btn" onclick="continueSession()" style="display:none" data-i18n="continue-session">▶ Continue Session</button>
   </div>
 
   <!-- GUESS SCREEN -->
   <div id="screen-guess" class="screen">
-    <div class="progress-bar"><div class="fill" style="width: 33%"></div></div>
+    <div class="progress-bar"><div class="fill" id="card-progress-bar" style="width: 0%"></div></div>
+    <div class="trial-progress" id="card-progress-label"></div>
 
     <div class="tip-banner" id="tip-guess">
       <span class="tip-icon">💡</span>
@@ -290,7 +326,7 @@
 
   <!-- RESULT SCREEN -->
   <div id="screen-result" class="screen">
-    <div class="progress-bar"><div class="fill" style="width: 66%"></div></div>
+    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
 
     <div class="tip-banner" id="tip-result">
       <span class="tip-icon">💡</span>
@@ -314,14 +350,18 @@
       <div class="mini-stat"><div class="val" id="ls-miss">0</div><div class="lbl" data-i18n="miss">Miss</div></div>
     </div>
 
+    <div class="chi-indicator chi-ns" id="chi-indicator" style="display:none"></div>
+
     <div class="field">
-      <label for="result-notes" data-i18n="reflection">Reflection</label>
-      <textarea id="result-notes" data-i18n-placeholder="card-result-placeholder" placeholder="What matched? What didn't?"></textarea>
+      <label for="result-notes" data-i18n="card-session-notes">Session Notes</label>
+      <textarea id="result-notes" data-i18n-placeholder="card-result-placeholder" placeholder="How did the session feel? Any patterns?"></textarea>
     </div>
 
     <div class="nav-row">
-      <button class="btn btn-secondary" onclick="showScreen('guess')" data-i18n="back">← Back</button>
-      <button class="btn btn-primary" onclick="saveRound()" data-i18n="save-next">💾 Save &amp; Next Round</button>
+      <button class="btn btn-primary" id="next-card-btn" onclick="nextGuess()" data-i18n="card-next">⏭ Next Card</button>
+      <button class="btn btn-primary" id="save-session-btn" onclick="saveSession()" style="display:none" data-i18n="save-session">💾 Save Session</button>
+      <button class="btn btn-secondary" id="share-btn" data-share-btn onclick="shareCardScore()" style="display:none" data-i18n="share-score">📣 Share Score</button>
+      <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
     </div>
   </div>
 
@@ -351,7 +391,7 @@
   <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<script src="utils.js" defer></script>
+<script src="utils.js?v=1.7.1" defer></script>
 <script>
 // ─── Card Guessing App Logic ──────────────────────────────
 const SUITS = ['♠','♥','♦','♣'];
@@ -406,7 +446,45 @@ function renderCardFront(el, card) {
   el.innerHTML = `<span class="rank">${card.rank}</span><span class="suit">${card.suit}</span>`;
 }
 
-function startRound() {
+// ─── Session Management ─────────────────────────────────
+let sessionSize = 10;
+let sessionTrials = [];
+let sessionIndex = 0;
+
+function loadSession() { return loadData('card_session'); }
+function saveSessionState() { saveData('card_session', { size: sessionSize, deck: currentDeck, trials: sessionTrials, index: sessionIndex }); }
+function clearSessionState() { localStorage.removeItem('card_session'); }
+
+function sessionCount(result) { return sessionTrials.filter(tr => tr.result === result).length; }
+
+function updateSessionProgress() {
+  document.getElementById('card-progress-bar').style.width = (sessionIndex / sessionSize * 100) + '%';
+  document.getElementById('card-progress-label').innerHTML =
+    t('card-guess-of') + ' <strong>' + (sessionIndex + 1) + '</strong> / <strong>' + sessionSize + '</strong> &nbsp;·&nbsp; 🎯 <strong>' + sessionCount('exact') + '</strong>';
+}
+
+function startSession() {
+  sessionSize = parseInt(document.getElementById('session-size').value);
+  sessionTrials = [];
+  sessionIndex = 0;
+  document.getElementById('result-notes').value = '';
+  saveSessionState();
+  nextGuess();
+}
+
+function continueSession() {
+  const state = loadSession();
+  if (!state || !Array.isArray(state.trials)) return;
+  sessionSize = state.size;
+  currentDeck = state.deck || currentDeck;
+  sessionTrials = state.trials;
+  sessionIndex = state.index;
+  saveSessionState();
+  nextGuess();
+}
+
+function nextGuess() {
+  if (sessionIndex >= sessionSize) return;
   currentCard = pickRandomCard();
   guessSuit = null;
   guessRank = null;
@@ -416,6 +494,7 @@ function startRound() {
   buildRankGrid();
   renderCardFront(document.getElementById('card-front'), currentCard);
   document.getElementById('card-display').classList.remove('flipped');
+  updateSessionProgress();
   showScreen('guess');
 }
 
@@ -434,6 +513,11 @@ function revealCard() {
   else result = 'miss';
 
   currentResult = result;
+
+  // Record this guess in the session
+  sessionTrials.push({ card: currentCard.suit + ' ' + currentCard.rank, guess: guessSuit + ' ' + guessRank, result: result });
+  sessionIndex++;
+  saveSessionState();
 
   // Show result card
   renderCardFront(document.getElementById('result-card-front'), currentCard);
@@ -454,43 +538,93 @@ function revealCard() {
   } else {
     badge.className = 'result-badge result-miss';
     badge.textContent = getMissMessage();
+    retriggerAnimation(badge);
     playSound('miss');
   }
 
-  // Live stats
+  // Live stats (this session)
   updateLiveStats();
+  updateChiIndicator();
+
+  // Advance button vs finish button
+  const nextBtn = document.getElementById('next-card-btn');
+  const saveBtn = document.getElementById('save-session-btn');
+  const shareBtn = document.getElementById('share-btn');
+  if (sessionIndex < sessionSize) {
+    nextBtn.style.display = 'block';
+    saveBtn.style.display = 'none';
+    shareBtn.style.display = 'none';
+  } else {
+    nextBtn.style.display = 'none';
+    saveBtn.style.display = 'block';
+    shareBtn.style.display = 'block';
+    if (result === 'exact') spawnConfetti(60);
+  }
 
   showScreen('result');
 }
 
+function updateChiIndicator() {
+  const el = document.getElementById('chi-indicator');
+  const n = sessionTrials.length;
+  if (n < 10) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  const chance = currentDeck === 'full' ? 52 : 40;
+  const e = n / chance;
+  const o = sessionCount('exact');
+  const chi2 = Math.pow(o - e, 2) / e + Math.pow((n - o) - (n - e), 2) / (n - e);
+  const critical = 3.84; // df=1, p=0.05
+  const txt = (msg) => msg.replace('{chi2}', chi2.toFixed(2)).replace('{critical}', critical);
+  if (o > e && chi2 >= critical) { el.className = 'chi-indicator chi-sig'; el.textContent = txt(t('chi-sig')); }
+  else if (o > e && chi2 >= critical * 0.7) { el.className = 'chi-indicator chi-ns'; el.textContent = txt(t('chi-ns')); }
+  else { el.className = 'chi-indicator chi-low'; el.textContent = txt(t('chi-low')); }
+}
+
 function updateLiveStats() {
-  const history = loadHistory();
   const counts = { exact: 0, 'same-suit': 0, 'same-color': 0, miss: 0 };
-  history.forEach(h => { if (counts[h.result] !== undefined) counts[h.result]++; });
+  sessionTrials.forEach(tr => { if (counts[tr.result] !== undefined) counts[tr.result]++; });
   document.getElementById('ls-exact').textContent = counts.exact;
   document.getElementById('ls-suit').textContent = counts['same-suit'];
   document.getElementById('ls-color').textContent = counts['same-color'];
   document.getElementById('ls-miss').textContent = counts.miss;
 }
 
-function saveRound() {
-  const entry = {
-    timestamp: Date.now(),
-    deck: currentDeck,
-    card: currentCard.suit + ' ' + currentCard.rank,
-    guess: guessSuit + ' ' + guessRank,
-    result: currentResult,
-    notes: document.getElementById('result-notes').value
-  };
+function saveSession() {
+  const notes = document.getElementById('result-notes').value;
   const history = loadHistory();
-  history.unshift(entry);
+  for (let i = sessionTrials.length - 1; i >= 0; i--) {
+    const tr = sessionTrials[i];
+    history.unshift({
+      timestamp: Date.now(),
+      deck: currentDeck,
+      card: tr.card,
+      guess: tr.guess,
+      result: tr.result,
+      notes: i === 0 ? notes : ''
+    });
+  }
   saveHistory(history);
   updateStreak();
-  addXp(10, 'card-guess');
+  addXp(10 + sessionCount('exact') * 5, 'card-guess');
   checkAppBadge('card-guess', history.length);
   markAppTried('card-guess');
-  currentResult = null;
-  showScreen('welcome');
+  clearSessionState();
+  const hadTrials = sessionTrials.length > 0;
+  sessionTrials = [];
+  sessionIndex = 0;
+  document.getElementById('result-notes').value = '';
+  document.getElementById('share-btn').style.display = 'none';
+  document.getElementById('next-card-btn').style.display = 'block';
+  document.getElementById('save-session-btn').style.display = 'none';
+  document.getElementById('chi-indicator').style.display = 'none';
+  if (hadTrials) { showScreen('welcome'); }
+}
+
+// ─── Share ────────────────────────────────────────────────
+function shareCardScore() {
+  const exact = sessionCount('exact');
+  const shareText = t('share-card-text').replace('{score}', exact).replace('{total}', sessionTrials.length);
+  shareResult(shareText, buildChallengeUrl(exact, sessionTrials.length));
 }
 
 // ─── History ──────────────────────────────────────────────
@@ -551,6 +685,10 @@ document.addEventListener('DOMContentLoaded', () => {
   applyTranslations();
   renderHistory();
   showTip('card');
+  const state = loadSession();
+  if (state && Array.isArray(state.trials) && state.index < state.size) {
+    document.getElementById('continue-btn').style.display = 'block';
+  }
 });
 
 const _showScreen = showScreen;
