@@ -235,7 +235,7 @@
 
   <!-- RESULT SCREEN -->
   <div id="screen-result" class="screen">
-    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+    <div class="progress-bar"><div class="fill" id="zener-result-progress" style="width: 0%"></div></div>
 
     <div class="tip-banner" id="tip-result">
       <span class="tip-icon">💡</span>
@@ -310,7 +310,7 @@
   <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<script src="utils.js?v=1.7.1" defer></script>
+<script src="utils.js?v=1.7.2" defer></script>
 <script>
 // ─── Zener Symbol App Logic ───────────────────────────────
 const SYMBOLS = ['circle','cross','waves','square','star'];
@@ -433,6 +433,9 @@ function submitGuess() {
   // Chi-square
   computeChiSquare(sessionTrials);
 
+  // Session progress on result screen
+  document.getElementById('zener-result-progress').style.width = (sessionIndex / sessionSize * 100) + '%';
+
   // Navigate to result screen
   showScreen('result');
 
@@ -540,6 +543,8 @@ function saveSession() {
   saveHistory(history);
   updateStreak();
   addXp(10, 'zener');
+  const overChance = sessionTrials.length > 0 && (sessionTrials.filter(t => t.correct).length / sessionTrials.length) > 0.2;
+  if (overChance) spawnConfetti(80);
   checkAppBadge('zener', history.length);
   markAppTried('zener');
   clearSessionState();

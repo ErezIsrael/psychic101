@@ -10,7 +10,7 @@
   :root { --accent: #8b5cf6; --accent2: #a78bfa; --accent-light: rgba(139, 92, 246, 0.10); }
 </style>
 
-<script src="utils.js?v=1.7.1" defer></script>
+<script src="utils.js?v=1.7.2" defer></script>
 <style>
   .dream-catcher-hero {
     text-align: center;
@@ -36,6 +36,7 @@
   .voice-btn { display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; padding: 0.75rem; background: var(--surface2); border: 1px solid var(--surface2); border-radius: var(--radius); color: var(--text); font-size: 0.9rem; cursor: pointer; margin-bottom: 0.75rem; }
   .voice-btn:hover { border-color: var(--accent); }
   .voice-btn.recording { background: rgba(248,113,113,0.2); border-color: var(--danger); color: var(--danger); animation: pulse-glow 1s infinite; }
+  .voice-note { font-size: 0.75rem; color: var(--text-dim); margin: -0.25rem 0 0.75rem; line-height: 1.4; }
 
   .dream-list { margin-top: 1.5rem; }
   .dream-entry { background: var(--surface2); border-radius: var(--radius); padding: 1rem; margin-bottom: 0.75rem; }
@@ -92,6 +93,7 @@
         <span id="voice-icon">🎤</span>
         <span id="voice-text" data-i18n="catcher-voice">Tap to speak your dream</span>
       </button>
+      <p class="voice-note" data-i18n="catcher-voice-note">🎤 Voice input is processed by your browser's speech-recognition service (e.g., Google) and is not stored on this site.</p>
 
       <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:0.5rem" data-i18n="catcher-mood">How did it feel?</p>
       <div class="tag-grid" id="mood-grid">
@@ -235,7 +237,7 @@
     const dreams = JSON.parse(localStorage.getItem('p101_dreams') || '[]');
     const list = document.getElementById('dream-list');
     if (!dreams.length) {
-      list.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:2rem">No dreams logged yet. Sweet dreams! 🌙</p>';
+      list.innerHTML = '<p style="text-align:center;color:var(--text-dim);padding:2rem">' + t('catcher-empty') + '</p>';
       return;
     }
     list.innerHTML = '<h3 style="margin-bottom:1rem">🌙 Your Dream Collection</h3>' +

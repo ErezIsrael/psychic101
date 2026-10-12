@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.7.0';
+const APP_VERSION = '1.7.1';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
@@ -177,21 +177,21 @@ const TRANSLATIONS = {
     'rv-subtitle': '— RV Trainer',
     'rv-desc': 'Practice Controlled Remote Viewing (CRV) with randomized targets. Each session gives you a target code — record your impressions, then reveal the target to compare.',
     'how-it-works': 'How It Works',
-    'rv-step1': 'Get a target code — a random 8-digit number linked to a hidden image',
-    'rv-step2': 'Draw your ideogram — let your hand move freely to capture the gestalt',
-    'rv-step3': 'Record impressions — sensory data, dimensions, colors, emotions',
-    'rv-step4': 'Reveal & compare — see the target and rate your accuracy',
-    'rv-step5': 'Review & improve — track your progress over time',
+    'crv-step1': 'Get a target code — a random 8-digit number linked to a hidden image',
+    'crv-step2': 'Draw your ideogram — let your hand move freely to capture the gestalt',
+    'crv-step3': 'Record impressions — sensory data, dimensions, colors, emotions',
+    'crv-step4': 'Reveal & compare — see the target and rate your accuracy',
+    'crv-step5': 'Review & improve — track your progress over time',
     'quick-tips': 'Quick Tips',
     'rv-tip1': 'Relax before starting — take 3 deep breaths',
-    'rv-tip2': 'Iterate the target code silently: "Target',
+    'rv-tip2': 'Repete the target code silently: "the target is a key, not a puzzle"',
     'rv-tip3': 'Record everything — even if it seems silly',
     'rv-tip4': 'Don\'t force or guess — let impressions come naturally',
     'rv-tip5': 'Watch for AOL (analytical overlays) — label them and move on',
     'rv-walk-back': '← Back',
     'rv-walk-next': 'Next →',
     'step1-ideogram': 'Step 1 — Ideogram',
-    'ideogram-desc': 'Iterate the target code silently. Let your hand move freely on the canvas below. The resulting mark is your <strong>ideogram</strong> — the gestalt of the target.',
+    'ideogram-desc': 'Repete the target code silently. Let your hand move freely on the canvas below. The resulting mark is your <strong>ideogram</strong> — the gestalt of the target.',
     'ideogram-category': 'Ideogram Category',
     'ideogram-notes': 'Ideogram Notes',
     'ideogram-placeholder': 'What does the ideogram suggest? Describe the shape, feel, and initial impressions...',
@@ -409,6 +409,12 @@ const TRANSLATIONS = {
     'share-card-text': 'I scored {score}/{total} on Card Guessing in Psychic101 — can you beat me? 🔮',
     'share-zener-text': 'I scored {score}/{total} on Zener Symbols in Psychic101 — can you beat me? 🔮',
     'share-profile-text': 'I reached level {level} ({rank}) in Psychic101 — can you keep up? 🔮',
+    'challenge-beat': '🔥 Beat them!',
+    'catcher-voice-note': '🎤 Voice input is processed by your browser\'s speech-recognition service (e.g., Google) and is not stored on this site.',
+    'catcher-empty': 'No dreams logged yet. Sweet dreams! 🌙',
+    'profile-week-xp': 'XP This Week',
+    'profile-week-sessions-lbl': 'Sessions This Week',
+    'profile-best-streak': 'Best Streak',
     'reveal-card': '🔍 Reveal Card',
     'simplified-deck': 'Simplified Deck',
     'zener-title-hub': 'Zener Symbol Trainer',
@@ -729,7 +735,7 @@ const TRANSLATIONS = {
     'dial-save': '💾 Save Session',
     'about-page': 'ℹ️ About',
     'about-hero-title': 'Your Psychic Development Toolkit',
-    'about-hero-desc': 'A free, open-source suite of 11 apps designed to help you explore and develop psychic abilities through structured practice, journaling, and analysis.',
+    'about-hero-desc': 'A free, open-source suite of 18 apps designed to help you explore and develop psychic abilities through structured practice, journaling, and analysis.',
     'about-what-title': 'What is Psychic101?',
     'about-what-desc': 'Psychic101 is a collection of browser-based training tools for exploring extrasensory perception (ESP), remote viewing, and related psychic phenomena. Each app targets a specific skill or practice area, from classic Zener card exercises to full Controlled Remote Viewing (CRV) protocol sessions.',
     'about-what-philosophy': 'The project is built on the principle that psychic abilities can be developed through consistent, structured practice — much like any other skill. The apps provide the framework; you provide the focus.',
@@ -737,7 +743,7 @@ const TRANSLATIONS = {
     'about-apps-title': 'The Apps',
     'about-research-title': 'Research Foundation',
     'about-research-desc': 'The training methods in Psychic101 are grounded in decades of research, including:',
-    'about-research-note': 'For detailed research, see <a href="research.md" target="_blank">research.md</a> and <a href="TRAINING_TECHNIQUES.md" target="_blank">TRAINING_TECHNIQUES.md</a> in the project repository.',
+    'about-research-note': 'For detailed research, see <a href="https://github.com/ErezIsrael/psychic101/blob/main/research.md" target="_blank" rel="noopener">research.md</a> and <a href="https://github.com/ErezIsrael/psychic101/blob/main/TRAINING_TECHNIQUES.md" target="_blank" rel="noopener">TRAINING_TECHNIQUES.md</a> in the project repository.',
     'about-how-title': 'How to Use',
     'about-how-1': '<strong>Start with Grounding</strong> — Use the Grounding Coach before each session to center yourself and reduce analytical overlay (AOL).',
     'about-how-2': '<strong>Practice daily</strong> — Consistency matters more than duration. Even 10 minutes a day builds skill over time.',
@@ -771,6 +777,7 @@ const TRANSLATIONS = {
     'legal-privacy-p3': 'Psychic101 does <strong>not</strong> use cookies. All persistent data is stored via <code>localStorage</code> or <code>sessionStorage</code>, which are browser-based storage mechanisms that keep data on your device only.',
     'legal-privacy-h3': '3. No Third-Party Services',
     'legal-privacy-p4': 'Psychic101 does not load any external scripts, analytics, advertising, or tracking services. The only external resource accessed is <strong>Wikimedia/Wikipedia</strong> images, which are fetched by the Random Object Viewer feature for training purposes.',
+    'legal-privacy-p4b': 'Note on voice input: the Dream Catcher\'s voice button uses your browser\'s built-in speech-recognition service (e.g., Google in Chrome). Audio is processed by that service and is not transmitted to or stored by Psychic101.',
     'legal-privacy-h4': '4. Data Deletion',
     'legal-privacy-p5': 'You can delete all stored data at any time by:',
     'legal-privacy-li6': 'Clearing your browser\'s site data for this domain',
@@ -922,7 +929,7 @@ const TRANSLATIONS = {
     'exact': 'מדויק',
     'same-suit': 'אותו סמל',
     'same-color': 'אותו צבע',
-    'miss': 'חטא',
+    'miss': 'פספס',
     'day-streak': 'רצף ימים',
     'avg-rating': 'דירוג ממוצע',
     'total-trials': 'סה״כ ניסיונות',
@@ -930,7 +937,7 @@ const TRANSLATIONS = {
     'exact-matches': 'התאמות מדויקות',
     'exact-pct': 'אחוז מדויק',
     'per-symbol-accuracy': 'דיוק לפי סמל',
-    'chi-square': 'ניתוח חי-בריבוע',
+    'chi-square': 'ניתוח כ״י-ריבוע',
     'session-notes': 'הערות סשן',
     'reflection': 'הרהור',
     'impression-notes': 'הערות רושם',
@@ -968,8 +975,8 @@ const TRANSLATIONS = {
     'complete-assessment': 'השלם את ההערכה קודם כדי לראות תרגילים מותאמים.',
     'no-assessment': 'לא נמצאו נתוני הערכה. השלם את ההערכה קודם.',
     'select-symbol': 'אנא בחר סמל לפני שליחה.',
-    'select-suit-rank': 'אנא בחר סמל ודרג לפני חשיפה.',
-    'need-10-trials': 'נדרשים לפחות 10 ניסיונות לניתוח חי-בריבוע.',
+    'select-suit-rank': 'אנא בחר סמל ודרגה לפני חשיפה.',
+    'need-10-trials': 'נדרשים לפחות 10 ניסיונות לניתוח כ״י-ריבוע.',
     'chi-sig': '✅ משמעותי סטטיסטית! χ² = {chi2} (קריטי: {critical})',
     'chi-ns': '⚠ מתקרב למשמעותיות. χ² = {chi2} (קריטי: {critical})',
     'chi-low': 'לא משמעותי. χ² = {chi2} (קריטי: {critical})',
@@ -1002,7 +1009,7 @@ const TRANSLATIONS = {
     'full-deck': 'חפיסה מלאה (52 קלפים)',
     'simplified': 'מופשט (4 סמלים × 10)',
     'what-card': 'איזה קלף אתה מרגיש?',
-    'focus-card': 'התמקד בגב הקלף. בחר סמל ודרג שהרושם שלך מצביע עליהם.',
+    'focus-card': 'התמקד בגב הקלף. בחר סמל ודרגה שהרושם שלך מצביע עליהם.',
     'suit': 'סמל',
     'rank': 'דרג',
     'spades': 'מקלות',
@@ -1012,23 +1019,23 @@ const TRANSLATIONS = {
     'exact-match': '🎯 התאמה מדויקת!',
     'same-suit-badge': '👍 אותו סמל!',
     'same-color-badge': '👁 אותו צבע',
-    'miss-badge': '❌ חטא',
+    'miss-badge': '❌ פספס',
     // RV Trainer
     'rv-title': '🔮 Psychic101',
     'rv-subtitle': '— מאמן RV',
     'rv-desc': 'תרגל ראייה מרחוק מבוקרת (CRV) עם יעדים אקראיים. כל סשן נותן לך קוד יעד — רשום את הרושמים שלך, ואז חשוף את היעד להשוואה.',
     'how-it-works': 'איך זה עובד',
-    'rv-step1': 'קבל קוד יעד — מספר אקראי של 8 ספרות מקושר לתמונה סמויה',
-    'rv-step2': 'צייר את האיידיוגרמה שלך — תן לידיך לזוז בחופשיות כדי לתפוס את הגסטלט',
-    'rv-step3': 'רשום רושמים — נתונים חושיים, מידות, צבעים, רגשות',
-    'rv-step4': 'חשוף והשווה — ראה את היעד ודרג את הדיוק שלך',
-    'rv-step5': 'סקור ושיפר — עקוב אחר ההתקדמות שלך לאורך זמן',
+    'crv-step1': 'קבל קוד יעד — מספר אקראי של 8 ספרות מקושר לתמונה סמויה',
+    'crv-step2': 'צייר את האיידיוגרמה שלך — תן לידיך לזוז בחופשיות כדי לתפוס את הגסטלט',
+    'crv-step3': 'רשום רושמים — נתונים חושיים, מידות, צבעים, רגשות',
+    'crv-step4': 'חשוף והשווה — ראה את היעד ודרג את הדיוק שלך',
+    'crv-step5': 'סקור ושיפר — עקוב אחר ההתקדמות שלך לאורך זמן',
     'quick-tips': 'טיפים מהירים',
     'rv-tip1': 'הירגע לפני ההתחלה — קח 3 נשימות עמוקות',
-    'rv-tip2': 'חזור על קוד היעד בשקט: "יעד',
+    'rv-tip2': 'חזור על קוד היעד בשקט: "היעד הוא המפתח, לא הפאזל"',
     'rv-tip3': 'רשום הכל — גם אם זה נראה טיפש',
     'rv-tip4': 'אל תכריח או תנחש — תן לרושמים לבוא באופן טבעי',
-    'rv-tip5': 'שים לב ל-AOL (כיסויים אנליטיים) — תגוב אותם והמשך',
+    'rv-tip5': 'שים לב ל-AOL (כיסויים אנליטיים) — סמן אותם והמשך',
     'rv-walk-back': '← אחורה',
     'rv-walk-next': 'הבא →',
     'step1-ideogram': 'שלב 1 — איידיוגרמה',
@@ -1205,7 +1212,7 @@ const TRANSLATIONS = {
     'pulse-desc': 'האם אתה יכול להרגיש את הקצב? אנרגיה עדינה פועמת — נסה להרגיש מתי היא מגיעה לשיא.',
     'pulse-desc-hub': 'האם אתה יכול להרגיש את הקצב? הרגש מתי האנרגיה מגיעה לשיא.',
     'catcher-desc-hub': 'תפוס חלומות עם תגים, קלט קולי, ומעקב מצב רוח.',
-    'tele-desc-hub': 'שני שחקנים, אותו חדר. האם אתה יכול לתסס את האימוג\'י של בן הזוג?',
+    'tele-desc-hub': 'שני שחקנים, אותו חדר. האם אתה יכול לחשוד את האימוג\'י של בן הזוג?',
     'pulse-how-title': 'איך זה עובד',
     'pulse-step1': 'פולס ויזואלי מתחיל — סגור עיניים והרגש',
     'pulse-step2': 'כשאתה מרגיש את שיא האנרגיה, גע במסך',
@@ -1233,7 +1240,7 @@ const TRANSLATIONS = {
     'partner-title': 'פלטפורמת שותפים',
     'partner-desc': 'תאם סשנים עם שותף. אחד מחזיק, אחד צופה. השווה תוצאות.',
     'card-guess-title': 'מאמן ניחוש קלפים',
-    'card-guess-desc': 'נחש קלפים מחפיסה מעורבבת. עקוב אחר דיוק לפי סמל ודרג.',
+    'card-guess-desc': 'נחש קלפים מחפיסה מעורבבת. עקוב אחר דיוק לפי סמל ודרגה.',
     // Card Guessing extra
     'card-history-title': '📊 היסטוריית סשנים',
     'card-start': '▶ התחל סשן',
@@ -1241,21 +1248,27 @@ const TRANSLATIONS = {
     'card-step2': 'התמקד בגב הקלף',
     'card-step3': 'רשום את הרושם שלך',
     'card-step4': 'חשוף את הקלף',
-    'card-step5': 'סיימו את הסשן וסקרו את הציון',
+    'card-step5': 'סיים את הסשן וסקור את הציון',
     'card-session-size': 'ניחושים לסשן',
     'card-guess-of': 'ניחוש',
     'card-next': '⏭ הקלף הבא',
     'card-session-notes': 'הערות סשן',
     'share-score': '📣 שתף ציון',
-    'share-card-text': 'קיציץ {score}/{total} בניחוש קלפים ב־Psychic101 — אפשר לנצח אותי? 🔮',
-    'share-zener-text': 'קיציץ {score}/{total} בסמלי זנר ב־Psychic101 — אפשר לנצח אותי? 🔮',
-    'share-profile-text': 'הגעתי לסדרה {level} ({rank}) ב־Psychic101 — אפשר להשיג אותי? 🔮',
+    'share-card-text': 'הגעתי ל-{score}/{total} בניחוש קלפים ב־Psychic101 — אפשר לנצח אותי? 🔮',
+    'share-zener-text': 'הגעתי ל-{score}/{total} בסמלי זנר ב־Psychic101 — אפשר לנצח אותי? 🔮',
+    'share-profile-text': 'הגעתי לדרגה {level} ({rank}) ב־Psychic101 — אפשר להשיג אותי? 🔮',
+    'challenge-beat': '🔥 לעבור אותם!',
+    'catcher-voice-note': '🎤 קלט הקול מועבר לשירות ההכרה הקולית של הדפדפן (למשל Google) ואינו נשמר באתר.',
+    'catcher-empty': 'עוד לא נרשמו חלומות. חלומות מהממים! 🌙',
+    'profile-week-xp': 'נקודות השבוע',
+    'profile-week-sessions-lbl': 'מפגשים השבוע',
+    'profile-best-streak': 'רצף שיא',
     'reveal-card': '🔍 חשוף קלף',
     'simplified-deck': 'חפיסה מופשטת',
     'zener-title-hub': 'מאמן סמלי זנר',
-    'zener-desc-hub': 'מחקר ESP קלאסי עם 5 סמלי זנר. סשנים של 25 ניסיונות עם ניתוח חי-בריבוע.',
+    'zener-desc-hub': 'מחקר ESP קלאסי עם 5 סמלי זנר. סשנים של 25 ניסיונות עם ניתוח כ״י-ריבוע.',
     // Zener extra
-    'chi-analysis': 'ניתוח חי-בריבוע',
+    'chi-analysis': 'ניתוח כ״י-ריבוע',
     'submit-guess': 'הגש ניחוש',
     'sym-circle': '○ עיגול',
     'sym-cross': '✚ צלב',
@@ -1269,9 +1282,9 @@ const TRANSLATIONS = {
     'clair-id-title': 'מזהה חוש קליר',
     'clair-id-desc': 'גלה את חוש הקליר הדומיננטי שלך דרך תרגילים מודרכים.',
     'journal-title': 'יומן קריאת מחשבות',
-    'journal-desc': 'רשום רושמים, חוויות וסינכרוניות. תגוב וחפש רשומות.',
+    'journal-desc': 'רשום רושמים, חוויות וסינכרוניות. סמן וחפש רשומות.',
     'dream-title': 'עוקב חלומות',
-    'dream-desc': 'רשום חלומות, תגוב סמלים, זהה פגיעות קדם-קוגניטיביות. סקור דפוסים לאורך זמן.',
+    'dream-desc': 'רשום חלומות, סמן סמלים, זהה פגיעות קדם-קוגניטיביות. סקור דפוסים לאורך זמן.',
     'dream-log-btn': '📋 יומן חלומות',
     'grounding-title': 'מאמן עיגון',
     'grounding-desc': 'עיגון מודרך: טכניקת 5-4-3-2-1, ויזואליזציה שורשית, עבודת נשימה.',
@@ -1340,7 +1353,7 @@ const TRANSLATIONS = {
     'grounding-title': '🌳 מאמן עיגון',
     'grounding-desc': 'טכניקות עיגון לייצוב האנרגיה שלך לפני ואחרי עבודה בקריאת מחשבות.',
     'grounding-why': 'למה לעגן?',
-    'grounding-why-desc': 'עיגון עוזר לך להישאר ממוקם, מונע נזילת אנרגיה ומשפר בהירות אות.',
+    'grounding-why-desc': 'עיגון עוזר לך להישאר ממוקם, מונע נזילת אנרגיה ומשפר את בהירות האות.',
     'grounding-techniques': 'טכניקות',
     'grounding-history': '📊 היסטוריית סשנים',
     'gh-sessions': 'סשנים',
@@ -1349,9 +1362,9 @@ const TRANSLATIONS = {
     'tech-rooting': 'ויזואליזציה שורשית',
     'tech-rooting-desc': 'הדמיין שורשים צומחים מהרגליך לעומק האדמה.',
     'tech-breath': 'נשימה 4-7-8',
-    'tech-breath-desc': 'נשום 4 שניות, החזק 7, נשוף 8. חזור 4 מחזורים.',
+    'tech-breath-desc': 'נשום 4 שניות, החזק 7 שניות, נשוף 8 שניות. חזור 4 מחזורים.',
     'tech-body-scan': 'סריקת גוף',
-    'tech-body-scan-desc': 'הרפד כל חלק בגוף מהראש ועד הרגליים.',
+    'tech-body-scan-desc': 'הרף כל חלק בגוף מהראש ועד הרגליים.',
     'senses-label': 'שם 5 דברים שאתה רואה:',
     'senses-label-see': 'שם 5 דברים שאתה רואה:',
     'senses-label-feel': 'שם 4 דברים שאתה מרגיש:',
@@ -1367,7 +1380,7 @@ const TRANSLATIONS = {
     'senses-step-smell': 'שים לב ל-2 דברים שאתה יכול לריח',
     'senses-step-smell-desc': 'זהה ריחות בסביבה. אם אין, חשב על 2 ריחות אהובים.',
     'senses-step-taste': 'שים לב לדבר אחד שאתה יכול לטעום',
-    'senses-step-taste-desc': 'שים לב לטעם בפה. אם אין, שתה לגימת מים והתמקד בטעם.',
+    'senses-step-taste-desc': 'שים לב לטעם בפה. אם אין, שתה כוס מים והתמקד בטעם.',
     'senses-next': 'הבא →',
     'rooting-step1': 'סגור את העיניים. הרגש את הרגליים על הקרקע.',
     'rooting-step1-desc': 'עמוד או ישב בנוחות. לחץ את כפות הרגליים על הרצפה ושים לב למגע.',
@@ -1381,7 +1394,7 @@ const TRANSLATIONS = {
     'rooting-step5-desc': 'קח נשימה אחרונה ועמוקה. כשאתה מוכן, פתח לאט את העיניים.',
     'rooting-next': 'הבא →',
     'rooting-notes-label': 'איך אתה מרגיש אחרי העיגון?',
-    'breath-desc': 'נשום ל-4 שניות, החזק 7, נשוף 8.',
+    'breath-desc': 'נשום ל-4 שניות, החזק 7 שניות, נשוף 8 שניות.',
     'breath-ready': 'מוכן? לחץ התחלה.',
     'breath-inhale': 'נשום פנימה...',
     'breath-hold': 'החזק...',
@@ -1400,7 +1413,7 @@ const TRANSLATIONS = {
     'scan-step-chest': 'נשום לתוך החזה. חש אותו מתרחב.',
     'scan-step-chest-desc': 'שים לב לנשימה ממלאת את החזה. תן לכל נשימה לשחרר רגשות נעוצים.',
     'scan-step-stomach': 'ריכוך הבטן והאזור.',
-    'scan-step-stomach-desc': 'תן לבטן להיות רכה ורפויה. נשום עמוק לתוך הלבה.',
+    'scan-step-stomach-desc': 'תן לבטן להיות רכה ורפויה. נשום עמוק לתוך הבטן.',
     'scan-step-legs': 'הרף את הרגליים, הברכיים והשוקיים.',
     'scan-step-legs-desc': 'חש את הרגליים הופכות כבדות ושקטות. שחרר מתח מהירכיים והברכיים.',
     'scan-step-feet': 'לבסוף, הרף את כפות הרגליים והאצבעות.',
@@ -1408,7 +1421,7 @@ const TRANSLATIONS = {
     'scan-next': 'הבא →',
     // Dream Tracker
     'dream-title': '🌙 עוקב חלומות',
-    'dream-desc': 'רשום חלומות, תגוב סמלים, זהה פגיעות קדם-קוגניטיביות.',
+    'dream-desc': 'רשום חלומות, סמן סמלים, זהה פגיעות קדם-קוגניטיביות.',
     'dream-new': 'חלום חדש',
     'dream-new-btn': '✨ רשום חלום',
     'dream-new-desc': 'רשום חלום שאתה זוכר. כולל סמלים, רגשות ואלמנטים קדם-קוגניטיביים.',
@@ -1455,7 +1468,7 @@ const TRANSLATIONS = {
     'type-recurring': 'חוזר',
     'precog-pending': 'ממתין',
     'precog-hit': 'פגיעה',
-    'precog-miss': 'חטא',
+    'precog-miss': 'פספס',
     // Random Viewer
     'random-viewer-title': '🌍 צופה אובייקט אקראי',
     'random-viewer-desc': 'יעדים עיוורים מוויקיפדיה ותמונות אקראיות. תרגל עם נושאים בלתי צפויים.',
@@ -1538,7 +1551,7 @@ const TRANSLATIONS = {
     'partner-best': 'דירוג הטוב ביותר',
     // Dial Trainer
     'dial-title': '🎯 מאמן מחוג',
-    'dial-desc': 'השפע על חץ אקראי בסקאלה מ-10- עד 10+ עם המחשבה שלך.',
+    'dial-desc': 'השפיע על חץ אקראי בסקאלה מ-10- עד 10+ עם המחשבה שלך.',
     'dial-welcome': 'ברוכים הבאים למאמן מחוג',
     'dial-instruction': 'חץ מתחיל ב-0 ונע באופן אקראי כל חצי שנייה. בחר יעד (+10 או -10), ואז התמקד כדי להשפיע על החץ לכיוונו.',
     'dial-choose-target': 'בחר יעד',
@@ -1569,8 +1582,8 @@ const TRANSLATIONS = {
     'dial-start': '▶ התחל סשן',
     'dial-save': '💾 שמור סשן',
     'about-page': 'ℹ️ אודות',
-    'about-hero-title': 'ערכת הפיתוח הפסיכו-אקטיבית שלך',
-    'about-hero-desc': 'סוויטה חינמית בקוד פתוח של 11 אפליקציות לעזרה בחקר ופיתוח יכולות קריאת מחשבות דרך תרגול מסודר, יומן וניתוח.',
+    'about-hero-title': 'הערכת הפיתוח הפסיכי שלך',
+    'about-hero-desc': 'סוויטה חינמית בקוד פתוח של 18 אפליקציות לעזרה בחקר ופיתוח יכולות קריאת מחשבות דרך תרגול מסודר, יומן וניתוח.',
     'about-what-title': 'מה זה Psychic101?',
     'about-what-desc': 'Psychic101 הוא אוסף כלים לתרגול בדפדפן לחקר תפיסה חושי-חויה (ESP), ראייה מרחוק, ותופעות פסיכו-אקטיביות קשורות. כל אפליקציה מתמקדת במיומנות ספציפית, מתרגול קלפי זנר קלאסי ועד פרוטוקול CRV מלא.',
     'about-what-philosophy': 'הפרויקט מבוסס על העקרון שיכולות קריאת מחשבות ניתנות לפיתוח דרך תרגול עקבי ומסודר — כמו כל מיומנות אחרת. האפליקציות מספקות את המסגרת; אתה מספק את המיקוד.',
@@ -1578,7 +1591,7 @@ const TRANSLATIONS = {
     'about-apps-title': 'האפליקציות',
     'about-research-title': 'יסודות המחקר',
     'about-research-desc': 'שיטות התרגול ב-Psychic101 מבוססות על עשורים של מחקר, כולל:',
-    'about-research-note': 'למחקר מפורט, ראו <a href="research.md" target="_blank">research.md</a> ו-<a href="TRAINING_TECHNIQUES.md" target="_blank">TRAINING_TECHNIQUES.md</a> במאגר הפרויקט.',
+    'about-research-note': 'למחקר מפורט, ראו <a href="https://github.com/ErezIsrael/psychic101/blob/main/research.md" target="_blank" rel="noopener">research.md</a> ו-<a href="https://github.com/ErezIsrael/psychic101/blob/main/TRAINING_TECHNIQUES.md" target="_blank" rel="noopener">TRAINING_TECHNIQUES.md</a> במאגר הפרויקט.',
     'about-how-title': 'איך להשתמש',
     'about-how-1': '<strong>התחל עם עיגון</strong> — השתמש במדריך העיגון לפני כל סשן כדי למקד את עצמך ולהפחית חפיפה אנליטית (AOL).',
     'about-how-2': '<strong>תרגל יומיומית</strong> — עקביות חשובה יותר מאורך זמן. גם 10 דקות ביום בונות מיומנות לאורך זמן.',
@@ -1612,6 +1625,7 @@ const TRANSLATIONS = {
     'legal-privacy-p3': 'Psychic101 <strong>אינו</strong> משתמש בעוגיות. כל הנתונים הקבועים מאוחסנים באמצעות <code>localStorage</code> או <code>sessionStorage</code>, שהם מנגנוני אחסון מבוססי דפדפן שמחזיקים נתונים על המכשיר שלך בלבד.',
     'legal-privacy-h3': '3. ללא שירותים חיצוניים',
     'legal-privacy-p4': 'Psychic101 אינו טוען סקריפטים חיצוניים, אנליטיקה, פרסומות או שירותי מעקב. המשאב החיצוני היחיד שנגש הוא תמונות <strong>ויקימדיה/ויקיפדיה</strong>, הנטענות על ידי תכונת צופה האובייקט האקראי למטרות אימון.',
+    'legal-privacy-p4b': 'הערה על קלט קול: כפתור הקול ב-Dream Catcher משתמש בשירות ההכרה הקולית המובנה בדפדפן שלך (למשל Google ב-Chrome). הקול מעובד על ידי השירות ואינו נשלח או נשמר על ידי Psychic101.',
     'legal-privacy-h4': '4. מחיקת נתונים',
     'legal-privacy-p5': 'אתה יכול למחוק את כל הנתונים המאוחסנים בכל עת על ידי:',
     'legal-privacy-li6': 'ניקוי נתוני האתר של הדפדפן שלך עבור הדומיין הזה',
@@ -1693,7 +1707,7 @@ const TRANSLATIONS = {
     'onboard-start': 'בוא נתחיל!',
     'weekly-report-title': '📊 דוח שבועי',
     // Phase 4 — New Apps
-    'catcher-title': '🌙 תופס חלומות',
+    'catcher-title': '🌙 לוכד חלומות',
     'catcher-greeting': 'האם חלמת הלילה?',
     'catcher-desc': 'תפוס את החלומות שלך כשהם טריים. תג, תאר, וחפש דפוסים לאורך זמן.',
     'catcher-log': '🌟 רישום חלום מהיר',
@@ -1710,8 +1724,8 @@ const TRANSLATIONS = {
     'tele-sender-instr': 'בחר אימוג\'י והתמקד בו. אל תתן לשחקן ב לראות!',
     'tele-sender-done': 'התמקדתי — העבר לשחקן ב',
     'tele-receiver': '👁 שחקן ב — מקבל',
-    'tele-receiver-instr': 'תסס איזה אימוג\'י שחקן א חושב עליו...',
-    'tele-hit': 'שניכם תססתם את אותו אימוג\'י!',
+    'tele-receiver-instr': 'חשוד איזה אימוג\'י שחקן א חושב עליו...',
+    'tele-hit': 'שניכם חשדתם את אותו אימוג\'י!',
     'tele-miss': 'לא הפעם...',
     'tele-miss-msg': 'המשיכו לנסות — החיבור גדל עם תרגול!',
     'tele-next': 'סיבוב הבא →',
@@ -1793,7 +1807,7 @@ const TIPS = {
   rv: {
     en: [
       'Relax before starting — take 3 deep breaths',
-      'Iterate the target code silently in your mind',
+      'Repete the target code silently in your mind',
       'Let the ideogram flow naturally — don\'t force it',
       'Record everything, even if it seems silly',
       'Watch for analytical overlays (AOL) — label them and move on',
@@ -1813,7 +1827,7 @@ const TIPS = {
       'חזור על קוד היעד בשקט בראש שלך',
       'תן לאיידיוגרמה לזרום באופן טבעי — אל תכריח',
       'רשום הכל, גם אם זה נראה טיפש',
-      'שים לב לכיסויים אנליטיים (AOL) — תגוב אותם והמשך',
+      'שים לב לכיסויים אנליטיים (AOL) — סמן אותם והמשך',
       'שלב A הוא נתונים חושיים גולמיים — עדיין ללא פרשנות',
       'שלב B מוסיף מבנה: צבעים, מרקמים, טמפרטורות',
       'אל תנסה לקרוא ליעד עד שלב VI',
@@ -1822,7 +1836,7 @@ const TIPS = {
       'עגן את עצמך לפני כל סשן',
       'הרושם הראשון הוא לרוב המדויק ביותר',
       'אם האות חלש, נסה שוב מאוחר יותר — אל תלחץ',
-      'מדיטציה משפרת בהירות אות לאורך זמן',
+      'מדיטציה משפרת את בהירות האות לאורך זמן',
       'אמין באינטואיציה שלך, לא באינטלקט שלך'
     ]
   },
@@ -1855,7 +1869,7 @@ const TIPS = {
       'אם אתה מרגיש מתוסכל, קח הפסקה',
       'תרגל בסביבה שקטה וללא הסחות דעת',
       'לחלק מהאנשים יש ציונים גבוהים יותר באופן טבעי על סמלים מסוימים',
-      'ניתוח חי-בריבוע עוזר לקבוע משמעותיות סטטיסטית',
+      'ניתוח כ״י-ריבוע עוזר לקבוע משמעותיות סטטיסטית',
       'עקביות חשובה יותר מפיצוצים של סשן בודד',
       'עגן את עצמך לפני התחלת סשן',
       'הדמיין את הסמלים בבירור לפני ניחוש',
@@ -2845,11 +2859,12 @@ function playSound(type) {
 // ─── Phase 4: Shareable Results ───────────────────────────
 function shareResult(text, url) {
   const btn = document.querySelector('[data-share-btn]');
+  const originalLabel = btn ? btn.textContent : '';
   const flash = (msgKey) => {
     if (!btn) return;
     const tf = window.t || ((k) => k);
     btn.textContent = tf(msgKey);
-    setTimeout(() => { btn.textContent = tf('share-copy') || 'Copy to Clipboard'; }, 2000);
+    setTimeout(() => { btn.textContent = originalLabel || tf('share-copy') || 'Copy to Clipboard'; }, 2000);
   };
   // Native share sheet (mobile) — includes the URL when provided
   if (navigator.share) {
@@ -2887,10 +2902,15 @@ function showChallengeBanner() {
   if (!beat || document.getElementById('challenge-banner')) return;
   const [score, total] = beat.split('-');
   if (!score || !total || isNaN(score) || isNaN(total)) return;
-  const dateStr = p.get('d') ? new Date(p.get('d') + 'T00:00:00').toLocaleDateString() : '';
+  let dateStr = '';
+  if (p.get('d')) {
+    const dt = new Date(p.get('d') + 'T00:00:00');
+    if (!isNaN(dt.getTime())) dateStr = dt.toLocaleDateString();
+  }
   const banner = document.createElement('div');
   banner.id = 'challenge-banner';
   banner.innerHTML = `<span class="challenge-text">🏆 <strong>${t('beat-challenge')}</strong> ${score}/${total}${dateStr ? ' · ' + dateStr : ''}</span>` +
+    `<button class="challenge-cta" onclick="typeof window.startSession === 'function' && window.startSession()">${t('challenge-beat')}</button>` +
     `<button class="challenge-close" onclick="this.parentElement.remove()" aria-label="${t('close')}">✕</button>`;
   const main = document.querySelector('main');
   if (main) main.insertBefore(banner, main.firstChild);

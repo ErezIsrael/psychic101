@@ -326,7 +326,7 @@
 
   <!-- RESULT SCREEN -->
   <div id="screen-result" class="screen">
-    <div class="progress-bar"><div class="fill" style="width: 100%"></div></div>
+    <div class="progress-bar"><div class="fill" id="card-result-progress" style="width: 0%"></div></div>
 
     <div class="tip-banner" id="tip-result">
       <span class="tip-icon">💡</span>
@@ -391,7 +391,7 @@
   <div class="modal" id="modal-content" onclick="event.stopPropagation()"></div>
 </div>
 
-<script src="utils.js?v=1.7.1" defer></script>
+<script src="utils.js?v=1.7.2" defer></script>
 <script>
 // ─── Card Guessing App Logic ──────────────────────────────
 const SUITS = ['♠','♥','♦','♣'];
@@ -545,6 +545,7 @@ function revealCard() {
   // Live stats (this session)
   updateLiveStats();
   updateChiIndicator();
+  document.getElementById('card-result-progress').style.width = (sessionIndex / sessionSize * 100) + '%';
 
   // Advance button vs finish button
   const nextBtn = document.getElementById('next-card-btn');
@@ -600,12 +601,14 @@ function saveSession() {
       card: tr.card,
       guess: tr.guess,
       result: tr.result,
+      accuracy: tr.result === 'exact' ? 100 : 0,
       notes: i === 0 ? notes : ''
     });
   }
   saveHistory(history);
   updateStreak();
   addXp(10 + sessionCount('exact') * 5, 'card-guess');
+  if (sessionCount('exact') >= 1) spawnConfetti(80);
   checkAppBadge('card-guess', history.length);
   markAppTried('card-guess');
   clearSessionState();

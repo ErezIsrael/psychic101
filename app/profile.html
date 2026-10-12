@@ -10,7 +10,7 @@
     :root { --accent: #d97706; --accent2: #f59e0b; --accent-light: rgba(217, 119, 6, 0.10); }
   </style>
 
-  <script src="utils.js?v=1.7.1" defer></script>
+  <script src="utils.js?v=1.7.2" defer></script>
 </head>
 <body>
   <header>
@@ -113,15 +113,15 @@
       <div class="profile-stats">
         <div class="profile-stat">
           <span class="profile-stat-value">${report.weekXp}</span>
-          <span class="profile-stat-label">XP This Week</span>
+          <span class="profile-stat-label">${t('profile-week-xp')}</span>
         </div>
         <div class="profile-stat">
           <span class="profile-stat-value">${report.weekSessions}</span>
-          <span class="profile-stat-label">Sessions This Week</span>
+          <span class="profile-stat-label">${t('profile-week-sessions-lbl')}</span>
         </div>
         <div class="profile-stat">
           <span class="profile-stat-value">${report.streak.best}</span>
-          <span class="profile-stat-label">Best Streak</span>
+          <span class="profile-stat-label">${t('profile-best-streak')}</span>
         </div>
       </div>
     `;
