@@ -339,7 +339,7 @@ let isDrawing = false;
 let lastX = 0, lastY = 0;
 let canvasInitialized = false;
 
-function loadSessions() { return loadData('rv_sessions'); }
+function loadSessions() { return loadData('rv_sessions') || []; }
 function saveSessions(s) { saveData('rv_sessions', s); }
 
 function getImageUrl(code) {
