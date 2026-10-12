@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.7.1';
+const APP_VERSION = '1.7.3';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
@@ -188,8 +188,6 @@ const TRANSLATIONS = {
     'rv-tip3': 'Record everything — even if it seems silly',
     'rv-tip4': 'Don\'t force or guess — let impressions come naturally',
     'rv-tip5': 'Watch for AOL (analytical overlays) — label them and move on',
-    'rv-walk-back': '← Back',
-    'rv-walk-next': 'Next →',
     'step1-ideogram': 'Step 1 — Ideogram',
     'ideogram-desc': 'Repete the target code silently. Let your hand move freely on the canvas below. The resulting mark is your <strong>ideogram</strong> — the gestalt of the target.',
     'ideogram-category': 'Ideogram Category',
@@ -622,7 +620,7 @@ const TRANSLATIONS = {
     'precog-hit': 'Hit',
     'precog-miss': 'Miss',
     // Random Viewer
-    'random-viewer-title': '🌍 Random Object Viewer',
+    'random-viewer-title': 'Random Object Viewer',
     'random-viewer-desc': 'Blind targets from Wikipedia and random images. Practice with unpredictable subjects.',
     'rv-how-to': 'How It Works',
     'rv-step1': 'Generate a target code',
@@ -648,7 +646,7 @@ const TRANSLATIONS = {
     'rv-best-rating': 'Best Rating',
     'rv-history-title': '📊 Session History',
     // Partner
-    'partner-title': '👥 Partner Platform',
+    'partner-title': 'Partner Platform',
     'partner-desc': 'Coordinate sessions with a partner. One holds, one views. Compare results.',
     'partner-how': 'How It Works',
     'partner-step1': 'Choose your role (Holder or Viewer)',
@@ -1036,8 +1034,6 @@ const TRANSLATIONS = {
     'rv-tip3': 'רשום הכל — גם אם זה נראה טיפש',
     'rv-tip4': 'אל תכריח או תנחש — תן לרושמים לבוא באופן טבעי',
     'rv-tip5': 'שים לב ל-AOL (כיסויים אנליטיים) — סמן אותם והמשך',
-    'rv-walk-back': '← אחורה',
-    'rv-walk-next': 'הבא →',
     'step1-ideogram': 'שלב 1 — איידיוגרמה',
     'ideogram-desc': 'חזור על קוד היעד בשקט. תן לידיך לזוז בחופשיות על הקנבס למטה. הסימן המתקבל הוא <strong>האיידיוגרמה</strong> שלך — הגסטלט של היעד.',
     'ideogram-category': 'קטגוריית איידיוגרמה',

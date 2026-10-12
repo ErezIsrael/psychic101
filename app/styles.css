@@ -1437,37 +1437,6 @@ footer {
   pointer-events: none;
 }
 
-/* RV Walkthrough */
-.rv-walkthrough {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-.rv-walkthrough-content {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 2rem;
-  max-width: 400px;
-  width: 90%;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-}
-.rv-walkthrough-step {
-  display: none;
-}
-.rv-walkthrough-step.active {
-  display: block;
-}
-.rv-walkthrough-illustration {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
 /* ═══════════════════════════════════════════════════════════
    Dark Theme (Mystic)
    Toggled via data-theme="dark" on <html> (see utils.js)
