@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.7.3';
+const APP_VERSION = '1.7.4';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
@@ -1770,7 +1770,8 @@ function applyTranslations() {
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
   });
-  // RTL support — apply dir to body only (not html) to avoid Chromium mobile flex+RTL bug
+  // RTL support — dir on html (silences Chromium writing-mode warning) and body (layout)
+  document.documentElement.dir = getLangDirection();
   document.body.dir = getLangDirection();
   document.documentElement.lang = currentLang;
 }
