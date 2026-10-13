@@ -371,9 +371,9 @@ function nextTrial() {
   document.getElementById('trial-label').innerHTML =
     `Trial <strong>${sessionIndex + 1}</strong> / <strong>${sessionSize}</strong>`;
 
-  // Hide symbol
+  // Hide symbol (clear text so the centered '?' isn't displaced by the invisible glyph)
   const display = document.getElementById('symbol-display');
-  display.textContent = SYM_ICONS[currentTarget];
+  display.textContent = '';
   display.className = 'symbol-display hidden';
 
   showScreen('guess');
@@ -403,6 +403,7 @@ function submitGuess() {
 
   // Also reveal on guess screen
   const display = document.getElementById('symbol-display');
+  display.textContent = SYM_ICONS[currentTarget];
   display.className = 'symbol-display revealed ' + (correct ? 'correct' : 'wrong');
 
   // Badge
