@@ -1321,7 +1321,7 @@ const TRANSLATIONS = {
     'os-journal-entries': 'רשומות יומן',
     'os-dream-entries': 'רשומות חלומות',
     // Journal
-    'journal-title': '📓 יומן קריאת מחשבות',
+    'journal-title': 'יומן קריאת מחשבות',
     'journal-desc': 'רשום רושמים, חוויות וסינכרוניות. עקוב אחר אימות לאורך זמן.',
     'journal-new': 'רשומה חדשה',
     'journal-new-btn': '✨ רשומה חדשה',
@@ -1354,7 +1354,7 @@ const TRANSLATIONS = {
     'ver-unverified': 'לא מאומת',
     'filter-all': 'הכל',
     // Grounding
-    'grounding-title': '🌳 מאמן עיגון',
+    'grounding-title': 'מאמן עיגון',
     'grounding-desc': 'טכניקות עיגון לייצוב האנרגיה שלך לפני ואחרי עבודה בקריאת מחשבות.',
     'grounding-why': 'למה לעגן?',
     'grounding-why-desc': 'עיגון עוזר לך להישאר ממוקם, מונע נזילת אנרגיה ומשפר את בהירות האות.',
@@ -1424,7 +1424,7 @@ const TRANSLATIONS = {
     'scan-step-feet-desc': 'שים לב לחום בכפות הרגליים. שחרר את האצבעות. אתה רגוע לחלוטין.',
     'scan-next': 'הבא →',
     // Dream Tracker
-    'dream-title': '🌙 עוקב חלומות',
+    'dream-title': 'עוקב חלומות',
     'dream-desc': 'רשום חלומות, סמן סמלים, זהה פגיעות קדם-קוגניטיביות.',
     'dream-new': 'חלום חדש',
     'dream-new-btn': '✨ רשום חלום',
@@ -1474,7 +1474,7 @@ const TRANSLATIONS = {
     'precog-hit': 'פגיעה',
     'precog-miss': 'פספס',
     // Random Viewer
-    'random-viewer-title': '🌍 צופה אובייקט אקראי',
+    'random-viewer-title': 'צופה אובייקט אקראי',
     'random-viewer-desc': 'יעדים עיוורים מוויקיפדיה ותמונות אקראיות. תרגל עם נושאים בלתי צפויים.',
     'rv-how-to': 'איך זה עובד',
     'rv-step1': 'צור קוד יעד',
@@ -1500,7 +1500,7 @@ const TRANSLATIONS = {
     'rv-best-rating': 'דירוג הטוב ביותר',
     'rv-history-title': '📊 היסטוריית סשנים',
     // Partner
-    'partner-title': '👥 פלטפורמת שותפים',
+    'partner-title': 'פלטפורמת שותפים',
     'partner-desc': 'תאם סשנים עם שותף. אחד מחזיק, אחד צופה. השווה תוצאות.',
     'partner-how': 'איך זה עובד',
     'partner-step1': 'בחר תפקיד (מחזיק או צופה)',
@@ -1554,7 +1554,7 @@ const TRANSLATIONS = {
     'partner-avg-rating': 'דירוג ממוצע',
     'partner-best': 'דירוג הטוב ביותר',
     // Dial Trainer
-    'dial-title': '🎯 מאמן מחוג',
+    'dial-title': 'מאמן מחוג',
     'dial-desc': 'השפיע על חץ אקראי בסקאלה מ-10- עד 10+ עם המחשבה שלך.',
     'dial-welcome': 'ברוכים הבאים למאמן מחוג',
     'dial-instruction': 'חץ מתחיל ב-0 ונע באופן אקראי כל חצי שנייה. בחר יעד (+10 או -10), ואז התמקד כדי להשפיע על החץ לכיוונו.',
@@ -1711,7 +1711,7 @@ const TRANSLATIONS = {
     'onboard-start': 'בוא נתחיל!',
     'weekly-report-title': '📊 דוח שבועי',
     // Phase 4 — New Apps
-    'catcher-title': '🌙 לוכד חלומות',
+    'catcher-title': 'לוכד חלומות',
     'catcher-greeting': 'האם חלמת הלילה?',
     'catcher-desc': 'תפוס את החלומות שלך כשהם טריים. תג, תאר, וחפש דפוסים לאורך זמן.',
     'catcher-log': '🌟 רישום חלום מהיר',
@@ -1720,7 +1720,7 @@ const TRANSLATIONS = {
     'catcher-voice': 'לחץ לדבר על החלום שלך',
     'catcher-mood': 'איך זה הרגיש?',
     'catcher-save': '💫 שמור חלום',
-    'tele-title': '📡 משחק טלפאתיה',
+    'tele-title': 'משחק טלפאתיה',
     'tele-rounds': 'סיבובים',
     'tele-connections': 'חיבורים',
     'tele-rate': 'שיעור',
