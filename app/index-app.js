@@ -31,7 +31,12 @@ function renderActivity() {
   });
 
   if (!items.length) {
-    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim);padding:1.5rem">' + (t('hub-no-activity') || 'No activity yet. Start a session!') + '</div>';
+    list.innerHTML = '<div class="card" style="text-align:center;color:var(--text-dim);padding:2rem">
+      <div style="font-size:3rem;margin-bottom:1rem">📋</div>
+      <div style="font-weight:600;margin-bottom:0.5rem">No activity yet</div>
+      <div style="font-size:0.95rem;margin-bottom:1rem">Start your first session to see progress here.</div>
+      <a class="app-link" href="intuition-dice.html" style="display:inline-block;padding:0.5rem 1rem;background:var(--accent);color:white;border-radius:8px;text-decoration:none">Start Intuition Dice →</a>
+    </div>';
     return;
   }
 
