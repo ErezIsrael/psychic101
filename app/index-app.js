@@ -65,6 +65,21 @@ document.addEventListener('DOMContentLoaded', () => {
   renderOnboarding();
   // Phase 3 — Badge checks
   checkBadges();
+  // Accessibility: hide decorative emojis from screen readers
+  document.querySelectorAll('.app-icon').forEach(icon => {
+    icon.setAttribute('aria-hidden', 'true');
+  });
+  // Accessibility: add concise aria-labels to app cards
+  document.querySelectorAll('.app-card').forEach(card => {
+    const titleEl = card.querySelector('.app-title');
+    if (titleEl) {
+      card.setAttribute('aria-label', 'Open ' + titleEl.textContent.trim());
+    }
+  });
+  // Accessibility: add aria-labels to language selector buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.setAttribute('aria-label', 'Select ' + btn.textContent.trim() + ' language');
+  });
   // Append ?lang=XX to all app links so language persists across pages
   document.querySelectorAll('.app-card').forEach(a => {
     a.addEventListener('click', (e) => {
@@ -75,4 +90,22 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+});
+
+// ─── Onboarding: Escape key to dismiss ──────────────────────────────
+function dismissOnboarding() {
+  const overlay = document.getElementById('onboarding-overlay');
+  if (overlay) {
+    overlay.remove();
+    completeOnboarding();
+  }
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const overlay = document.getElementById('onboarding-overlay');
+    if (overlay && overlay.querySelector('.onboarding-modal')) {
+      dismissOnboarding();
+      document.removeEventListener('keydown', dismissOnboarding);
+    }
+  }
 });

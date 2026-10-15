@@ -1,7 +1,7 @@
 // ─── Psychic101 Shared Utilities ──────────────────────────
 
 // ─── Version (update here on each release) ────────────────
-const APP_VERSION = '1.7.4';
+const APP_VERSION = '1.8.0';
 
 // ─── i18n ─────────────────────────────────────────────────
 // Detect once which storage mechanism actually works, then use it exclusively
@@ -2718,24 +2718,25 @@ function renderOnboarding() {
   const t = window.t || ((k) => k);
   container.innerHTML = `
     <div class="onboarding-modal">
+      <button class="onboard-close btn-sm" aria-label="Close onboarding">✕</button>
       <div class="onboarding-content">
-        <h2>${t('onboard-title') || '🔮 Welcome to Psychic101'}</h2>
+        <h2><span aria-hidden="true">${t('onboard-title') || '🔮 Welcome to Psychic101'}</span><span class="sr-only">Welcome to Psychic101</span></h2>
         <p>${t('onboard-desc') || 'Your journey into psychic exploration starts here. Here\'s how to get the most out of this experience:'}</p>
         <div class="onboard-steps">
           <div class="onboard-step">
-            <span class="step-icon">🎯</span>
+            <span class="step-icon" aria-hidden="true">🎯</span>
             <span>${t('onboard-step1') || 'Start with the apps that interest you most'}</span>
           </div>
           <div class="onboard-step">
-            <span class="step-icon">📅</span>
+            <span class="step-icon" aria-hidden="true">📅</span>
             <span>${t('onboard-step2') || 'Practice a little every day — consistency is key'}</span>
           </div>
           <div class="onboard-step">
-            <span class="step-icon">📖</span>
+            <span class="step-icon" aria-hidden="true">📖</span>
             <span>${t('onboard-step3') || 'Journal your experiences to track your growth'}</span>
           </div>
           <div class="onboard-step">
-            <span class="step-icon">🏆</span>
+            <span class="step-icon" aria-hidden="true">🏆</span>
             <span>${t('onboard-step4') || 'Earn badges and XP as you explore'}</span>
           </div>
         </div>
