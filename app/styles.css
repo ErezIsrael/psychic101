@@ -9,9 +9,28 @@
   --surface: #ffffff;
   --surface2: #f5f3fa;
   --surface1: #faf9fc;
-  --accent: #5b3ae8;
-  --accent2: #7e5bd8;
-  --accent-light: rgba(91, 58, 232, 0.08);
+
+  /* Vibrant multi-color palette - bold and playful */
+  --accent-purple: #a855f7;
+  --accent-purple-dark: #7c3aed;
+  --accent-pink: #f472b6;
+  --accent-pink-dark: #be185d;
+  --accent-blue: #60a5fa;
+  --accent-blue-dark: #2563eb;
+  --accent-orange: #fb923c;
+  --accent-orange-dark: #ea580c;
+  --accent-green: #4ade80;
+  --accent-green-dark: #16a085;
+  --accent-amber: #fbbf24;
+  --accent-amber-dark: #d97706;
+
+  --accent: var(--accent-purple);
+  --accent2: var(--accent-pink);
+  --accent3: var(--accent-blue);
+  --accent-light: rgba(168, 85, 247, 0.12);
+  --accent-light2: rgba(244, 114, 182, 0.12);
+  --accent-light3: rgba(96, 165, 250, 0.12);
+
   --text: #1e1b3a;
   --text-dim: #6b6890;
   --success: #22c55e;
@@ -19,11 +38,15 @@
   --danger: #ef4444;
   --border: #e5e2f0;
   --radius: 12px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
   --content-max: 100%;
   --pad-inline: 1rem;
   --shadow-sm: 0 1px 3px rgba(91, 58, 232, 0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 12px rgba(91, 58, 232, 0.08), 0 2px 4px rgba(0,0,0,0.04);
   --shadow-lg: 0 8px 24px rgba(91, 58, 232, 0.12), 0 4px 8px rgba(0,0,0,0.04);
+  --shadow-colorful: 0 8px 24px rgba(168, 85, 247, 0.3), 0 4px 8px rgba(0,0,0,0.04);
+  --shadow-glow: 0 0 20px rgba(168, 85, 247, 0.4);
 }
 
 /* ─── Visually Hidden ─────────────────────────────────── */
@@ -85,7 +108,7 @@ html {
 
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: linear-gradient(180deg, #eae8f5 0%, var(--bg) 30%);
+  background: linear-gradient(180deg, #e9e6f2 0%, #f0eef6 40%, #f5f3fa 100%);
   color: var(--text);
   min-height: 100vh;
   min-height: -webkit-fill-available;
@@ -94,10 +117,175 @@ body {
   flex-direction: column;
   align-items: center;
   line-height: 1.5;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* ─── Animated Background Blobs ──────────────────────── */
+.bg-blob {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(168, 85, 247, 0.15);
+  filter: blur(80px);
+  border-radius: 50%;
+  z-index: -1;
+  animation: float-bg 10s ease-in-out infinite;
+}
+
+.bg-blob.pink { background: rgba(244, 114, 182, 0.15); animation-delay: 2s; }
+.bg-blob.blue { background: rgba(96, 165, 250, 0.15); animation-delay: 4s; }
+.bg-blob.orange { background: rgba(251, 146, 60, 0.15); animation-delay: 6s; }
+
+@keyframes float-bg {
+  0%, 100% { transform: translate(0, 0); }
+  33% { transform: translate(50px, -50px); }
+  66% { transform: translate(-50px, 50px); }
+}
+
+/* ─── Confetti Container ────────────────────────────── */
+.confetti {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ─── Gradient Text & Backgrounds ───────────────────── */
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* All images/videos constrained */
 img, video, canvas { max-width: 100%; height: auto; }
+
+/* ─── Gradient Text & Backgrounds ───────────────────── */
+.text-gradient {
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--accent3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-pink {
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-light2), var(--accent-light3));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-bg::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+  animation: pulse-bg 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-bg {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+  50% { transform: translate(10px, 10px) scale(1.1); opacity: 0.8; }
+}
+
+/* ─── Animations ─────────────────────────────────────── */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes bounce-high {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.entrance {
+  animation: fade-in-up 0.7s ease-out forwards;
+}
+
+.entrance-delay-1 { animation-delay: 0.1s; }
+.entrance-delay-2 { animation-delay: 0.2s; }
+.entrance-delay-3 { animation-delay: 0.3s; }
+.entrance-delay-4 { animation-delay: 0.4s; }
+.entrance-delay-5 { animation-delay: 0.5s; }
+.entrance-delay-6 { animation-delay: 0.6s; }
+
+.float-animate {
+  animation: float 4s ease-in-out infinite;
+}
+
+.float-animate-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s linear infinite;
+}
+
+/* ─── Glow Effects ───────────────────────────────────── */
+.glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.glow-btn {
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s;
+}
+
+@media (hover: hover) {
+  .glow-btn:hover {
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+    transform: translateY(-2px);
+  }
+}
 
 /* ─── Header ───────────────────────────────────────────── */
 header {
@@ -131,21 +319,26 @@ header h1 span {
 
 /* ─── Navigation Button (≥48×48px tap target) ─────────── */
 .nav-btn {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border: none;
+  color: #fff;
   padding: 0.5rem 1rem;
   min-height: 3rem;
   min-width: 3rem;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.85rem;
+  font-weight: 600;
   transition: all 0.2s;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-glow);
+}
+
+.nav-btn:active {
+  transform: scale(0.95);
 }
 
 @media (hover: hover) {
-  .nav-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .nav-btn:hover { box-shadow: 0 0 30px rgba(168, 85, 247, 0.6); transform: translateY(-1px); }
 }
 
 /* ─── About Link (lightweight, no box) ─────────────────── */
@@ -161,11 +354,13 @@ header h1 span {
   color: var(--text-dim);
   text-decoration: none;
   padding: 0.25rem 0.5rem;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  display: inline-block;
+  border-radius: 4px;
 }
 
 @media (hover: hover) {
-  .about-link:hover { color: var(--accent2); }
+  .about-link:hover { color: var(--accent2); transform: translateY(-1px); background: var(--accent-light); }
 }
 
 /* ─── Language Selector ────────────────────────────────── */
@@ -559,17 +754,44 @@ label {
 
 /* ─── Progress Bar ─────────────────────────────────────── */
 .progress-bar {
-  height: 4px;
+  height: 6px;
   background: var(--border);
-  border-radius: 2px;
+  border-radius: 3px;
   margin-bottom: 1.5rem;
   overflow: hidden;
+  position: relative;
+}
+
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-light), var(--accent-light2), var(--accent-light3));
+  opacity: 0.3;
 }
 
 .progress-bar .fill {
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
   transition: width 0.3s;
+  border-radius: 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.progress-bar .fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  border-radius: 3px;
+  animation: shimmer 2s linear infinite;
 }
 
 /* ─── Stats Grid (2-col on mobile) ─────────────────────── */
@@ -718,40 +940,59 @@ label {
 .app-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-xl);
   padding: 1.25rem;
-  transition: all 0.25s;
+  transition: all 0.3s;
   text-decoration: none;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  min-height: 3rem;
+  min-height: 3.5rem;
   box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
 }
 
 @media (hover: hover) {
   .app-card:hover {
     border-color: var(--accent);
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: var(--shadow-colorful);
   }
 }
 
+.app-card:hover .app-icon {
+  transform: scale(1.2) rotate(-5deg);
+  transition: transform 0.3s;
+}
+
 .app-card .app-icon {
-  font-size: 2rem;
+  font-size: 2.25rem;
   margin-bottom: 0.25rem;
+  display: block;
 }
 
 .app-card .app-title {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+  font-weight: 700;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .app-card .app-desc {
   font-size: 0.85rem;
   color: var(--text-dim);
-  line-height: 1.5;
+  line-height: 1.6;
   flex: 1;
 }
 
@@ -760,36 +1001,130 @@ label {
   color: var(--accent);
   font-weight: 600;
   margin-top: 0.25rem;
+  transition: color 0.2s;
+}
+
+.app-card .app-link:hover {
+  color: var(--accent2);
+}
+
+/* Individual card color themes - vibrant */
+.app-card.purple::before { background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-dark)); }
+.app-card.purple .app-link { color: var(--accent-purple); font-weight: 700; }
+.app-card.purple .app-link:hover { color: var(--accent-purple-dark); }
+.app-card.purple:hover { box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+
+.app-card.pink::before { background: linear-gradient(90deg, var(--accent-pink), var(--accent-pink-dark)); }
+.app-card.pink .app-link { color: var(--accent-pink); font-weight: 700; }
+.app-card.pink .app-link:hover { color: var(--accent-pink-dark); }
+.app-card.pink:hover { box-shadow: 0 0 20px rgba(244, 114, 182, 0.4); }
+
+.app-card.blue::before { background: linear-gradient(90deg, var(--accent-blue), var(--accent-blue-dark)); }
+.app-card.blue .app-link { color: var(--accent-blue); font-weight: 700; }
+.app-card.blue .app-link:hover { color: var(--accent-blue-dark); }
+.app-card.blue:hover { box-shadow: 0 0 20px rgba(96, 165, 250, 0.4); }
+
+.app-card.orange::before { background: linear-gradient(90deg, var(--accent-orange), var(--accent-orange-dark)); }
+.app-card.orange .app-link { color: var(--accent-orange); font-weight: 700; }
+.app-card.orange .app-link:hover { color: var(--accent-orange-dark); }
+.app-card.orange:hover { box-shadow: 0 0 20px rgba(251, 146, 60, 0.4); }
+
+.app-card.green::before { background: linear-gradient(90deg, var(--accent-green), var(--accent-green-dark)); }
+.app-card.green .app-link { color: var(--accent-green); font-weight: 700; }
+.app-card.green .app-link:hover { color: var(--accent-green-dark); }
+.app-card.green:hover { box-shadow: 0 0 20px rgba(74, 222, 128, 0.4); }
+
+.app-card.amber::before { background: linear-gradient(90deg, var(--accent-amber), var(--accent-amber-dark)); }
+.app-card.amber .app-link { color: var(--accent-amber); font-weight: 700; }
+.app-card.amber .app-link:hover { color: var(--accent-amber-dark); }
+.app-card.amber:hover { box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
+
+.hero-badge {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  animation: bounce 2s ease-in-out infinite;
 }
 
 .hero {
   text-align: center;
-  padding: 2rem 0 1.5rem;
+  padding: 4rem 0 3rem;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(244, 114, 182, 0.15), rgba(96, 165, 250, 0.15));
+  z-index: -1;
+  border-radius: var(--radius-2xl);
+  margin: 1rem;
 }
 
 .hero h2 {
-  font-size: 1.35rem;
+  font-size: 2.5rem;
   color: var(--accent);
   margin-bottom: 0.5rem;
-  font-weight: 800;
+  font-weight: 900;
+  letter-spacing: -1px;
+  position: relative;
+  z-index: 1;
+  line-height: 1.1;
 }
 
 .hero p {
   color: var(--text-dim);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
   max-width: 30rem;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.8;
+  position: relative;
+  z-index: 1;
 }
 
 .section-title {
-  font-size: 1rem;
+  font-size: 1.25rem;
   color: var(--text);
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--accent);
-  font-weight: 700;
+  border-bottom: 3px solid var(--accent);
+  font-weight: 800;
+  position: relative;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+}
+
+.section-title.entrance {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.app-grid.entrance > .app-card {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.app-grid.entrance > .app-card:nth-child(1) { animation-delay: 0.1s; }
+.app-grid.entrance > .app-card:nth-child(2) { animation-delay: 0.2s; }
+.app-grid.entrance > .app-card:nth-child(3) { animation-delay: 0.3s; }
+.app-grid.entrance > .app-card:nth-child(4) { animation-delay: 0.4s; }
+.app-grid.entrance > .app-card:nth-child(5) { animation-delay: 0.5s; }
+.app-grid.entrance > .app-card:nth-child(6) { animation-delay: 0.6s; }
+.app-grid.entrance > .app-card:nth-child(7) { animation-delay: 0.7s; }
+.app-grid.entrance > .app-card:nth-child(8) { animation-delay: 0.8s; }
+
 
 /* ═══════════════════════════════════════════════════════════
    TABLET — ≥600px

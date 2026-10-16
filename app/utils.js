@@ -72,6 +72,15 @@ const TRANSLATIONS = {
     'rating': 'Rating',
     'duration': 'Duration',
     'accuracy': 'Accuracy',
+    'score': 'Score',
+    'session-score': 'Session Score',
+    'total-score': 'Total Score',
+    'points': 'Points',
+    'excellent': 'Excellent',
+    'great': 'Great',
+    'good': 'Good',
+    'fair': 'Fair',
+    'needs-practice': 'Needs Practice',
     'sessions': 'Sessions',
     'total': 'Total',
     'correct': 'Correct',
@@ -82,6 +91,7 @@ const TRANSLATIONS = {
     'same-suit': 'Same Suit',
     'same-color': 'Same Color',
     'miss': 'Miss',
+    'all-miss': 'All misses',
     'day-streak': 'Day Streak',
     'avg-rating': 'Avg Rating',
     'total-trials': 'Total Trials',
@@ -152,6 +162,9 @@ const TRANSLATIONS = {
     'above-chance': '👍 Above chance — Good work!',
     'near-chance': '👁 Near chance — Keep practicing!',
     'below-chance': '📉 Below chance — Don\'t be discouraged.',
+    'zener-correct': 'Correct',
+    'zener-total': 'Total',
+    'zener-all-miss': 'No correct guesses',
     // Card
     'card-title': '🃏 Card Guessing',
     'card-subtitle': '— ESP Trainer',
@@ -288,6 +301,10 @@ const TRANSLATIONS = {
     'dice-dice-showed': 'The dice showed:',
     'dice-roll-again': '🎲 Roll Again',
     'dice-history-title': '📊 Roll History',
+    'dice-hit-message': '🎯 Hit!',
+    'dice-miss-message': '🎲 Miss',
+    'dice-correct-bonus': '+10 points',
+    'dice-miss-penalty': '+1 point',
     // ── Color Sense ──
     'color-title': 'Color Sense',
     'color-desc': 'A color flashes briefly — can your inner eye see it?',
@@ -922,6 +939,15 @@ const TRANSLATIONS = {
     'rating': 'דירוג',
     'duration': 'משך',
     'accuracy': 'דיוק',
+    'score': 'ציון',
+    'session-score': 'ציון פגישה',
+    'total-score': 'ציון כולל',
+    'points': 'נקודות',
+    'excellent': 'מצוין',
+    'great': 'נהדר',
+    'good': 'טוב',
+    'fair': 'סביר',
+    'needs-practice': 'דרוש תרגול',
     'sessions': 'סשנים',
     'total': 'סה״כ',
     'correct': 'נכון',
@@ -932,6 +958,7 @@ const TRANSLATIONS = {
     'same-suit': 'אותו סמל',
     'same-color': 'אותו צבע',
     'miss': 'פספס',
+    'all-miss': 'כל הפיסח',
     'day-streak': 'רצף ימים',
     'avg-rating': 'דירוג ממוצע',
     'total-trials': 'סה״כ ניסיונות',
@@ -951,6 +978,14 @@ const TRANSLATIONS = {
     'session-history': '📊 היסטוריית סשנים',
     'card-history': '📊 היסטוריית ניחוש קלפים',
     'zener-history': '📊 היסטוריית זנר',
+    'zener-correct': 'נכון',
+    'zener-total': 'סה״כ',
+    'zener-all-miss': 'אין ניחושים נכונים',
+    'dice-hit-message': '🎯 פגע!',
+    'dice-miss-message': '🎲 פספס',
+    'dice-correct-bonus': '+10 נקודות',
+    'dice-miss-penalty': '+1 נקודה',
+    'all-miss': 'כל הפיסח',
     'daily-exercises': 'תרגילים יומיים',
     'training-log': 'יומן אימון',
     'score-breakdown': 'פירוט ציונים',
@@ -2699,6 +2734,43 @@ function getWeeklyReport() {
   const weekSessions = Object.values(profile).reduce((s, a) => s + (a.lastSession && a.lastSession >= weekAgo ? 1 : 0), 0);
 
   return { weekXp, totalSessions, weekSessions, streak, level, badgesCount: badges.length, totalBadges: BADGES.length };
+}
+
+// ─── Session Scoring ────────────────────────────────────────
+// Calculate a numerical score for a session based on trial results
+function calculateSessionScore(trials, appType, sessionStreak = 0) {
+  if (!trials || !trials.length) return 0;
+
+  const total = trials.length;
+  // For card-guess: correct = 'exact' result; for dice/zener: correct = true boolean
+  const correct = trials.filter(t => t.correct === true || t.result === 'exact').length;
+  const accuracy = (correct / total) * 100;
+
+  // Base points: 1 per trial
+  let score = total;
+
+  // Correct hit: +9 per correct (total 10 per correct including base)
+  score += correct * 9;
+
+  // Additional points for same-suit/same-color in card-guess
+  if (appType === 'card-guess') {
+    const sameSuit = trials.filter(t => t.result === 'same-suit').length;
+    const sameColor = trials.filter(t => t.result === 'same-color').length;
+    score += sameSuit * 3;
+    score += sameColor * 2;
+  }
+
+  // Over-chance bonus: +20 if accuracy exceeds chance by 5%+
+  const chanceRate = appType === 'zener' ? 20 : appType === 'card-guess' ? 25 : 17;
+  if (accuracy > chanceRate + 5) score += 20;
+
+  // Perfect session bonus
+  if (correct === total && total > 0) score += 50;
+
+  // Streak bonus
+  score += sessionStreak * 2;
+
+  return score;
 }
 
 // ─── Onboarding / Welcome Flow ────────────────────────────

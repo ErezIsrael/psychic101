@@ -148,6 +148,19 @@
   .history-item .target-sym { font-size: 1.25rem; flex-shrink: 0; }
   .history-item .guess-sym { font-size: 1.25rem; flex-shrink: 0; }
   .history-item .match { flex-shrink: 0; }
+
+  .score-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .score-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-left: 0.5rem;
+  }
 </style>
 </head>
 <body>
@@ -273,6 +286,12 @@
       <button class="btn btn-primary" id="save-session-btn" onclick="saveSession()" style="display:none" data-i18n="save-session">💾 Save Session</button>
       <button class="btn btn-secondary" id="share-btn" data-share-btn onclick="shareZenerScore()" style="display:none" data-i18n="share-score">📣 Share Score</button>
     </div>
+
+    <div class="score-card" style="margin-top:1.5rem;text-align:center;padding:1rem;background:var(--accent-light);border-radius:8px;display:none" id="score-card">
+      <div style="font-size:2.5rem;font-weight:800;color:var(--accent)" id="result-score"></div>
+      <div style="font-size:0.9rem;color:var(--text-dim)" data-i18n="score">Points</div>
+      <div style="font-size:0.8rem;color:var(--text-dim)" id="result-score-breakdown"></div>
+    </div>  
   </div>
 
   <!-- HISTORY SCREEN -->
@@ -533,12 +552,16 @@ function computeChiSquare(trials) {
 // ─── Save Session ─────────────────────────────────────────
 function saveSession() {
   const history = loadHistory() || [];
+  const correctCount = sessionTrials.filter(t => t.correct).length;
+  const sessionScore = calculateSessionScore(sessionTrials, 'zener', 0);
+
   const session = {
     timestamp: Date.now(),
     size: sessionSize,
     trials: sessionTrials,
-    correct: sessionTrials.filter(t => t.correct).length,
-    accuracy: (sessionTrials.filter(t => t.correct).length / sessionTrials.length * 100).toFixed(1),
+    correct: correctCount,
+    accuracy: (correctCount / sessionTrials.length * 100).toFixed(1),
+    score: sessionScore,
     notes: document.getElementById('result-notes').value
   };
   history.unshift(session);
@@ -551,6 +574,12 @@ function saveSession() {
   markAppTried('zener');
   clearSessionState();
   sessionActive = false;
+  // Show score on result screen
+  document.getElementById('result-score').textContent = sessionScore;
+  const pct = (correctCount / sessionTrials.length * 100).toFixed(1);
+  const breakdown = correctCount > 0 ? t('zener-correct') + ': ' + correctCount + ' (' + pct + '%) ' + t('zener-total') + ': ' + sessionTrials.length : t('zener-all-miss') || 'No correct guesses';
+  document.getElementById('result-score-breakdown').textContent = breakdown;
+  document.getElementById('score-card').style.display = 'block';
   showScreen('welcome');
 }
 
@@ -597,10 +626,12 @@ function renderHistory() {
     list.innerHTML = history.map((s, i) => {
       const pct = s.accuracy + '%';
       const rc = parseFloat(s.accuracy) >= 25 ? 'tag-green' : parseFloat(s.accuracy) >= 20 ? 'tag-yellow' : 'tag-red';
+      const scoreDisplay = s.score ? '<span class="score-badge">+' + s.score + ' pts</span>' : '';
       return `<div class="history-item" onclick="viewSession(${i})">
         <span class="trial-num">#${i+1}</span>
         <span style="flex:1">${s.trials.length} ${t('trials')} — ${s.correct} ${t('correct')}</span>
         <span class="tag ${rc}">${pct}</span>
+        ${scoreDisplay}
         <span style="font-size:0.7rem;color:var(--text-dim)">${formatDate(s.timestamp)}</span>
       </div>`;
     }).join('');
@@ -621,6 +652,9 @@ function viewSession(index) {
   let html = `<h3>Session #${index + 1}</h3>`;
   html += `<p><strong>${t('date')}:</strong> ${formatDate(s.timestamp)}</p>`;
   html += `<p><strong>${t('trials')}:</strong> ${s.trials.length} | <strong>${t('correct')}:</strong> ${s.correct} | <strong>${t('accuracy')}:</strong> ${s.accuracy}%</p>`;
+  if (s.score !== undefined) {
+    html += `<p><strong>${t('score')}: ${s.score}</strong> ${t('points')}</p>`;
+  } 
 
   html += '<div style="margin-top:0.75rem;max-height:300px;overflow-y:auto">';
   s.trials.forEach((t, i) => {

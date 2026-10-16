@@ -214,6 +214,19 @@
   .history-item .info .guess-text { font-size: 0.85rem; color: var(--text); }
   .history-item .info .date-text { font-size: 0.7rem; color: var(--text-dim); }
   .history-item .result-tag { flex-shrink: 0; }
+
+  .score-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+  .score-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-left: 0.5rem;
+  }
 </style>
 </head>
 <body>
@@ -364,6 +377,12 @@
       <button class="btn btn-secondary" id="share-btn" data-share-btn onclick="shareCardScore()" style="display:none" data-i18n="share-score">📣 Share Score</button>
       <button class="btn btn-secondary" onclick="showScreen('welcome')" data-i18n="back">← Back</button>
     </div>
+
+    <div class="score-card" style="margin-top:1.5rem;text-align:center;padding:1rem;background:var(--accent-light);border-radius:8px;display:none" id="score-card">
+      <div style="font-size:2.5rem;font-weight:800;color:var(--accent)" id="result-score"></div>
+      <div style="font-size:0.9rem;color:var(--text-dim)" data-i18n="score">Points</div>
+      <div style="font-size:0.8rem;color:var(--text-dim)" id="result-score-breakdown"></div>
+    </div>  
   </div>
 
   <!-- HISTORY SCREEN -->
@@ -593,6 +612,15 @@ function updateLiveStats() {
 
 function saveSession() {
   const notes = document.getElementById('result-notes').value;
+  const exact = sessionCount('exact');
+  const total = sessionTrials.length;
+  const sameSuit = sessionCount('same-suit');
+  const sameColor = sessionCount('same-color');
+  const miss = sessionCount('miss');
+
+  // Calculate session score
+  const sessionScore = calculateSessionScore(sessionTrials, 'card-guess', 0);
+
   const history = loadHistory();
   for (let i = sessionTrials.length - 1; i >= 0; i--) {
     const tr = sessionTrials[i];
@@ -606,10 +634,12 @@ function saveSession() {
       notes: i === 0 ? notes : ''
     });
   }
+  // Save score with last entry
+  history[0].score = sessionScore;
   saveHistory(history);
   updateStreak();
-  addXp(10 + sessionCount('exact') * 5, 'card-guess');
-  if (sessionCount('exact') >= 1) spawnConfetti(80);
+  addXp(10 + exact * 5, 'card-guess');
+  if (exact >= 1) spawnConfetti(80);
   checkAppBadge('card-guess', history.length);
   markAppTried('card-guess');
   clearSessionState();
@@ -621,7 +651,12 @@ function saveSession() {
   document.getElementById('next-card-btn').style.display = 'block';
   document.getElementById('save-session-btn').style.display = 'none';
   document.getElementById('chi-indicator').style.display = 'none';
-  if (hadTrials) { showScreen('welcome'); }
+  // Show score on result screen
+  document.getElementById('result-score').textContent = sessionScore;
+  const breakdown = exact > 0 ? t('exact') + ':' + exact + ' ' + t('same-suit') + ':' + sameSuit + ' ' + t('same-color') + ':' + sameColor + ' ' + t('miss') + ':' + miss : t('all-miss') || 'All misses';
+  document.getElementById('result-score-breakdown').textContent = breakdown;
+  document.getElementById('score-card').style.display = 'block';
+  if (hadTrials) { showScreen('welcome'); }  
 }
 
 // ─── Share ────────────────────────────────────────────────
@@ -645,6 +680,7 @@ function renderHistory() {
       const color = SUIT_COLORS[suit] || 'black';
       const rc = h.result === 'exact' ? 'tag-green' : h.result === 'same-suit' ? 'tag-yellow' : h.result === 'same-color' ? 'tag-yellow' : 'tag-red';
       const labels = { exact: t('exact'), 'same-suit': t('same-suit'), 'same-color': t('same-color'), miss: t('miss') };
+      const scoreDisplay = h.score ? '<span class="score-badge">+' + h.score + ' pts</span>' : '';
       return `<div class="history-item" onclick="viewRound(${i})">
         <div class="mini-card ${color}">${h.card}</div>
         <div class="info">
@@ -652,7 +688,8 @@ function renderHistory() {
           <div class="date-text">${formatDate(h.timestamp)}</div>
         </div>
         <div class="result-tag"><span class="tag ${rc}">${labels[h.result]}</span></div>
-      </div>`;
+        ${scoreDisplay}
+      </div>`; 
     }).join('');
   }
 
